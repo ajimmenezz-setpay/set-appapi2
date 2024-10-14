@@ -1,0 +1,84 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "APP SET V2",
+        "description": "APP SET V2 Documentation",
+        "contact": {
+            "email": "alonso@setpay.mx"
+        },
+        "version": "2.0.0"
+    },
+    "paths": {
+        "/api/commission/pay": {
+            "post": {
+                "tags": [
+                    "Commissions"
+                ],
+                "summary": "Paga las comisiones de una cuenta",
+                "description": "Paga las comisiones de una cuenta",
+                "operationId": "payCommission",
+                "requestBody": {
+                    "description": "Datos de la cuenta",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "account"
+                                ],
+                                "properties": {
+                                    "account": {
+                                        "type": "string",
+                                        "format": "string",
+                                        "example": "123456789012345678"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Pago de comisión enviado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Se ha enviado la orden de pago de comisión correctamente. Por favor espere la confirmación de STP."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al pagar la comisión",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error al pagar la comisión. Por favor intente más tarde."
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Commissions",
+            "description": "Commissions"
+        }
+    ]
+}
