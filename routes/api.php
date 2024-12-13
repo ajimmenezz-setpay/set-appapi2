@@ -7,4 +7,10 @@ Route::middleware([VerifyJwt::class])->group(function () {
     Route::group(['prefix' => 'commission'], function () {
         Route::post('pay', [App\Http\Controllers\Stp\Commissions::class, 'payCommission']);
     });
+
+    Route::group(['prefix' => 'reports'], function () {
+        Route::group(['prefix' => 'card-cloud'], function () {
+            Route::get('daily-consume', [App\Http\Controllers\Report\CardCloud\DailyConsume::class, 'index']);
+        });
+    });
 });

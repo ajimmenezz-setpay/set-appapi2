@@ -9,6 +9,112 @@
         "version": "2.0.0"
     },
     "paths": {
+        "/api/reports/card-cloud/daily-consume": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Get daily consume from card cloud",
+                "description": "Get daily consume from card cloud",
+                "operationId": "dailyConsume",
+                "parameters": [
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "description": "Date to get the daily consume",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "Y-m-d"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Daily consume from card cloud",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "total_amount": {
+                                            "type": "number",
+                                            "example": "1000.00"
+                                        },
+                                        "request_date": {
+                                            "type": "string",
+                                            "format": "Y-m-d",
+                                            "example": "2025-01-01"
+                                        },
+                                        "movements": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "enviroment": {
+                                                        "type": "string",
+                                                        "example": "SET"
+                                                    },
+                                                    "company": {
+                                                        "type": "string",
+                                                        "example": "Company Name"
+                                                    },
+                                                    "client_id": {
+                                                        "type": "string",
+                                                        "example": "SP0000001"
+                                                    },
+                                                    "masked_pan": {
+                                                        "type": "string",
+                                                        "example": "516152XXXXXX2992"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "example": "Purchase"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Purchase description"
+                                                    },
+                                                    "amount": {
+                                                        "type": "number",
+                                                        "example": "100.00"
+                                                    },
+                                                    "authorization_code": {
+                                                        "type": "string",
+                                                        "example": "123456"
+                                                    },
+                                                    "date": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-01-01 00:00:00"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error getting daily consume from card cloud",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error getting daily consume from card cloud"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/commission/pay": {
             "post": {
                 "tags": [
@@ -76,6 +182,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Reports",
+            "description": "Reports"
+        },
         {
             "name": "Commissions",
             "description": "Commissions"

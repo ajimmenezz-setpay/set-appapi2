@@ -30,7 +30,7 @@ class VerifyJwt
 
             $request->attributes->add(['jwt' => $decoded]);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Invalid token' . $e->getMessage()], 401);
+            return response()->json(['error' => 'Invalid token. ' . $e->getMessage()], 401);
         }
 
 
