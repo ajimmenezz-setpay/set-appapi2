@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Report\CardCloud;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Users\Validate;
 use App\Http\Services\CardCloudApi;
+use App\Models\Backoffice\Companies\CompanyProjection;
 use App\Models\Backoffice\Users\CompaniesAndUsers;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class DailyConsume extends Controller
@@ -19,7 +21,7 @@ class DailyConsume extends Controller
      *  description="Get daily consume from card cloud",
      *  operationId="dailyConsume",
      *  security={{"bearerAuth":{}}},
-     * 
+     *
      *  @OA\Parameter(
      *      name="date",
      *      in="query",
@@ -30,7 +32,7 @@ class DailyConsume extends Controller
      *          format="Y-m-d"
      *      )
      *  ),
-     * 
+     *
      *  @OA\Response(
      *      response=200,
      *      description="Daily consume from card cloud",
@@ -50,13 +52,13 @@ class DailyConsume extends Controller
      *          )),
      *      ),
      *  ),
-     * 
+     *
      *  @OA\Response(
-    *      response=400,
-    *          description="Error getting daily consume from card cloud",
-    *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="Error getting daily consume from card cloud"))
-    *      )
-    *  )
+     *      response=400,
+     *          description="Error getting daily consume from card cloud",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="Error getting daily consume from card cloud"))
+     *      )
+     *  )
      */
 
     public function index(Request $request)
@@ -69,13 +71,20 @@ class DailyConsume extends Controller
         ]);
 
         try {
-            Validate::userProfile(7, $request->attributes->get('jwt')->profileId);
+            Validate::userProfile([7, 9], $request->attributes->get('jwt')->profileId);
         } catch (\Exception $e) {
             return response($e->getMessage(), 400);
         }
 
-
-        $companies = CompaniesAndUsers::where('UserId', $request->attributes->get('jwt')->id)->get();
+        if ($request->attributes->get('jwt')->profileId == 7) {
+            $companies = CompaniesAndUsers::where('UserId', $request->attributes->get('jwt')->id)->get();
+        } else {
+            $user = User::where('Id', $request->attributes->get('jwt')->id)->first();
+            $companies = CompanyProjection::where('BusinessId', $user->BusinessId)
+            ->where('Active', 1)
+            ->select('Id as CompanyId')
+            ->get();
+        }
 
         if ($companies->count() == 0) {
             return response('User does not have any companies associated', 400);
