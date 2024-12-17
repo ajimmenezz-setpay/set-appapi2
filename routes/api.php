@@ -13,4 +13,10 @@ Route::middleware([VerifyJwt::class])->group(function () {
             Route::get('daily-consume', [App\Http\Controllers\Report\CardCloud\DailyConsume::class, 'index']);
         });
     });
+
+    Route::group(['prefix' => 'cardCloud'], function () {
+        Route::group(['prefix' => 'card'], function () {
+            Route::post('/{cardId}/nip', [App\Http\Controllers\CardCloud\CardManagementController::class, 'updateNip']);
+        });
+    });
 });

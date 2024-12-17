@@ -9,6 +9,92 @@
         "version": "2.0.0"
     },
     "paths": {
+        "/api/cardCloud/card/{cardId}/nip": {
+            "post": {
+                "tags": [
+                    "Card Cloud"
+                ],
+                "summary": "Update NIP from card",
+                "description": "Update NIP from card",
+                "operationId": "updateNip",
+                "parameters": [
+                    {
+                        "name": "cardId",
+                        "in": "path",
+                        "description": "Card ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "old_nip": {
+                                        "type": "string",
+                                        "example": "1234"
+                                    },
+                                    "new_nip": {
+                                        "type": "string",
+                                        "example": "4321"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "NIP updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "NIP updated successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error updating NIP",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error updating NIP"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/reports/card-cloud/daily-consume": {
             "get": {
                 "tags": [
@@ -182,6 +268,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Card Cloud",
+            "description": "Card Cloud"
+        },
         {
             "name": "Reports",
             "description": "Reports"
