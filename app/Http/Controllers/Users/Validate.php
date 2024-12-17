@@ -11,7 +11,7 @@ class Validate extends Controller
 
     public static function userProfile($profileId, $userProfileId)
     {
-        if(!in_array($profileId, $userProfileId)) {
+        if(!in_array($userProfileId, $profileId)) {
             Throw new \Exception('User not allowed to access this resource');
         }
     }
