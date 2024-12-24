@@ -19,4 +19,8 @@ Route::middleware([VerifyJwt::class])->group(function () {
             Route::post('/{cardId}/nip', [App\Http\Controllers\CardCloud\CardManagementController::class, 'updateNip']);
         });
     });
+
+    Route::group(['prefix' => 'ticket'], function () {
+        Route::post('/', [App\Http\Controllers\Ticket\ClickupTicket::class, 'create']);
+    });
 });
