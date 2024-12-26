@@ -22,5 +22,13 @@ Route::middleware([VerifyJwt::class])->group(function () {
 
     Route::group(['prefix' => 'ticket'], function () {
         Route::post('/', [App\Http\Controllers\Ticket\ClickupTicket::class, 'create']);
+        Route::get('/', [App\Http\Controllers\Ticket\ClickupTicket::class, 'index']);
+        Route::get('/{id}', [App\Http\Controllers\Ticket\ClickupTicket::class, 'show']);
+    });
+});
+
+Route::group(['prefix' => 'clickup'], function () {
+    Route::group(['prefix' => 'webhook'], function () {
+        Route::post('task', [App\Http\Controllers\Clickup\Webhook::class, 'updateTask']);
     });
 });

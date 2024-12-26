@@ -265,6 +265,403 @@
                     }
                 ]
             }
+        },
+        "/api/ticket": {
+            "get": {
+                "tags": [
+                    "Ticket"
+                ],
+                "summary": "Obtiene los tickets del usuario",
+                "description": "Obtiene los tickets del usuario",
+                "operationId": "getTickets",
+                "responses": {
+                    "200": {
+                        "description": "Tickets obtenidos exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "TICKET-00001"
+                                        },
+                                        "description": {
+                                            "type": "string",
+                                            "example": "Descripción del ticket"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "Abierto"
+                                        },
+                                        "status_color": {
+                                            "type": "string",
+                                            "example": "#3d3d3d"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "example": "2021-09-01 12:00:00"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "example": "2021-09-01 12:00:00"
+                                        },
+                                        "movement_id": {
+                                            "type": "string",
+                                            "example": "UUID del movimiento"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al obtener los tickets",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No hemos podido obtener los tickets. Por favor intente más tarde"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No autorizado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Ticket"
+                ],
+                "summary": "Crea un ticket en Clickup",
+                "description": "Crea un ticket en Clickup",
+                "operationId": "createTicket",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "description"
+                                ],
+                                "properties": {
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Descripción del ticket"
+                                    },
+                                    "movement_id": {
+                                        "type": "string",
+                                        "example": "UUID del movimiento"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Ticket creado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "TICKET-00001"
+                                        },
+                                        "description": {
+                                            "type": "string",
+                                            "example": "Descripción del ticket"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "Abierto"
+                                        },
+                                        "status_color": {
+                                            "type": "string",
+                                            "example": "#3d3d3d"
+                                        },
+                                        "movement_id": {
+                                            "type": "string",
+                                            "example": "UUID del movimiento"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "example": "2021-09-01 12:00:00"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "example": "2021-09-01 12:00:00"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al crear el ticket",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al crear el ticket"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No autorizado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Al parecer este ambiente no tiene habilitado el seguimiento de Tickets. Por favor contacte al administrador",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Al parecer este ambiente no tiene habilitado el seguimiento de Tickets. Por favor contacte al administrador"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "El ID de movimiento es requerido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "El ID de movimiento es requerido"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/ticket/{id}": {
+            "get": {
+                "tags": [
+                    "Ticket"
+                ],
+                "summary": "Obtiene la información de un ticket",
+                "description": "Obtiene la información de un ticket",
+                "operationId": "getTicket",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del ticket",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ticket obtenido exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "TICKET-00001"
+                                        },
+                                        "description": {
+                                            "type": "string",
+                                            "example": "Descripción del ticket"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "Abierto"
+                                        },
+                                        "status_color": {
+                                            "type": "string",
+                                            "example": "#3d3d3d"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "example": "2021-09-01 12:00:00"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "example": "2021-09-01 12:00:00"
+                                        },
+                                        "movement": {
+                                            "properties": {
+                                                "movement_id": {
+                                                    "type": "string",
+                                                    "example": "UUID del movimiento"
+                                                },
+                                                "date": {
+                                                    "type": "integer",
+                                                    "example": 1732808475
+                                                },
+                                                "type": {
+                                                    "type": "string",
+                                                    "example": "PURCHASE"
+                                                },
+                                                "amount": {
+                                                    "type": "string",
+                                                    "example": "-65.00"
+                                                },
+                                                "balance": {
+                                                    "type": "string",
+                                                    "example": "41391.41"
+                                                },
+                                                "authorization_code": {
+                                                    "type": "string",
+                                                    "example": "832993"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "MERCADOPAGO *2PRODUCT  Ciudad de Mex MEX"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "Approved"
+                                                },
+                                                "client_id": {
+                                                    "type": "string",
+                                                    "example": "SP0001275"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al obtener la información del ticket",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No hemos podido obtener la información del ticket. Por favor intente más tarde"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No autorizado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Ticket no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Ticket no encontrado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "tags": [
@@ -279,6 +676,10 @@
         {
             "name": "Commissions",
             "description": "Commissions"
+        },
+        {
+            "name": "Ticket",
+            "description": "Ticket"
         }
     ]
 }
