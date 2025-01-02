@@ -11,6 +11,7 @@ Route::middleware([VerifyJwt::class])->group(function () {
     Route::group(['prefix' => 'reports'], function () {
         Route::group(['prefix' => 'card-cloud'], function () {
             Route::get('daily-consume', [App\Http\Controllers\Report\CardCloud\DailyConsume::class, 'index']);
+            Route::get('card-status', [App\Http\Controllers\Report\CardCloud\CardStatus::class, 'index']);
         });
     });
 

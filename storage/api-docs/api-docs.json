@@ -95,6 +95,74 @@
                 ]
             }
         },
+        "/api/reports/card-cloud/card-status": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Get card status and balance from card cloud",
+                "description": "Get card status and balance from card cloud",
+                "operationId": "cardStatus",
+                "responses": {
+                    "200": {
+                        "description": "Card status and balance from card cloud",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "enviroment": {
+                                            "type": "string",
+                                            "example": "GBS"
+                                        },
+                                        "company": {
+                                            "type": "string",
+                                            "example": "GBS1"
+                                        },
+                                        "client_id": {
+                                            "type": "string",
+                                            "example": "GB0000001"
+                                        },
+                                        "masked_pan": {
+                                            "type": "string",
+                                            "example": "516152XXXXXX0546"
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "example": "virtual"
+                                        },
+                                        "balance": {
+                                            "type": "number",
+                                            "example": "20.00"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "NORMAL"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error getting card status and balance from card cloud",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error getting card status and balance from card cloud"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/reports/card-cloud/daily-consume": {
             "get": {
                 "tags": [

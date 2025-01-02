@@ -5,9 +5,6 @@ namespace App\Http\Controllers\Report\CardCloud;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Users\Validate;
 use App\Http\Services\CardCloudApi;
-use App\Models\Backoffice\Companies\CompanyProjection;
-use App\Models\Backoffice\Users\CompaniesAndUsers;
-use App\Models\User;
 use Illuminate\Http\Request;
 
 class DailyConsume extends Controller
@@ -76,15 +73,7 @@ class DailyConsume extends Controller
             return response($e->getMessage(), 400);
         }
 
-        if ($request->attributes->get('jwt')->profileId == 7) {
-            $companies = CompaniesAndUsers::where('UserId', $request->attributes->get('jwt')->id)->get();
-        } else {
-            $user = User::where('Id', $request->attributes->get('jwt')->id)->first();
-            $companies = CompanyProjection::where('BusinessId', $user->BusinessId)
-            ->where('Active', 1)
-            ->select('Id as CompanyId')
-            ->get();
-        }
+        $companies = CompaniesByUser::get($request->attributes->get('jwt'));
 
         if ($companies->count() == 0) {
             return response('User does not have any companies associated', 400);
@@ -107,4 +96,5 @@ class DailyConsume extends Controller
 
         return response($response->getBody()->getContents());
     }
+
 }
