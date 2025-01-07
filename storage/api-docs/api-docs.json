@@ -95,6 +95,104 @@
                 ]
             }
         },
+        "/api/cardCloud/movement/{uuid}": {
+            "get": {
+                "tags": [
+                    "Card Cloud"
+                ],
+                "summary": "Show movement",
+                "description": "Show movement",
+                "operationId": "9f1385842d7cdeeb0cc98f2f7e12772d",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "Movement UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Movement",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "movement_id": {
+                                            "type": "string",
+                                            "example": "01935c81-abe0-7238-8635-46a8486259be"
+                                        },
+                                        "date": {
+                                            "type": "integer",
+                                            "example": 1732423822
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "example": "PURCHASE"
+                                        },
+                                        "amount": {
+                                            "type": "string",
+                                            "example": "-429.00"
+                                        },
+                                        "balance": {
+                                            "type": "string",
+                                            "example": "325.73"
+                                        },
+                                        "authorization_code": {
+                                            "type": "string",
+                                            "example": "324411"
+                                        },
+                                        "description": {
+                                            "type": "string",
+                                            "example": "COMPRA EN TIENDA"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "Approved"
+                                        },
+                                        "client_id": {
+                                            "type": "string",
+                                            "example": "SP0001275"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al obtener el movimiento",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error al obtener el movimiento"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/reports/card-cloud/card-status": {
             "get": {
                 "tags": [

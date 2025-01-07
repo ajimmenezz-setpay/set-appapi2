@@ -19,6 +19,10 @@ Route::middleware([VerifyJwt::class])->group(function () {
         Route::group(['prefix' => 'card'], function () {
             Route::post('/{cardId}/nip', [App\Http\Controllers\CardCloud\CardManagementController::class, 'updateNip']);
         });
+
+        Route::group(['prefix' => 'movement'], function () {
+            Route::get('/{uuid}', [App\Http\Controllers\CardCloud\MovementController::class, 'show']);
+        });
     });
 
     Route::group(['prefix' => 'ticket'], function () {
@@ -26,6 +30,7 @@ Route::middleware([VerifyJwt::class])->group(function () {
         Route::get('/', [App\Http\Controllers\Ticket\ClickupTicket::class, 'index']);
         Route::get('/{id}', [App\Http\Controllers\Ticket\ClickupTicket::class, 'show']);
     });
+
 });
 
 Route::group(['prefix' => 'clickup'], function () {
