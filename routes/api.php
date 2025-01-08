@@ -38,3 +38,9 @@ Route::group(['prefix' => 'clickup'], function () {
         Route::post('task', [App\Http\Controllers\Clickup\Webhook::class, 'updateTask']);
     });
 });
+
+Route::group(['prefix' => 'stp'], function () {
+    Route::group(['prefix' => 'spei-transactions'], function () {
+        Route::get('register-in', [App\Http\Controllers\Stp\Transactions\SpeiIn::class, 'register']);
+    });
+});
