@@ -8,10 +8,12 @@
         "php": "^8.2",
         "darkaonline/l5-swagger": "^8.6",
         "firebase/php-jwt": "^6.10",
+        "google/apiclient": "*",
         "laravel/framework": "^11.9",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "ramsey/uuid": "^4.7",
+        "spomky-labs/otphp": "*",
         "tymon/jwt-auth": "^2.1"
     },
     "require-dev": {

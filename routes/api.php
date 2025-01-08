@@ -1,9 +1,21 @@
 <?php
 
+use App\Http\Controllers\Security\Password;
 use App\Http\Middleware\VerifyJwt;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware([VerifyJwt::class])->group(function () {
+    Route::group(['prefix' => 'security'], function () {
+        Route::group(['prefix' => 'password'], function () {
+            Route::post('change', [Password::class, 'change']);
+        });
+
+        Route::group(['prefix' => '2fa'], function () {
+            Route::post('authorize', [App\Http\Controllers\Security\GoogleAuth::class, 'authorize']);
+        });
+    });
+
+
     Route::group(['prefix' => 'commission'], function () {
         Route::post('pay', [App\Http\Controllers\Stp\Commissions::class, 'payCommission']);
     });
@@ -30,7 +42,6 @@ Route::middleware([VerifyJwt::class])->group(function () {
         Route::get('/', [App\Http\Controllers\Ticket\ClickupTicket::class, 'index']);
         Route::get('/{id}', [App\Http\Controllers\Ticket\ClickupTicket::class, 'show']);
     });
-
 });
 
 Route::group(['prefix' => 'clickup'], function () {
