@@ -52,18 +52,7 @@ class GoogleAuth extends Controller
                 'code.max' => 'El código de autenticación debe tener 6 caracteres.'
             ]);
 
-            $user = User::leftJoin('t_security_authenticator_factors', 't_security_authenticator_factors.UserId', '=', 't_users.Id')
-                ->where('t_users.Id', $request->attributes->get('jwt')->id)
-                ->select('t_security_authenticator_factors.SecretKey')
-                ->first();
-
-            if (!$user || !$user->SecretKey) {
-                return $this->basicError('No se ha configurado la autenticación de dos factores.');
-            }
-
-            if (!self::validateToken($user->SecretKey, $request->code)) {
-                return $this->basicError('El código de autenticación es incorrecto.');
-            }
+            self::authorized($request->attributes->get('jwt')->id, $request->code);
 
             return $this->success(['message' => 'Autorizado']);
         } catch (\Exception $e) {
@@ -77,5 +66,21 @@ class GoogleAuth extends Controller
 
         $totp = TOTP::create($secretKey);
         return $totp->verify($code);
+    }
+
+    public static function authorized($userId, $code)
+    {
+        $user = User::leftJoin('t_security_authenticator_factors', 't_security_authenticator_factors.UserId', '=', 't_users.Id')
+            ->where('t_users.Id', $userId)
+            ->select('t_security_authenticator_factors.SecretKey')
+            ->first();
+
+        if (!$user || !$user->SecretKey) {
+            throw new \Exception('No se ha configurado la autenticación de dos factores.');
+        }
+
+        if (!self::validateToken($user->SecretKey, $code)) {
+            throw new \Exception('El código de autenticación es incorrecto.');
+        }
     }
 }

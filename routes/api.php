@@ -30,6 +30,9 @@ Route::middleware([VerifyJwt::class])->group(function () {
     Route::group(['prefix' => 'cardCloud'], function () {
         Route::group(['prefix' => 'card'], function () {
             Route::post('/{cardId}/nip', [App\Http\Controllers\CardCloud\CardManagementController::class, 'updateNip']);
+            Route::get('/client-id/{clientId}', [App\Http\Controllers\CardCloud\CardManagementController::class, 'searchByClientId']);
+            Route::post('/transfer', [App\Http\Controllers\CardCloud\TransferController::class, 'cardTransfer']);
+            Route::post('/activate', [App\Http\Controllers\CardCloud\CardManagementController::class, 'activateCard']);
         });
 
         Route::group(['prefix' => 'movement'], function () {

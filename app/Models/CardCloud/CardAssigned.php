@@ -12,6 +12,7 @@ class CardAssigned extends Model
     protected $primaryKey = 'Id';
 
     protected $fillable = [
+        'Id',
         'BusinessId',
         'CardCloudId',
         'CardCloudNumber',

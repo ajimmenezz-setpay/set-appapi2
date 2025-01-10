@@ -95,6 +95,164 @@
                 ]
             }
         },
+        "/api/cardCloud/card/client-id/{clientId}": {
+            "get": {
+                "tags": [
+                    "Card Cloud"
+                ],
+                "summary": "Search card by client id",
+                "description": "Search card by client id",
+                "operationId": "searchByClientId",
+                "parameters": [
+                    {
+                        "name": "clientId",
+                        "in": "path",
+                        "description": "Client ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Card found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "card_id": {
+                                            "type": "string",
+                                            "example": "0190760f-acf6-7800-bce8-1b2a451c3427"
+                                        },
+                                        "client_id": {
+                                            "type": "string",
+                                            "example": "SP0000001"
+                                        },
+                                        "masked_pan": {
+                                            "type": "string",
+                                            "example": "123456******1234"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error searching card by client id",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error searching card by client id"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cardCloud/card/activate": {
+            "post": {
+                "tags": [
+                    "Card Cloud"
+                ],
+                "summary": "Activate additional card for user",
+                "description": "Activate additional card for user",
+                "operationId": "activateCard",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "card",
+                                    "expiration_date",
+                                    "pin"
+                                ],
+                                "properties": {
+                                    "card": {
+                                        "type": "string",
+                                        "example": "12345678"
+                                    },
+                                    "expiration_date": {
+                                        "type": "string",
+                                        "example": "1225 (mmYY)"
+                                    },
+                                    "pin": {
+                                        "type": "string",
+                                        "example": "1234"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Card activated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tarjeta activada correctamente"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error activating card",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error activating card"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/cardCloud/movement/{uuid}": {
             "get": {
                 "tags": [
@@ -170,6 +328,153 @@
                                 "schema": {
                                     "type": "string",
                                     "example": "Error al obtener el movimiento"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cardCloud/card/transfer": {
+            "post": {
+                "tags": [
+                    "Card Cloud"
+                ],
+                "summary": "Transfer money between cards",
+                "description": "Transfer money between cards",
+                "operationId": "077953d1e5c7a9ade9c068853204466a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "source_card",
+                                    "destination_card",
+                                    "amount",
+                                    "concept"
+                                ],
+                                "properties": {
+                                    "source_card": {
+                                        "type": "string",
+                                        "example": "0190760f-acf6-7800-bce8-1b2a451c3427"
+                                    },
+                                    "destination_card": {
+                                        "type": "string",
+                                        "example": "0190760f-acf6-7800-bce8-1b2a451c3427"
+                                    },
+                                    "amount": {
+                                        "type": "number",
+                                        "example": 100
+                                    },
+                                    "concept": {
+                                        "type": "string",
+                                        "example": "Transferencia de dinero"
+                                    },
+                                    "auth_code": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Transfer completed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "new_balance": {
+                                            "type": "number",
+                                            "example": 10.12
+                                        },
+                                        "movement": {
+                                            "properties": {
+                                                "movement_order": {
+                                                    "type": "number",
+                                                    "example": 107631
+                                                },
+                                                "movement_id": {
+                                                    "type": "string",
+                                                    "example": "01944de9-4c8a-700c-b31f-a7895fb50244"
+                                                },
+                                                "type": {
+                                                    "type": "string",
+                                                    "example": "TRANSFER"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Transferencia de dinero"
+                                                },
+                                                "reference": {
+                                                    "type": "string",
+                                                    "example": ""
+                                                },
+                                                "amount": {
+                                                    "type": "number",
+                                                    "example": -100
+                                                },
+                                                "balance": {
+                                                    "type": "number",
+                                                    "example": 10.12
+                                                },
+                                                "date": {
+                                                    "type": "number",
+                                                    "example": 1736473922
+                                                },
+                                                "card": {
+                                                    "properties": {
+                                                        "card_id": {
+                                                            "type": "string",
+                                                            "example": "0190760f-acf6-71e0-bce8-1b2a762c3427"
+                                                        },
+                                                        "masked_pan": {
+                                                            "type": "string",
+                                                            "example": "516152XXXXXX1111"
+                                                        },
+                                                        "bin": {
+                                                            "type": "string",
+                                                            "example": "22221111"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error transferring money",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error transferring money"
                                 }
                             }
                         }
