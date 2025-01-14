@@ -59,4 +59,6 @@ Route::group(['prefix' => 'stp'], function () {
     });
 
     Route::get('generate_clabe', [App\Http\Controllers\Stp\GenerateClabe::class, 'generate']);
+
+    Route::get('fix_clabes_assignation', [App\Http\Controllers\Stp\AssignClabes::class, 'fixClabesAssignation']);
 });
