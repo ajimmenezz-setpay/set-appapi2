@@ -40,7 +40,7 @@ class SpeiIn extends Controller
                 $movements = $this->processMovements($movements, $account);
                 $response[$account->Id]['movements'] = $movements;
             } catch (\Exception $e) {
-                $response[$account->Id]['errors'][] = $e->getMessage();
+                $response[$account->Id]['errors'][] = $e->getMessage() . " " . $e->getLine();
                 continue;
             }
         }
