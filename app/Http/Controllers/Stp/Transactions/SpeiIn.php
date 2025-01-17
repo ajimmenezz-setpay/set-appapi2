@@ -73,7 +73,7 @@ class SpeiIn extends Controller
 
             $cardCloudCompany = $this->searchByCardCloudCompanyAccount($movement->cuentaBeneficiario);
             if (!is_null($cardCloudCompany)) {
-                $response[] = $this->processCardCloudMovement($movement, 'company', $cardCloudCompany->Id);
+                $response[] = $this->processCardCloudMovement($movement, 'company', $cardCloudCompany->CompanyId);
                 continue;
             }
 
@@ -293,7 +293,7 @@ class SpeiIn extends Controller
     {
         try {
             $client = new Client();
-            $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/subaccount/' . $company . '/deposit', [
+            $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/subaccount/' . $company . '/deposit', [
                 'headers' => [
                     'Content-Type' => 'application/json'
                 ],
@@ -315,7 +315,7 @@ class SpeiIn extends Controller
     {
         try {
             $client = new Client();
-            $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/card/' . $card . '/deposit', [
+            $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/card/' . $card . '/deposit', [
                 'headers' => [
                     'Content-Type' => 'application/json'
                 ],
