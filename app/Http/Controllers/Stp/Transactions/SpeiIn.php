@@ -170,7 +170,7 @@ class SpeiIn extends Controller
         return $comissions;
     }
 
-    private function calculateCompanyCommission($comissions, $amount)
+    private function calculateCompanyCommission($comissions = null, $amount)
     {
         $response = [
             'speiOut' => 0,
@@ -181,12 +181,14 @@ class SpeiIn extends Controller
             'total' => $amount
         ];
 
-        $comissions = json_decode($comissions, true);
+        if (!is_null($comissions)) {
+            $comissions = json_decode($comissions);
 
-        foreach ($comissions as $commission) {
-            if ($commission->type == 2) {
-                $response['speiIn'] = $amount * ($commission->speiIn / 100);
-                $response['total'] -= $response['speiIn'];
+            foreach ($comissions as $commission) {
+                if ($commission->type == 2) {
+                    $response['speiIn'] = $amount * ($commission->speiIn / 100);
+                    $response['total'] -= $response['speiIn'];
+                }
             }
         }
 
@@ -248,7 +250,7 @@ class SpeiIn extends Controller
     public function processCardCloudMovement($movement, $type, $cardCloudCompany = null, $cardCloudCard = null)
     {
         $company = Company::where('Id', env('CARD_CLOUD_MAIN_COMPANY_ID'))->first();
-        $comissions = $this->calculateCompanyCommission(json_encode("{}"), $movement->monto);
+        $comissions = $this->calculateCompanyCommission(null, $movement->monto);
         $companyBalance = $company->Balance + $comissions['total'];
 
         try {
