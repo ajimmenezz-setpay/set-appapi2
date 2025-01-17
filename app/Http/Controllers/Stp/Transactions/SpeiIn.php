@@ -181,7 +181,7 @@ class SpeiIn extends Controller
             'total' => $amount
         ];
 
-        $comissions = json_decode($comissions);
+        $comissions = json_decode($comissions, true);
 
         foreach ($comissions as $commission) {
             if ($commission->type == 2) {
