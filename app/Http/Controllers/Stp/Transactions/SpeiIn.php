@@ -248,7 +248,7 @@ class SpeiIn extends Controller
     public function processCardCloudMovement($movement, $type, $cardCloudCompany = null, $cardCloudCard = null)
     {
         $company = Company::where('Id', env('CARD_CLOUD_MAIN_COMPANY_ID'))->first();
-        $comissions = $this->calculateCompanyCommission(json_decode("{}"), $movement->monto);
+        $comissions = $this->calculateCompanyCommission(json_encode("{}"), $movement->monto);
         $companyBalance = $company->Balance + $comissions['total'];
 
         try {
