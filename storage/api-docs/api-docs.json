@@ -253,6 +253,183 @@
                 ]
             }
         },
+        "/api/cardCloud/card/buy_virtual_card": {
+            "post": {
+                "tags": [
+                    "Card Cloud"
+                ],
+                "summary": "Buy virtual card",
+                "description": "Buy virtual card",
+                "operationId": "buyVirtualCard",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "source_card",
+                                    "months",
+                                    "auth_code"
+                                ],
+                                "properties": {
+                                    "source_card": {
+                                        "type": "string",
+                                        "example": "01948734-0b5d-73d2-ac58-465617bfaa5b"
+                                    },
+                                    "months": {
+                                        "type": "integer",
+                                        "example": 3
+                                    },
+                                    "auth_code": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Virtual card bought successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "card_id": {
+                                            "type": "string",
+                                            "example": "0190760f-acf6-7800-bce8-1b2a451c3427"
+                                        },
+                                        "card_external_id": {
+                                            "type": "string",
+                                            "example": "01948734-19d5-5641-e5af-e7a5433f2a81"
+                                        },
+                                        "card_type": {
+                                            "type": "string",
+                                            "example": "virtual"
+                                        },
+                                        "brand": {
+                                            "type": "string",
+                                            "example": "MASTER"
+                                        },
+                                        "bin": {
+                                            "type": "string",
+                                            "example": "55557777"
+                                        },
+                                        "pan": {
+                                            "type": "string",
+                                            "example": "1111444455557777"
+                                        },
+                                        "client_id": {
+                                            "type": "string",
+                                            "example": "SP0000001"
+                                        },
+                                        "masked_pan": {
+                                            "type": "string",
+                                            "example": "516152XXXXXX9874"
+                                        },
+                                        "balance": {
+                                            "type": "string",
+                                            "example": "0.00"
+                                        },
+                                        "clabe": {
+                                            "type": "string",
+                                            "example": "123456789012345678"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "BLOCKED"
+                                        },
+                                        "setups": {
+                                            "properties": {
+                                                "CardId": {
+                                                    "type": "integer",
+                                                    "example": 106124
+                                                },
+                                                "Status": {
+                                                    "type": "string",
+                                                    "example": "BLOCKED"
+                                                },
+                                                "StatusReason": {
+                                                    "type": "string",
+                                                    "example": "INITIAL_BLOCKED"
+                                                },
+                                                "Ecommerce": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "International": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "Stripe": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "Wallet": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "Withdrawal": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "Contactless": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "PinOffline": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "PinOnUs": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "Id": {
+                                                    "type": "integer",
+                                                    "example": 84831
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error buying virtual card",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error buying virtual card"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/cardCloud/movement/{uuid}": {
             "get": {
                 "tags": [

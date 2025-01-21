@@ -10,6 +10,7 @@ use App\Http\Services\CardCloudApi;
 use GuzzleHttp\Exception\RequestException;
 use App\Models\Backoffice\Companies\CompanyProjection;
 use App\Models\Backoffice\Companies\CompaniesUsers;
+use App\Http\Controllers\Security\GoogleAuth;
 use Ramsey\Uuid\Uuid;
 
 class CardManagementController extends Controller
@@ -313,5 +314,141 @@ class CardManagementController extends Controller
     private function validateAlreadyAssigned($cardId)
     {
         return CardAssigned::where('CardCloudId', $cardId)->count() > 0;
+    }
+
+    /**
+     * @OA\Post(
+     *      path="/api/cardCloud/card/buy_virtual_card",
+     *      tags={"Card Cloud"},
+     *      summary="Buy virtual card",
+     *      description="Buy virtual card",
+     *      operationId="buyVirtualCard",
+     *      security={{"bearerAuth":{}}},
+     *
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"source_card", "months", "auth_code"},
+     *              @OA\Property(property="source_card", type="string", example="01948734-0b5d-73d2-ac58-465617bfaa5b"),
+     *              @OA\Property(property="months", type="integer", example=3),
+     *              @OA\Property(property="auth_code", type="string", example="123456")
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Virtual card bought successfully",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="card_id", type="string", example="0190760f-acf6-7800-bce8-1b2a451c3427"),
+     *              @OA\Property(property="card_external_id", type="string", example="01948734-19d5-5641-e5af-e7a5433f2a81"),
+     *              @OA\Property(property="card_type", type="string", example="virtual"),
+     *              @OA\Property(property="brand", type="string", example="MASTER"),
+     *              @OA\Property(property="bin", type="string", example="55557777"),
+     *              @OA\Property(property="pan", type="string", example="1111444455557777"),
+     *              @OA\Property(property="client_id", type="string", example="SP0000001"),
+     *              @OA\Property(property="masked_pan", type="string", example="516152XXXXXX9874"),
+     *              @OA\Property(property="balance", type="string", example="0.00"),
+     *              @OA\Property(property="clabe", type="string", example="123456789012345678"),
+     *              @OA\Property(property="status", type="string", example="BLOCKED"),
+     *              @OA\Property(property="setups", type="object",
+     *                  @OA\Property(property="CardId", type="integer", example=106124),
+     *                  @OA\Property(property="Status", type="string", example="BLOCKED"),
+     *                  @OA\Property(property="StatusReason", type="string", example="INITIAL_BLOCKED"),
+     *                  @OA\Property(property="Ecommerce", type="boolean", example=true),
+     *                  @OA\Property(property="International", type="boolean", example=false),
+     *                  @OA\Property(property="Stripe", type="boolean", example=true),
+     *                  @OA\Property(property="Wallet", type="boolean", example=true),
+     *                  @OA\Property(property="Withdrawal", type="boolean", example=false),
+     *                  @OA\Property(property="Contactless", type="boolean", example=false),
+     *                  @OA\Property(property="PinOffline", type="boolean", example=true),
+     *                  @OA\Property(property="PinOnUs", type="boolean", example=false),
+     *                  @OA\Property(property="Id", type="integer", example=84831)
+     *             )
+     *         )
+     *    ),
+     *
+     *      @OA\Response(
+     *          response=400,
+     *          description="Error buying virtual card",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="Error buying virtual card"))
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="Unauthorized"))
+     *      )
+     *
+     * )
+     *
+     */
+
+    public function buyVirtualCard(Request $request)
+    {
+        try {
+            $this->validate($request, [
+                'source_card' => 'required',
+                'months' => 'required|numeric|min:1',
+                'auth_code' => 'required|min:6|max:6'
+            ], [
+                'source_card.required' => 'La tarjeta de origen es requerida',
+                'months.required' => 'Los meses de la tarjeta virtual son requeridos',
+                'months.numeric' => 'Los meses de la tarjeta virtual deben ser un número',
+                'months.min' => 'Los meses de la tarjeta virtual deben ser mayor a 0',
+                'auth_code.required' => 'El código de autenticación es requerido.',
+                'auth_code.min' => 'El código de autenticación debe tener 6 caracteres.',
+                'auth_code.max' => 'El código de autenticación debe tener 6 caracteres.'
+            ]);
+
+            // GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->auth_code);
+
+            if (CardAssigned::where('CardCloudId', $request->source_card)->where('UserId', $request->attributes->get('jwt')->id)->count() == 0) {
+                return self::basicError("La tarjeta de origen no está asignada al usuario");
+            }
+
+            $client = new Client();
+            $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $request->source_card . '/buy_virtual_card', [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                ],
+                'json' => [
+                    'months' => $request->months
+                ]
+            ]);
+
+            $decodedJson = json_decode($response->getBody(), true);
+
+            CardAssigned::create([
+                'Id' => Uuid::uuid7(),
+                'BusinessId' => $request->attributes->get('jwt')->businessId,
+                'CardCloudId' => $decodedJson['card_id'],
+                'UserId' => $request->attributes->get('jwt')->id,
+                'Name' => $request->attributes->get('jwt')->firstName,
+                'Lastname' => $request->attributes->get('jwt')->lastname,
+                'Email' => $request->attributes->get('jwt')->email,
+                'IsPending' => 0,
+                'CreatedByUser' => $request->attributes->get('jwt')->id,
+                'CreateDate' => date('Y-m-d H:i:s')
+            ]);
+
+            return response()->json($decodedJson);
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                $statusCode = $e->getResponse()->getStatusCode();
+                $responseBody = $e->getResponse()->getBody()->getContents();
+                $decodedJson = json_decode($responseBody, true);
+                $message = 'Error al comprar la tarjeta virtual.';
+
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $message .= " " . $decodedJson['message'];
+                }
+                return response($message, $statusCode);
+            } else {
+                return response("Error al comprar la tarjeta virtual.", 400);
+            }
+        } catch (\Exception $e) {
+            return self::basicError($e->getMessage());
+        }
     }
 }
