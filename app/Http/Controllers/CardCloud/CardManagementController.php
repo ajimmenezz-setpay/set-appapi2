@@ -504,7 +504,8 @@ class CardManagementController extends Controller
             $client = new Client();
             $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $request->card_id . '/virtual_card_price', [
                 'headers' => [
-                    'Content-Type' => 'application/json'
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
                 ]
             ]);
 
