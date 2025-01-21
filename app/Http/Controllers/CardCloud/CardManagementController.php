@@ -400,7 +400,7 @@ class CardManagementController extends Controller
                 'auth_code.max' => 'El código de autenticación debe tener 6 caracteres.'
             ]);
 
-             GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->auth_code);
+            GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->auth_code);
 
             if (CardAssigned::where('CardCloudId', $request->source_card)->where('UserId', $request->attributes->get('jwt')->id)->count() == 0) {
                 return self::basicError("La tarjeta de origen no está asignada al usuario");
@@ -446,6 +446,84 @@ class CardManagementController extends Controller
                 return response($message, $statusCode);
             } else {
                 return response("Error al comprar la tarjeta virtual.", 400);
+            }
+        } catch (\Exception $e) {
+            return self::basicError($e->getMessage());
+        }
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/cardCloud/card/virtual_card_price",
+     *      tags={"Card Cloud"},
+     *      summary="Get virtual card price",
+     *      description="Get virtual card price",
+     *      operationId="getVirtualCardPrice",
+     *      security={{"bearerAuth":{}}},
+     *
+     *      @OA\Parameter(
+     *          name="card_id",
+     *          in="query",
+     *          description="Card ID",
+     *          required=true,
+     *          @OA\Schema(type="string")
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Virtual card price",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="price", type="string", example="100.00")
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=400,
+     *          description="Error getting virtual card price",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="Error getting virtual card price"))
+     *      ),
+     *
+     *     @OA\Response(
+     *          response=401,
+     *          description="Unauthorized",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="Unauthorized"))
+     *     )
+     * )
+     */
+
+    public function getVirtualCardPrice(Request $request)
+    {
+        try {
+
+            $this->validate($request, [
+                'card_id' => 'required',
+            ], [
+                'card_id.required' => 'El id de la tarjeta es requerido'
+            ]);
+
+            $client = new Client();
+            $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $request->card_id . '/virtual_card_price', [
+                'headers' => [
+                    'Content-Type' => 'application/json'
+                ]
+            ]);
+
+            $decodedJson = json_decode($response->getBody(), true);
+
+            return response()->json($decodedJson);
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                $statusCode = $e->getResponse()->getStatusCode();
+                $responseBody = $e->getResponse()->getBody()->getContents();
+                $decodedJson = json_decode($responseBody, true);
+                $message = 'Error al obtener el precio de la tarjeta virtual.';
+
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $message .= " " . $decodedJson['message'];
+                }
+                return response($message, $statusCode);
+            } else {
+                return response("Error al obtener el precio de la tarjeta virtual.", 400);
             }
         } catch (\Exception $e) {
             return self::basicError($e->getMessage());

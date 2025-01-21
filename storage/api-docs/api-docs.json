@@ -430,6 +430,72 @@
                 ]
             }
         },
+        "/api/cardCloud/card/virtual_card_price": {
+            "get": {
+                "tags": [
+                    "Card Cloud"
+                ],
+                "summary": "Get virtual card price",
+                "description": "Get virtual card price",
+                "operationId": "getVirtualCardPrice",
+                "parameters": [
+                    {
+                        "name": "card_id",
+                        "in": "query",
+                        "description": "Card ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Virtual card price",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "price": {
+                                            "type": "string",
+                                            "example": "100.00"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error getting virtual card price",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error getting virtual card price"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/cardCloud/movement/{uuid}": {
             "get": {
                 "tags": [
