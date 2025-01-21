@@ -400,7 +400,7 @@ class CardManagementController extends Controller
                 'auth_code.max' => 'El código de autenticación debe tener 6 caracteres.'
             ]);
 
-            // GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->auth_code);
+             GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->auth_code);
 
             if (CardAssigned::where('CardCloudId', $request->source_card)->where('UserId', $request->attributes->get('jwt')->id)->count() == 0) {
                 return self::basicError("La tarjeta de origen no está asignada al usuario");
