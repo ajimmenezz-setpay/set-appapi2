@@ -34,6 +34,7 @@ Route::middleware([VerifyJwt::class])->group(function () {
             Route::post('/transfer', [App\Http\Controllers\CardCloud\TransferController::class, 'cardTransfer']);
             Route::post('/activate', [App\Http\Controllers\CardCloud\CardManagementController::class, 'activateCard']);
             Route::post('/buy_virtual_card', [App\Http\Controllers\CardCloud\CardManagementController::class, 'buyVirtualCard']);
+            Route::get('/virtual_card_price', [App\Http\Controllers\CardCloud\CardManagementController::class, 'getVirtualCardPrice']);
         });
 
         Route::group(['prefix' => 'movement'], function () {
