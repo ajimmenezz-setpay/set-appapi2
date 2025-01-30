@@ -58,6 +58,7 @@ Route::group(['prefix' => 'clickup'], function () {
 Route::group(['prefix' => 'stp'], function () {
     Route::group(['prefix' => 'spei-transactions'], function () {
         Route::get('register-in', [App\Http\Controllers\Stp\Transactions\SpeiIn::class, 'register']);
+        Route::get('fix-balances', [App\Http\Controllers\Stp\Transactions\Transactions::class, 'fixStpBalances']);
     });
 
     Route::get('generate_clabe', [App\Http\Controllers\Stp\GenerateClabe::class, 'generate']);

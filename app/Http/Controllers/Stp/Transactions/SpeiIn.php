@@ -45,6 +45,8 @@ class SpeiIn extends Controller
             }
         }
 
+        Transactions::fixBalances();
+
         return response()->json($response);
     }
 
@@ -147,7 +149,7 @@ class SpeiIn extends Controller
                     'Balance' => $companyBalance
                 ]);
 
-            Company::where('Id', $company->CompanyId)
+            Company::where('Id', $company->Id)
                 ->update([
                     'Balance' => $companyBalance
                 ]);
@@ -217,7 +219,7 @@ class SpeiIn extends Controller
         $transaction->Amount = $movement->monto;
         $transaction->Commissions = $comissions;
 
-        $date = Carbon::createFromTimestampMs($movement->tsLiquidacion);
+        $date = Carbon::createFromTimestampMs($movement->tsLiquidacion)->setTimezone('America/Mexico_City');
 
         $transaction->LiquidationDate = $date->toDateTimeString();
         $transaction->UrlCEP = "";
