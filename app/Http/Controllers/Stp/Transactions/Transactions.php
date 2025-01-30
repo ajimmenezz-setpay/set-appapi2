@@ -74,7 +74,7 @@ class Transactions extends Controller
 
     public static function getAccountMovements($bankAccountNumber)
     {
-        return StpTransaction::where('StatusId', 3)
+        return StpTransaction::whereIn('StatusId', [3,1])
             ->where(function ($query) use ($bankAccountNumber) {
                 $query->where('SourceAccount', $bankAccountNumber)
                     ->orWhere('DestinationAccount', $bankAccountNumber);
