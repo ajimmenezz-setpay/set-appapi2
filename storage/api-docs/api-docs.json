@@ -496,6 +496,292 @@
                 ]
             }
         },
+        "/api/cardCloud/contact": {
+            "get": {
+                "tags": [
+                    "Card Cloud - Contactos"
+                ],
+                "summary": "Lista de contactos del usuario",
+                "description": "Lista de contactos del usuario",
+                "operationId": "19d07363197721c131923e81899bcbac",
+                "responses": {
+                    "200": {
+                        "description": "Lista de contactos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "contact_id": {
+                                            "type": "string",
+                                            "example": "01935c81-abe0-7238-8635-46a8486259be"
+                                        },
+                                        "alias": {
+                                            "type": "string",
+                                            "example": "Contacto 1"
+                                        },
+                                        "client_id": {
+                                            "type": "string",
+                                            "example": "SP0001275"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al obtener los contactos",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error al obtener los contactos"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Card Cloud - Contactos"
+                ],
+                "summary": "Crear contacto",
+                "description": "Crear contacto",
+                "operationId": "cfdb5fae9cde70713ba417fe19be16e4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "alias",
+                                    "client_id"
+                                ],
+                                "properties": {
+                                    "alias": {
+                                        "type": "string",
+                                        "example": "Contacto 1"
+                                    },
+                                    "client_id": {
+                                        "type": "string",
+                                        "example": "SP0001275"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Contacto creado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "contact_id": {
+                                            "type": "string",
+                                            "example": "01935c81-abe0-7238-8635-46a8486259be"
+                                        },
+                                        "alias": {
+                                            "type": "string",
+                                            "example": "Contacto 1"
+                                        },
+                                        "client_id": {
+                                            "type": "string",
+                                            "example": "SP0001275"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al crear el contacto",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error al crear el contacto"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cardCloud/contact/{uuid}": {
+            "get": {
+                "tags": [
+                    "Card Cloud - Contactos"
+                ],
+                "summary": "Mostrar contacto",
+                "description": "Mostrar contacto",
+                "operationId": "f069148fb3e8af9a53389ad976e69c17",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "Contact UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Contacto",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "contact_id": {
+                                            "type": "string",
+                                            "example": "01935c81-abe0-7238-8635-46a8486259be"
+                                        },
+                                        "alias": {
+                                            "type": "string",
+                                            "example": "Contacto 1"
+                                        },
+                                        "client_id": {
+                                            "type": "string",
+                                            "example": "SP0000001"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al obtener el contacto",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error al obtener el contacto"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Card Cloud - Contactos"
+                ],
+                "summary": "Eliminar contacto",
+                "description": "Eliminar contacto",
+                "operationId": "689983cc3c7852bc0b14a37cee69118b",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "Contact UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Contacto eliminado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Contacto eliminado correctamente"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al eliminar el contacto",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error al eliminar el contacto"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/cardCloud/movement/{uuid}": {
             "get": {
                 "tags": [
@@ -1507,6 +1793,234 @@
                     }
                 ]
             }
+        },
+        "/api/users/secret-phrase": {
+            "post": {
+                "tags": [
+                    "Usuarios - Frase secreta"
+                ],
+                "summary": "Crear frase secreta",
+                "description": "Crear frase secreta",
+                "operationId": "ebad3b01fe72e3e7d819542051f0dbf4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "phrase",
+                                    "code"
+                                ],
+                                "properties": {
+                                    "phrase": {
+                                        "type": "string",
+                                        "example": "Frase secreta"
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Frase secreta creada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Frase secreta creada"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al crear la frase secreta",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error al crear la frase secreta"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Usuarios - Frase secreta"
+                ],
+                "summary": "Eliminar frase secreta",
+                "description": "Eliminar frase secreta",
+                "operationId": "447771de1e2f6630f0245070c7bc3023",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "code"
+                                ],
+                                "properties": {
+                                    "code": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Frase secreta eliminada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Frase secreta eliminada"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al eliminar la frase secreta",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error al eliminar la frase secreta"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Usuarios - Frase secreta"
+                ],
+                "summary": "Actualizar frase secreta",
+                "description": "Actualizar frase secreta",
+                "operationId": "e1caee8aa896122f53d065ad16c8d5c5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "phrase",
+                                    "code"
+                                ],
+                                "properties": {
+                                    "phrase": {
+                                        "type": "string",
+                                        "example": "Frase secreta"
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Frase secreta actualizada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Frase secreta actualizada"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al actualizar la frase secreta",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error al actualizar la frase secreta"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -1530,6 +2044,10 @@
             "description": "Card Cloud"
         },
         {
+            "name": "Card Cloud - Contactos",
+            "description": "Card Cloud - Contactos"
+        },
+        {
             "name": "Reports",
             "description": "Reports"
         },
@@ -1544,6 +2062,10 @@
         {
             "name": "Ticket",
             "description": "Ticket"
+        },
+        {
+            "name": "Usuarios - Frase secreta",
+            "description": "Usuarios - Frase secreta"
         }
     ]
 }

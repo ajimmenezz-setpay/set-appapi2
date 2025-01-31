@@ -40,12 +40,27 @@ Route::middleware([VerifyJwt::class])->group(function () {
         Route::group(['prefix' => 'movement'], function () {
             Route::get('/{uuid}', [App\Http\Controllers\CardCloud\MovementController::class, 'show']);
         });
+
+        Route::group(['prefix' => 'contact'], function () {
+            Route::get('/', [App\Http\Controllers\CardCloud\ContactController::class, 'index']);
+            Route::post('/', [App\Http\Controllers\CardCloud\ContactController::class, 'store']);
+            Route::get('/{uuid}', [App\Http\Controllers\CardCloud\ContactController::class, 'show']);
+            Route::delete('/{uuid}', [App\Http\Controllers\CardCloud\ContactController::class, 'delete']);
+        });
     });
 
     Route::group(['prefix' => 'ticket'], function () {
         Route::post('/', [App\Http\Controllers\Ticket\ClickupTicket::class, 'create']);
         Route::get('/', [App\Http\Controllers\Ticket\ClickupTicket::class, 'index']);
         Route::get('/{id}', [App\Http\Controllers\Ticket\ClickupTicket::class, 'show']);
+    });
+
+    Route::group(['prefix' => 'users'], function () {
+        Route::group(['prefix' => 'secret-phrase'], function () {
+            Route::post('/', [App\Http\Controllers\Users\SecretPhrase::class, 'create']);
+            Route::patch('/', [App\Http\Controllers\Users\SecretPhrase::class, 'update']);
+            Route::delete('/', [App\Http\Controllers\Users\SecretPhrase::class, 'delete']);
+        });
     });
 });
 
