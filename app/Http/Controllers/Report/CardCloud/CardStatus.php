@@ -44,33 +44,34 @@ class CardStatus extends Controller
 
     public function index(Request $request)
     {
+
         try {
             Validate::userProfile([7, 9], $request->attributes->get('jwt')->profileId);
+
+
+            $companies = CompaniesByUser::get($request->attributes->get('jwt'));
+
+            if ($companies->count() == 0) {
+                return response('User does not have any companies associated', 400);
+            }
+
+            $companiesArrayIds = $companies->pluck('CompanyId')->toArray();
+
+            $client = new \GuzzleHttp\Client();
+
+            $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/reports/card_status', [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                ],
+                'body' => json_encode([
+                    'companies' => $companiesArrayIds
+                ]),
+            ]);
+
+            return response()->json(json_decode($response->getBody()->getContents()));
         } catch (\Exception $e) {
-            return response($e->getMessage(), 400);
+            return self::basicError($e->getMessage());
         }
-
-        $companies = CompaniesByUser::get($request->attributes->get('jwt'));
-
-        if ($companies->count() == 0) {
-            return response('User does not have any companies associated', 400);
-        }
-
-        $companiesArrayIds = $companies->pluck('CompanyId')->toArray();
-
-        $client = new \GuzzleHttp\Client();
-
-        $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/reports/card_status', [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
-            ],
-            'body' => json_encode([
-                'companies' => $companiesArrayIds
-            ]),
-        ]);
-
-        return response($response->getBody()->getContents());
     }
-
 }
