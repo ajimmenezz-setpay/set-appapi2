@@ -29,7 +29,8 @@ class CardStatus extends Controller
      *          @OA\Property(property="masked_pan", type="string", example="516152XXXXXX0546"),
      *          @OA\Property(property="type", type="string", example="virtual"),
      *          @OA\Property(property="balance", type="number", example="20.00"),
-     *          @OA\Property(property="status", type="string", example="NORMAL")
+     *          @OA\Property(property="status", type="string", example="NORMAL"),
+     *          @OA\Property(property="active_date", type="timestamp", example="1717806908"),
      *     ),
      *  ),
      *

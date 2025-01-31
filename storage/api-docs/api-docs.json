@@ -1069,6 +1069,10 @@
                                         "status": {
                                             "type": "string",
                                             "example": "NORMAL"
+                                        },
+                                        "active_date": {
+                                            "type": "timestamp",
+                                            "example": "1717806908"
                                         }
                                     },
                                     "type": "object"
