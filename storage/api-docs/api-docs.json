@@ -1201,6 +1201,92 @@
                 ]
             }
         },
+        "/api/reports/card-cloud/fundings": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Get fundings from card cloud",
+                "description": "Get fundings from card cloud",
+                "operationId": "fundings",
+                "parameters": [
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "description": "Start date to get the fundings",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "UTC"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "description": "End date to get the fundings",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "UTC"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fundings from card cloud",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "enviroment": {
+                                            "type": "string",
+                                            "example": "SET"
+                                        },
+                                        "company": {
+                                            "type": "string",
+                                            "example": "Company Name"
+                                        },
+                                        "description": {
+                                            "type": "string",
+                                            "example": "Purchase description"
+                                        },
+                                        "amount": {
+                                            "type": "number",
+                                            "example": "100.00"
+                                        },
+                                        "approved_by": {
+                                            "type": "string",
+                                            "example": "John Doe"
+                                        },
+                                        "date": {
+                                            "type": "number",
+                                            "example": "1738027313"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error getting fundings from card cloud",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error getting fundings from card cloud"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/security/2fa/authorize": {
             "post": {
                 "tags": [
