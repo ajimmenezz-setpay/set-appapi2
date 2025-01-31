@@ -44,12 +44,19 @@ class Fundings extends Controller
      *          response=200,
      *          description="Fundings from card cloud",
      *          @OA\JsonContent(
-     *              @OA\Property(property="enviroment", type="string", example="SET"),
-     *              @OA\Property(property="company", type="string", example="Company Name"),
-     *             @OA\Property(property="description", type="string", example="Purchase description"),
-     *              @OA\Property(property="amount", type="number", example="100.00"),
-     *              @OA\Property(property="approved_by", type="string", example="John Doe"),
-     *              @OA\Property(property="date", type="number", example="1738027313"),
+     *              type="object",
+     *              @OA\Property(property="last_update", type="number", description="Fecha de la última actualización", example="1738300770"),
+     *             @OA\Property(property="data", type="array", description="Datos de los fondeos",
+     *                  @OA\Items(
+     *                      type="object",
+     *                      @OA\Property(property="enviroment", type="string", description="Ambiente", example="SET"),
+     *                      @OA\Property(property="company", type="string", description="Nombre de la empresa", example="SET Administración"),
+     *                      @OA\Property(property="description", type="string", description="Descripción del movimiento", example="Fondeo Prueba"),
+     *                      @OA\Property(property="amount", type="string", description="Monto del movimiento", example="1000.00"),
+     *                      @OA\Property(property="approved_by", type="string", description="Aprobado por", example="Admin"),
+     *                      @OA\Property(property="date", type="string", format="date-time", nullable=true, description="Fecha del movimiento", example="1738300770")
+     *                 )
+     *             )
      *          ),
      *     ),
      *

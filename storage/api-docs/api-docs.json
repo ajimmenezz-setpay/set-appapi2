@@ -1238,29 +1238,51 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "enviroment": {
-                                            "type": "string",
-                                            "example": "SET"
-                                        },
-                                        "company": {
-                                            "type": "string",
-                                            "example": "Company Name"
-                                        },
-                                        "description": {
-                                            "type": "string",
-                                            "example": "Purchase description"
-                                        },
-                                        "amount": {
+                                        "last_update": {
+                                            "description": "Fecha de la última actualización",
                                             "type": "number",
-                                            "example": "100.00"
+                                            "example": "1738300770"
                                         },
-                                        "approved_by": {
-                                            "type": "string",
-                                            "example": "John Doe"
-                                        },
-                                        "date": {
-                                            "type": "number",
-                                            "example": "1738027313"
+                                        "data": {
+                                            "description": "Datos de los fondeos",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "enviroment": {
+                                                        "description": "Ambiente",
+                                                        "type": "string",
+                                                        "example": "SET"
+                                                    },
+                                                    "company": {
+                                                        "description": "Nombre de la empresa",
+                                                        "type": "string",
+                                                        "example": "SET Administración"
+                                                    },
+                                                    "description": {
+                                                        "description": "Descripción del movimiento",
+                                                        "type": "string",
+                                                        "example": "Fondeo Prueba"
+                                                    },
+                                                    "amount": {
+                                                        "description": "Monto del movimiento",
+                                                        "type": "string",
+                                                        "example": "1000.00"
+                                                    },
+                                                    "approved_by": {
+                                                        "description": "Aprobado por",
+                                                        "type": "string",
+                                                        "example": "Admin"
+                                                    },
+                                                    "date": {
+                                                        "description": "Fecha del movimiento",
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "1738300770",
+                                                        "nullable": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
                                         }
                                     },
                                     "type": "object"
