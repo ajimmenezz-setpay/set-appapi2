@@ -56,20 +56,21 @@ class DailyConsume extends Controller
      *      response=200,
      *      description="Daily consume from card cloud",
      *      @OA\JsonContent(
-     *          @OA\Property(property="total_amount", type="number", example="1000.00"),
-     *          @OA\Property(property="request_date", type="string", format="Y-m-d", example="2025-01-01"),
+     *          @OA\Property(property="total_amount", type="string", example="-8527.35"),
      *          @OA\Property(property="movements", type="array", @OA\Items(
      *              @OA\Property(property="enviroment", type="string", example="SET"),
-     *              @OA\Property(property="company", type="string", example="Company Name"),
-     *              @OA\Property(property="client_id", type="string", example="SP0000001"),
-     *              @OA\Property(property="masked_pan", type="string", example="516152XXXXXX2992"),
-     *              @OA\Property(property="type", type="string", example="Purchase"),
-     *              @OA\Property(property="description", type="string", example="Purchase description"),
-     *              @OA\Property(property="amount", type="number", example="100.00"),
-     *              @OA\Property(property="authorization_code", type="string", example="123456"),
-     *              @OA\Property(property="date", type="datetime", example="2025-01-01 00:00:00"),
-     *          )),
-     *      ),
+     *              @OA\Property(property="company", type="string", example="SET Nominas"),
+     *              @OA\Property(property="client_id", type="string", example="0000320"),
+     *              @OA\Property(property="masked_pan", type="string", example="516152XXXXXX5678"),
+     *              @OA\Property(property="type", type="string", example="PURCHASE"),
+     *              @OA\Property(property="description", type="string", example="BAE VILLALUZ           JUAREZ NL     MEX"),
+     *              @OA\Property(property="amount", type="string", example="-28.00"),
+     *              @OA\Property(property="authorization_code", type="string", example="725997"),
+     *              @OA\Property(property="date", type="string", example="2025-01-13 12:31:29")
+     *         )
+     *    ),
+     *   @OA\Property(property="last_update", type="integer", example=1738393271)
+     *  )
      *  ),
      *
      *  @OA\Response(
@@ -134,7 +135,7 @@ class DailyConsume extends Controller
                 ], $dates)),
             ]);
 
-            return response($response->getBody()->getContents());
+            return response()->json(json_decode($response->getBody()->getContents()));
         } catch (\Exception $e) {
             return self::basicError($e->getMessage());
         }

@@ -1147,13 +1147,8 @@
                                 "schema": {
                                     "properties": {
                                         "total_amount": {
-                                            "type": "number",
-                                            "example": "1000.00"
-                                        },
-                                        "request_date": {
                                             "type": "string",
-                                            "format": "Y-m-d",
-                                            "example": "2025-01-01"
+                                            "example": "-8527.35"
                                         },
                                         "movements": {
                                             "type": "array",
@@ -1165,40 +1160,43 @@
                                                     },
                                                     "company": {
                                                         "type": "string",
-                                                        "example": "Company Name"
+                                                        "example": "SET Nominas"
                                                     },
                                                     "client_id": {
                                                         "type": "string",
-                                                        "example": "SP0000001"
+                                                        "example": "0000320"
                                                     },
                                                     "masked_pan": {
                                                         "type": "string",
-                                                        "example": "516152XXXXXX2992"
+                                                        "example": "516152XXXXXX5678"
                                                     },
                                                     "type": {
                                                         "type": "string",
-                                                        "example": "Purchase"
+                                                        "example": "PURCHASE"
                                                     },
                                                     "description": {
                                                         "type": "string",
-                                                        "example": "Purchase description"
+                                                        "example": "BAE VILLALUZ           JUAREZ NL     MEX"
                                                     },
                                                     "amount": {
-                                                        "type": "number",
-                                                        "example": "100.00"
+                                                        "type": "string",
+                                                        "example": "-28.00"
                                                     },
                                                     "authorization_code": {
                                                         "type": "string",
-                                                        "example": "123456"
+                                                        "example": "725997"
                                                     },
                                                     "date": {
                                                         "type": "string",
-                                                        "format": "date-time",
-                                                        "example": "2025-01-01 00:00:00"
+                                                        "example": "2025-01-13 12:31:29"
                                                     }
                                                 },
                                                 "type": "object"
                                             }
+                                        },
+                                        "last_update": {
+                                            "type": "integer",
+                                            "example": 1738393271
                                         }
                                     },
                                     "type": "object"
