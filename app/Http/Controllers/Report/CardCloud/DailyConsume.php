@@ -23,7 +23,29 @@ class DailyConsume extends Controller
      *      name="date",
      *      in="query",
      *      description="Date to get the daily consume",
-     *      required=true,
+     *      required=false,
+     *      @OA\Schema(
+     *          type="string",
+     *          format="Y-m-d"
+     *      )
+     *  ),
+     *
+     * @OA\Parameter(
+     *      name="from",
+     *      in="query",
+     *      description="Initial date to get the daily consume",
+     *      required=false,
+     *      @OA\Schema(
+     *         type="string",
+     *          format="Y-m-d"
+     *     )
+     * ),
+     *
+     *  @OA\Parameter(
+     *      name="to",
+     *      in="query",
+     *      description="Final date to get the daily consume",
+     *      required=false,
      *      @OA\Schema(
      *          type="string",
      *          format="Y-m-d"
