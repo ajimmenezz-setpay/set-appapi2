@@ -48,6 +48,10 @@ Route::middleware([VerifyJwt::class])->group(function () {
             Route::get('/{uuid}', [App\Http\Controllers\CardCloud\ContactController::class, 'show']);
             Route::delete('/{uuid}', [App\Http\Controllers\CardCloud\ContactController::class, 'delete']);
         });
+
+        Route::group(['prefix' => 'institution'], function () {
+            Route::get('/', [App\Http\Controllers\CardCloud\InstitutionController::class, 'index']);
+        });
     });
 
     Route::group(['prefix' => 'ticket'], function () {

@@ -515,13 +515,29 @@
                                             "type": "string",
                                             "example": "01935c81-abe0-7238-8635-46a8486259be"
                                         },
-                                        "alias": {
+                                        "name": {
                                             "type": "string",
                                             "example": "Contacto 1"
+                                        },
+                                        "institution_id": {
+                                            "type": "integer",
+                                            "example": "0"
+                                        },
+                                        "institution_name": {
+                                            "type": "string",
+                                            "example": "Card Cloud"
+                                        },
+                                        "account": {
+                                            "type": "string",
+                                            "example": "123456789012345678"
                                         },
                                         "client_id": {
                                             "type": "string",
                                             "example": "SP0001275"
+                                        },
+                                        "alias": {
+                                            "type": "string",
+                                            "example": "Contacto 1"
                                         }
                                     },
                                     "type": "object"
@@ -571,13 +587,26 @@
                         "application/json": {
                             "schema": {
                                 "required": [
+                                    "name",
                                     "alias",
-                                    "client_id"
+                                    "institution"
                                 ],
                                 "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Contacto 1"
+                                    },
                                     "alias": {
                                         "type": "string",
                                         "example": "Contacto 1"
+                                    },
+                                    "institution": {
+                                        "type": "integer",
+                                        "example": "0"
+                                    },
+                                    "account": {
+                                        "type": "string",
+                                        "example": "123456789012345678"
                                     },
                                     "client_id": {
                                         "type": "string",
@@ -600,13 +629,29 @@
                                             "type": "string",
                                             "example": "01935c81-abe0-7238-8635-46a8486259be"
                                         },
-                                        "alias": {
+                                        "name": {
                                             "type": "string",
                                             "example": "Contacto 1"
+                                        },
+                                        "institution_id": {
+                                            "type": "integer",
+                                            "example": "0"
+                                        },
+                                        "institution_name": {
+                                            "type": "string",
+                                            "example": "Card Cloud"
+                                        },
+                                        "account": {
+                                            "type": "string",
+                                            "example": "123456789012345678"
                                         },
                                         "client_id": {
                                             "type": "string",
                                             "example": "SP0001275"
+                                        },
+                                        "alias": {
+                                            "type": "string",
+                                            "example": "Contacto 1"
                                         }
                                     },
                                     "type": "object"
@@ -674,13 +719,29 @@
                                             "type": "string",
                                             "example": "01935c81-abe0-7238-8635-46a8486259be"
                                         },
-                                        "alias": {
+                                        "name": {
                                             "type": "string",
                                             "example": "Contacto 1"
                                         },
+                                        "institution_id": {
+                                            "type": "integer",
+                                            "example": "0"
+                                        },
+                                        "institution_name": {
+                                            "type": "string",
+                                            "example": "Card Cloud"
+                                        },
+                                        "account": {
+                                            "type": "string",
+                                            "example": "123456789012345678"
+                                        },
                                         "client_id": {
                                             "type": "string",
-                                            "example": "SP0000001"
+                                            "example": "SP0001275"
+                                        },
+                                        "alias": {
+                                            "type": "string",
+                                            "example": "Contacto 1"
                                         }
                                     },
                                     "type": "object"
@@ -759,6 +820,65 @@
                                 "schema": {
                                     "type": "string",
                                     "example": "Error al eliminar el contacto"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cardCloud/institution": {
+            "get": {
+                "tags": [
+                    "Institutions"
+                ],
+                "summary": "Get the list of institutions",
+                "description": "Get the list of institutions",
+                "operationId": "institution",
+                "responses": {
+                    "200": {
+                        "description": "List of institutions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": "1"
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Card Cloud"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "No se posible obtener la lista de instituciones",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "No se posible obtener la lista de instituciones"
                                 }
                             }
                         }
@@ -2176,6 +2296,10 @@
         {
             "name": "Card Cloud - Contactos",
             "description": "Card Cloud - Contactos"
+        },
+        {
+            "name": "Institutions",
+            "description": "Institutions"
         },
         {
             "name": "Reports",

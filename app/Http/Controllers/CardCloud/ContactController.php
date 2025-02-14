@@ -4,6 +4,7 @@ namespace App\Http\Controllers\CardCloud;
 
 use App\Http\Controllers\Controller;
 use App\Models\CardCloud\Contact;
+use App\Models\Speicloud\StpInstitutions;
 use Exception;
 use Illuminate\Http\Request;
 use Ramsey\Uuid\Uuid;
@@ -23,8 +24,12 @@ class ContactController extends Controller
      *          description="Lista de contactos",
      *          @OA\JsonContent(
      *              @OA\Property(property="contact_id", type="string", example="01935c81-abe0-7238-8635-46a8486259be"),
-     *              @OA\Property(property="alias", type="string", example="Contacto 1"),
-     *              @OA\Property(property="client_id", type="string", example="SP0001275")
+     *              @OA\Property(property="name", type="string", example="Contacto 1"),
+     *              @OA\Property(property="institution_id", type="integer", example="0"),
+     *              @OA\Property(property="institution_name", type="string", example="Card Cloud"),
+     *              @OA\Property(property="account", type="string", example="123456789012345678"),
+     *              @OA\Property(property="client_id", type="string", example="SP0001275"),
+     *              @OA\Property(property="alias", type="string", example="Contacto 1")
      *          )
      *      ),
      *
@@ -69,9 +74,12 @@ class ContactController extends Controller
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(
-     *              required={"alias", "client_id"},
+     *              required={"name", "alias", "institution"},
+     *              @OA\Property(property="name", type="string", example="Contacto 1"),
      *              @OA\Property(property="alias", type="string", example="Contacto 1"),
-     *              @OA\Property(property="client_id", type="string", example="SP0001275")
+     *              @OA\Property(property="institution", type="integer", example="0"),
+     *              @OA\Property(property="account", type="string", example="123456789012345678"),   
+     *              @OA\Property(property="client_id", type="string", example="SP0001275"),
      *          )
      *      ),
      *
@@ -80,8 +88,12 @@ class ContactController extends Controller
      *          description="Contacto creado correctamente",
      *          @OA\JsonContent(
      *              @OA\Property(property="contact_id", type="string", example="01935c81-abe0-7238-8635-46a8486259be"),
-     *              @OA\Property(property="alias", type="string", example="Contacto 1"),
-     *              @OA\Property(property="client_id", type="string", example="SP0001275")
+     *              @OA\Property(property="name", type="string", example="Contacto 1"),
+     *              @OA\Property(property="institution_id", type="integer", example="0"),
+     *              @OA\Property(property="institution_name", type="string", example="Card Cloud"),
+     *              @OA\Property(property="account", type="string", example="123456789012345678"),
+     *              @OA\Property(property="client_id", type="string", example="SP0001275"),
+     *              @OA\Property(property="alias", type="string", example="Contacto 1")
      *          )
      *      ),
      *
@@ -103,21 +115,45 @@ class ContactController extends Controller
     {
         try {
             $this->validate($request, [
+                'institution' => 'required',
                 'alias' => 'required',
-                'client_id' => 'required'
+                'name' => 'required',
             ], [
-                'alias.required' => 'El Alias del contacto es requerido',
-                'client_id.required' => 'El ClientId del contacto es requerido'
+                'institution.required' => 'El campo institution es obligatorio',
+                'alias.required' => 'El campo alias es obligatorio',
+                'name.required' => 'El campo name es obligatorio',
+                'client_id.required' => 'El campo client_id es obligatorio'
             ]);
 
-            $exist = Contact::where('UserId', $request->attributes->get('jwt')->id)->where('ClientId', $request->input('client_id'))->first();
-            if ($exist) throw new Exception('Ya existe un contacto con el mismo ClientId');
+            if ($request->input('institution') == 0) {
+                $this->validate($request, [
+                    'client_id' => 'required',
+                ], [
+                    'client_id.required' => 'El campo client_id es obligatorio'
+                ]);
+
+                $exist = Contact::where('UserId', $request->attributes->get('jwt')->id)->where('ClientId', $request->input('client_id'))->first();
+                if ($exist) throw new Exception('Ya existe un contacto con el mismo ClientId');
+            } else {
+                $institution = StpInstitutions::where('Code', $request->input('institution'))->first();
+                if (!$institution) throw new Exception('La institución no existe');
+
+                if (strlen($request->input('account')) < 18) throw new Exception('La cuenta CLABE debe tener 18 dígitos');
+                if (strlen($request->input('account')) > 18) throw new Exception('La cuenta CLABE debe tener 18 dígitos');
+
+                $exist = Contact::where('UserId', $request->attributes->get('jwt')->id)->where('Account', $request->input('account'))->first();
+                if ($exist) throw new Exception('Ya existe un contacto con la misma cuenta CLABE');
+            }
+
 
             $contact = Contact::create([
                 'UUID' => Uuid::uuid7(),
                 'UserId' => $request->attributes->get('jwt')->id,
+                'Name' => $request->input('name'),
+                'Institution' => $request->input('institution'),
+                'Account' => $request->input('account') ?? "",
                 'Alias' => $request->input('alias'),
-                'ClientId' => $request->input('client_id')
+                'ClientId' => $request->input('client_id') ?? "",
             ]);
 
             return response()->json(self::contactObject($contact));
@@ -147,8 +183,13 @@ class ContactController extends Controller
      *          description="Contacto",
      *          @OA\JsonContent(
      *              @OA\Property(property="contact_id", type="string", example="01935c81-abe0-7238-8635-46a8486259be"),
-     *              @OA\Property(property="alias", type="string", example="Contacto 1"),
-     *              @OA\Property(property="client_id", type="string", example="SP0000001")
+     *              @OA\Property(property="name", type="string", example="Contacto 1"),
+     *              @OA\Property(property="institution_id", type="integer", example="0"),
+     *              @OA\Property(property="institution_name", type="string", example="Card Cloud"),
+     *              @OA\Property(property="account", type="string", example="123456789012345678"),
+     *              @OA\Property(property="client_id", type="string", example="SP0001275"),
+     *              @OA\Property(property="alias", type="string", example="Contacto 1")
+     *         
      *          )
      *      ),
      *
@@ -234,10 +275,16 @@ class ContactController extends Controller
 
     public static function contactObject($contact)
     {
+        $institution = $contact->Institution == 0 ? 'Card Cloud' : StpInstitutions::where('Code', $contact->Institution)->first()->ShortName;
+
         return [
             'contact_id' => $contact->UUID,
-            'alias' => $contact->Alias,
-            'client_id' => $contact->ClientId
+            'name' => $contact->Name,
+            'institution_id' => $contact->Institution,
+            'institution_name' => $institution,
+            'account' => $contact->Account,
+            'client_id' => $contact->ClientId,
+            'alias' => $contact->Alias
         ];
     }
 }
