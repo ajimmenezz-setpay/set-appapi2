@@ -9,6 +9,50 @@ use Illuminate\Http\Request;
 
 class SecretPhrase extends Controller
 {
+
+    /**
+     * @OA\Get(
+     *      path="/api/users/secret-phrase",
+     *      tags={"Usuarios - Frase secreta"},
+     *      summary="Obtener frase secreta",
+     *     description="Obtener frase secreta",
+     *     security={{"bearerAuth":{}}},
+     * 
+     *    @OA\Response(
+     *          response=200,
+     *              description="Frase secreta",
+     *              @OA\JsonContent(
+     *                  @OA\Property(property="phrase", type="string", example="Frase secreta")
+     *              )
+     *     ),
+     * 
+     *    @OA\Response(
+     *          response=400,
+     *          description="Error al obtener la frase secreta",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="Error al obtener la frase secreta"))
+     *    ),
+     * 
+     *   @OA\Response(
+     *      response=401,
+     *      description="Unauthorized",
+     *      @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="Unauthorized"))
+     *      )
+     * )
+     */
+
+    public function index(Request $request)
+    {
+        try {
+            $secretPhrase = UsersSecretPhrase::where('UserId', $request->attributes->get('jwt')->id)->first();
+            if (!$secretPhrase) throw new \Exception('El usuario no tiene una frase secreta');
+
+            return self::success(['phrase' => $secretPhrase->SecretPhrase]);
+        } catch (\Exception $e) {
+            return self::basicError($e->getMessage());
+        }
+    }
+
+
     /**
      * @OA\Post(
      *      path="/api/users/secret-phrase",

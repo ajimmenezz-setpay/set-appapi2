@@ -65,6 +65,7 @@ Route::middleware([VerifyJwt::class])->group(function () {
             Route::post('/', [App\Http\Controllers\Users\SecretPhrase::class, 'create']);
             Route::patch('/', [App\Http\Controllers\Users\SecretPhrase::class, 'update']);
             Route::delete('/', [App\Http\Controllers\Users\SecretPhrase::class, 'delete']);
+            Route::get('/', [App\Http\Controllers\Users\SecretPhrase::class, 'index']);
         });
     });
 

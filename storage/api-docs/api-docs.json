@@ -2045,6 +2045,59 @@
             }
         },
         "/api/users/secret-phrase": {
+            "get": {
+                "tags": [
+                    "Usuarios - Frase secreta"
+                ],
+                "summary": "Obtener frase secreta",
+                "description": "Obtener frase secreta",
+                "operationId": "fbbad08fed92b8daa20edf7b480b17e5",
+                "responses": {
+                    "200": {
+                        "description": "Frase secreta",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "phrase": {
+                                            "type": "string",
+                                            "example": "Frase secreta"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al obtener la frase secreta",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error al obtener la frase secreta"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
             "post": {
                 "tags": [
                     "Usuarios - Frase secreta"
