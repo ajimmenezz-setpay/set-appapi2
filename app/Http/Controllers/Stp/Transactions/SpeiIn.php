@@ -269,7 +269,7 @@ class SpeiIn extends Controller
                     'Balance' => $companyBalance
                 ]);
 
-            Company::where('Id', $company->CompanyId)
+            Company::where('Id', $company->Id)
                 ->update([
                     'Balance' => $companyBalance
                 ]);
