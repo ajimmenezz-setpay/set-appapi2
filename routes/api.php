@@ -67,6 +67,12 @@ Route::middleware([VerifyJwt::class])->group(function () {
             Route::delete('/', [App\Http\Controllers\Users\SecretPhrase::class, 'delete']);
         });
     });
+
+    Route::group(['prefix' => 'administration'], function () {
+        Route::group(['prefix' => 'company'], function () {
+            Route::get('/', [App\Http\Controllers\Administration\Company::class, 'index']);
+        });
+    });
 });
 
 Route::group(['prefix' => 'clickup'], function () {
