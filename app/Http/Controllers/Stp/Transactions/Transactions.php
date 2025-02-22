@@ -33,6 +33,10 @@ class Transactions extends Controller
                 ];
             }
 
+            if(!isset($companies[$company->Id])) {
+                continue;
+            }
+
             if ($companies[$company->Id]['movements']->count() == 0) {
                 unset($companies[$company->Id]);
             } else {
