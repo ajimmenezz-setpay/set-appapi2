@@ -23,6 +23,49 @@ use Illuminate\Support\Facades\DB;
 
 class Activate extends Controller
 {
+    /**
+     * @OA\Post(
+     *      path="/api/users/validate",
+     *      tags={"Activación de cuenta"},
+     *      summary="Validar existencia de cuenta a través del email",
+     *      description="Validar existencia de cuenta a través del email",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"email"},
+     *             @OA\Property(property="email", type="string", example="  [email protected]")
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Nuevo usuario",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="user", type="object", example={"id": "123456", "email": "  [email protected]", "name": "", "last_name": "", "phone": ""}),
+     *              @OA\Property(property="temporal_code", type="string", example="1234567"),
+     *              @OA\Property(property="google_secret", type="string", example="1234567"),
+     *              @OA\Property(property="google_qrCode", type="string", example="data:image/svg+xml;base64,1234567"),
+     *              @OA\Property(property="newUser", type="boolean", example=true),
+     *              @OA\Property(property="has_2fa", type="boolean", example=false),
+     *              @OA\Property(property="has_secret_phrase", type="boolean", example=false),
+     *              @OA\Property(property="has_cards", type="boolean", example=false)
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=202,
+     *          description="Cuenta ya registrada",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="Para continuar con la activación de tu cuenta, por favor inicia sesión"))
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=400,
+     *          description="Error al validar el email",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="Error al validar el email"))
+     *      )
+     *
+     *)
+     */
     public function validateEmail(Request $request)
     {
         try {
@@ -75,6 +118,63 @@ class Activate extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     *      path="/api/users/validate-credentials",
+     *      tags={"Activación de cuenta"},
+     *      summary="Validar credenciales de usuario",
+     *      description="Validar credenciales de usuario",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"email", "password"},
+     *              @OA\Property(property="email", type="string", example="  [email protected]"),
+     *              @OA\Property(property="password", type="string", example="12345678")
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Credenciales válidas",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="user", type="object", example={"id": "123456", "email": "  [email protected]", "name": "", "last_name": "", "phone": ""}),
+     *              @OA\Property(property="temporal_code", type="string", example="1234567"),
+     *              @OA\Property(property="google_secret", type="string", example="1234567"),
+     *              @OA\Property(property="google_qrCode", type="string", example="data:image/svg+xml;base64,1234567"),
+     *              @OA\Property(property="newUser", type="boolean", example=false),
+     *              @OA\Property(property="has_2fa", type="boolean", example=false),
+     *              @OA\Property(property="has_secret_phrase", type="boolean", example=false),
+     *              @OA\Property(property="has_cards", type="boolean", example=false)
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=400,
+     *          description="Error al validar las credenciales",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="Error al validar las credenciales"))
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=401,
+     *          description="Cuenta no activada",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="La contraseña no coincide con la registrada"))
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=404,
+     *          description="Email no registrado",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="El email no está registrado"))
+     *     ),
+     *
+     *     @OA\Response(
+     *          response=409,
+     *          description="Cuenta no activada",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="No se ha completado el registro de la cuenta. Es necesario volver a empezar el proceso de activación"))
+     *    )
+     * )
+     *
+     *
+     */
     public function validateCredentials(Request $request)
     {
         try {
@@ -89,15 +189,15 @@ class Activate extends Controller
 
             $user = User::where('Email', $request->email)->first();
             if ($user && $user->Active == 0 && $user->ProfileId == 8 && $user->Name == 'Usuario' && $user->Lastname == 'Nuevo' && $user->Phone == '0000000000') {
-                throw new \Exception('No se ha completado el registro de la cuenta. Es necesario volver a empezar el proceso de activación', 400);
+                throw new \Exception('No se ha completado el registro de la cuenta. Es necesario volver a empezar el proceso de activación', 409);
             }
 
             if (!$user) {
-                throw new \Exception('El email no está registrado', 400);
+                throw new \Exception('El email no está registrado', 404);
             }
 
             if (!Password::verifyUserPassword($user->Id, $request->password)) {
-                throw new \Exception('La contraseña no coincide con la registrada', 400);
+                throw new \Exception('La contraseña no coincide con la registrada', 401);
             }
 
             $user->StpAccountId = substr(Uuid::uuid7(), -7);
@@ -138,6 +238,79 @@ class Activate extends Controller
             return self::basicError($e->getMessage());
         }
     }
+
+
+    /**
+     * @OA\Post(
+     *      path="/api/users/activate",
+     *      tags={"Activación de cuenta"},
+     *      summary="Activar cuenta de usuario, asociar tarjeta, definir frase secreta y activar doble factor de autenticación",
+     *      description="Activar cuenta de usuario, asociar tarjeta, definir frase secreta y activar doble factor de autenticación",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"user_id", "temporal_code", "google_code"},
+     *              @OA\Property(property="user_id", type="string", example="123456"),
+     *              @OA\Property(property="temporal_code", type="string", example="1234567"),
+     *              @OA\Property(property="google_code", type="string", example="1234567"),
+     *              @OA\Property(property="name", type="string", example="Nombre"),
+     *              @OA\Property(property="last_name", type="string", example="Apellido"),
+     *              @OA\Property(property="phone", type="string", example="1234567890"),
+     *              @OA\Property(property="secret_phrase", type="string", example="Frase secreta"),
+     *              @OA\Property(property="card", type="string", example="12345678"),
+     *              @OA\Property(property="nip", type="string", example="1234"),
+     *              @OA\Property(property="moye", type="string", example="0123")
+     *          )
+     *     ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Cuenta activada",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="message",
+     *                  type="array",
+     *                  @OA\Items(type="string"),
+     *                  example={
+     *                      "Los datos del usuario han sido registrados",
+     *                      "La frase secreta ha sido registrada",
+     *                      "La tarjeta ha sido registrada y asignada al usuario",
+     *                      "El doble factor de autenticación ha sido activado"
+     *                  }
+     *              )
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=400,
+     *          description="Error al activar la cuenta",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="error", type="string")
+     *          ),
+     *          @OA\Examples(
+     *              example="user_not_found",
+     *              summary="Usuario no encontrado",
+     *              value={"error": "El usuario no existe"}
+     *          ),
+     *          @OA\Examples(
+     *              example="invalid_temporal_code",
+     *              summary="Código temporal incorrecto",
+     *              value={"error": "El código temporal no coincide con el registrado"}
+     *          ),
+     *          @OA\Examples(
+     *              example="invalid_secret_phrase",
+     *              summary="Frase secreta no válida",
+     *              value={"error": "La frase secreta debe tener al menos 10 caracteres"}
+     *          ),
+     *          @OA\Examples(
+     *              example="invalid_nip",
+     *              summary="NIP incorrecto",
+     *              value={"error": "El NIP debe tener 4 dígitos"}
+     *          )
+     *      )
+     * )
+     *
+     */
 
     public function activate(Request $request)
     {

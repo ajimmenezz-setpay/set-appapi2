@@ -2044,6 +2044,347 @@
                 ]
             }
         },
+        "/api/users/validate": {
+            "post": {
+                "tags": [
+                    "Activación de cuenta"
+                ],
+                "summary": "Validar existencia de cuenta a través del email",
+                "description": "Validar existencia de cuenta a través del email",
+                "operationId": "1301c1bf552cedd03e8596e4869c8840",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "  [email protected]"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Nuevo usuario",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user": {
+                                            "type": "object",
+                                            "example": {
+                                                "id": "123456",
+                                                "email": "  [email protected]",
+                                                "name": "",
+                                                "last_name": "",
+                                                "phone": ""
+                                            }
+                                        },
+                                        "temporal_code": {
+                                            "type": "string",
+                                            "example": "1234567"
+                                        },
+                                        "google_secret": {
+                                            "type": "string",
+                                            "example": "1234567"
+                                        },
+                                        "google_qrCode": {
+                                            "type": "string",
+                                            "example": "data:image/svg+xml;base64,1234567"
+                                        },
+                                        "newUser": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "has_2fa": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "has_secret_phrase": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "has_cards": {
+                                            "type": "boolean",
+                                            "example": false
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "202": {
+                        "description": "Cuenta ya registrada",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Para continuar con la activación de tu cuenta, por favor inicia sesión"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al validar el email",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error al validar el email"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/validate-credentials": {
+            "post": {
+                "tags": [
+                    "Activación de cuenta"
+                ],
+                "summary": "Validar credenciales de usuario",
+                "description": "Validar credenciales de usuario",
+                "operationId": "d219b5314f61413a8a137bc7ca4c1a25",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "  [email protected]"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "12345678"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Credenciales válidas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user": {
+                                            "type": "object",
+                                            "example": {
+                                                "id": "123456",
+                                                "email": "  [email protected]",
+                                                "name": "",
+                                                "last_name": "",
+                                                "phone": ""
+                                            }
+                                        },
+                                        "temporal_code": {
+                                            "type": "string",
+                                            "example": "1234567"
+                                        },
+                                        "google_secret": {
+                                            "type": "string",
+                                            "example": "1234567"
+                                        },
+                                        "google_qrCode": {
+                                            "type": "string",
+                                            "example": "data:image/svg+xml;base64,1234567"
+                                        },
+                                        "newUser": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "has_2fa": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "has_secret_phrase": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "has_cards": {
+                                            "type": "boolean",
+                                            "example": false
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al validar las credenciales",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error al validar las credenciales"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Cuenta no activada",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "La contraseña no coincide con la registrada"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Email no registrado",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "El email no está registrado"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Cuenta no activada",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "No se ha completado el registro de la cuenta. Es necesario volver a empezar el proceso de activación"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/activate": {
+            "post": {
+                "tags": [
+                    "Activación de cuenta"
+                ],
+                "summary": "Activar cuenta de usuario, asociar tarjeta, definir frase secreta y activar doble factor de autenticación",
+                "description": "Activar cuenta de usuario, asociar tarjeta, definir frase secreta y activar doble factor de autenticación",
+                "operationId": "f05c6c389c3a2fbe995d3aa51efe0760",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id",
+                                    "temporal_code",
+                                    "google_code"
+                                ],
+                                "properties": {
+                                    "user_id": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    },
+                                    "temporal_code": {
+                                        "type": "string",
+                                        "example": "1234567"
+                                    },
+                                    "google_code": {
+                                        "type": "string",
+                                        "example": "1234567"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Nombre"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Apellido"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "1234567890"
+                                    },
+                                    "secret_phrase": {
+                                        "type": "string",
+                                        "example": "Frase secreta"
+                                    },
+                                    "card": {
+                                        "type": "string",
+                                        "example": "12345678"
+                                    },
+                                    "nip": {
+                                        "type": "string",
+                                        "example": "1234"
+                                    },
+                                    "moye": {
+                                        "type": "string",
+                                        "example": "0123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cuenta activada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "example": [
+                                                "Los datos del usuario han sido registrados",
+                                                "La frase secreta ha sido registrada",
+                                                "La tarjeta ha sido registrada y asignada al usuario",
+                                                "El doble factor de autenticación ha sido activado"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al activar la cuenta",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/users/secret-phrase": {
             "get": {
                 "tags": [
@@ -2369,6 +2710,10 @@
         {
             "name": "Ticket",
             "description": "Ticket"
+        },
+        {
+            "name": "Activación de cuenta",
+            "description": "Activación de cuenta"
         },
         {
             "name": "Usuarios - Frase secreta",
