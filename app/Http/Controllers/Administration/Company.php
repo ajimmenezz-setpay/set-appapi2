@@ -32,13 +32,32 @@ class Company extends Controller
             var_dump($e->getMessage());
             return self::basicError("Error al obtener las empresas");
         }
+    }
 
+    public function show(Request $request, $id)
+    {
+        try {
+            switch ($request->attributes->get('jwt')->profileId) {
+                case 5:
+                    $company = CompanyProjection::where('BusinessId', $request->attributes->get('jwt')->businessId)->where('Id', $id)->first();
+                    break;
+                case 7:
+                    $company = CompanyProjection::join('t_backoffice_companies_and_users', 't_backoffice_companies_and_users.CompanyId', '=', 't_backoffice_companies_projection.Id')
+                        ->where('t_backoffice_companies_and_users.UserId', $request->attributes->get('jwt')->id)
+                        ->where('t_backoffice_companies_projection.Id', $id)
+                        ->first();
+                    break;
+                default:
+                    return self::basicError("No tienes permisos para ver la empresa solicitada");
+            }
 
-        $companies = CompanyProjection::all();
-        $companies = $companies->map(function ($company) {
-            return self::companyObject($company);
-        });
-        return response()->json($companies);
+            if (!$company) {
+                return self::basicError("No tienes permisos para ver la empresa solicitada");
+            }
+            return response()->json(self::companyObject($company));
+        } catch (\Exception $e) {
+            return self::basicError("Error al obtener la empresa");
+        }
     }
 
     public static function companyObject($company)
@@ -102,7 +121,7 @@ class Company extends Controller
             ],
             "createdByUser" => $company->CreatedByUser,
             "register" => $company->CreateDate,
-            "active" => $company->Active
+            "active" => (string)$company->Active
         ];
     }
 
@@ -136,6 +155,10 @@ class Company extends Controller
     public static function users($company)
     {
         $users = json_decode($company->Users);
+        $users = array_map(function ($user) {
+            $user->profileId = $user->profile;
+            return $user;
+        }, $users);
         return $users;
     }
 

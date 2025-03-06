@@ -61,6 +61,7 @@ Route::middleware([VerifyJwt::class])->group(function () {
     });
 
     Route::group(['prefix' => 'users'], function () {
+
         Route::group(['prefix' => 'secret-phrase'], function () {
             Route::post('/', [App\Http\Controllers\Users\SecretPhrase::class, 'create']);
             Route::patch('/', [App\Http\Controllers\Users\SecretPhrase::class, 'update']);
@@ -72,6 +73,7 @@ Route::middleware([VerifyJwt::class])->group(function () {
     Route::group(['prefix' => 'administration'], function () {
         Route::group(['prefix' => 'company'], function () {
             Route::get('/', [App\Http\Controllers\Administration\Company::class, 'index']);
+            Route::get('/{id}', [App\Http\Controllers\Administration\Company::class, 'show']);
         });
     });
 });
@@ -91,4 +93,10 @@ Route::group(['prefix' => 'stp'], function () {
     Route::get('generate_clabe', [App\Http\Controllers\Stp\GenerateClabe::class, 'generate']);
 
     Route::get('fix_clabes_assignation', [App\Http\Controllers\Stp\AssignClabes::class, 'fixClabesAssignation']);
+});
+
+Route::group(['prefix' => 'users'], function () {
+    Route::post('validate', [App\Http\Controllers\Users\Activate::class, 'validateEmail']);
+    Route::post('login', [App\Http\Controllers\Users\Activate::class, 'validateCredentials']);
+    Route::post('activate', [App\Http\Controllers\Users\Activate::class, 'activate']);
 });

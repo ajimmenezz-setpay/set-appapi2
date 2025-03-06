@@ -259,11 +259,11 @@ class CardManagementController extends Controller
 
             $decodedJson = json_decode($response->getBody(), true);
 
-            if ($this->validateAlreadyAssigned($decodedJson['card_id'])) {
+            if (self::validateAlreadyAssigned($decodedJson['card_id'])) {
                 return response("La tarjeta ya está asignada a un usuario", 400);
             }
 
-            if (!$this->validateUserCompany($decodedJson['subaccount_id'], $request->attributes->get('jwt')->id)) {
+            if (!self::validateUserCompany($decodedJson['subaccount_id'], $request->attributes->get('jwt')->id)) {
                 return self::basicError("La tarjeta de origen no pertenece a la empresa del usuario");
             }
 
@@ -300,7 +300,7 @@ class CardManagementController extends Controller
         }
     }
 
-    private function validateUserCompany($subaccountId, $userId)
+    public static function validateUserCompany($subaccountId, $userId)
     {
         $company = CompanyProjection::where('Services', 'like', '%' . $subaccountId . '%')->first();
         if (!$company) return false;
@@ -311,7 +311,7 @@ class CardManagementController extends Controller
         return true;
     }
 
-    private function validateAlreadyAssigned($cardId)
+    public static function validateAlreadyAssigned($cardId)
     {
         return CardAssigned::where('CardCloudId', $cardId)->count() > 0;
     }

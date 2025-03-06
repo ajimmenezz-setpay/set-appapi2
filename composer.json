@@ -12,7 +12,9 @@
         "laravel/framework": "^11.9",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
+        "pragmarx/google2fa": "^8.0",
         "ramsey/uuid": "^4.7",
+        "simplesoftwareio/simple-qrcode": "^4.2",
         "spomky-labs/otphp": "*",
         "tymon/jwt-auth": "^2.1"
     },

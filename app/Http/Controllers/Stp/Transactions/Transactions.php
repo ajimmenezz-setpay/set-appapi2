@@ -33,7 +33,7 @@ class Transactions extends Controller
                 ];
             }
 
-            if(!isset($companies[$company->Id])) {
+            if (!isset($companies[$company->Id])) {
                 continue;
             }
 
@@ -78,10 +78,15 @@ class Transactions extends Controller
 
     public static function getAccountMovements($bankAccountNumber)
     {
-        return StpTransaction::whereIn('StatusId', [3,1])
+        return StpTransaction::whereIn('StatusId', [3, 1])
             ->where(function ($query) use ($bankAccountNumber) {
-                $query->where('SourceAccount', $bankAccountNumber)
-                    ->orWhere('DestinationAccount', $bankAccountNumber);
+                $query->where(function ($query) use ($bankAccountNumber) {
+                    $query->where('SourceAccount', $bankAccountNumber)
+                        ->where('TypeId', 1);
+                })->orWhere(function ($query) use ($bankAccountNumber) {
+                    $query->where('DestinationAccount', $bankAccountNumber)
+                        ->where('TypeId', 2);
+                });
             })->orderBy('CreateDate', 'asc')->get();
     }
 }
