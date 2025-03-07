@@ -90,6 +90,10 @@ class Activate extends Controller
             $continueProcess = false;
 
             $user = User::where('email', $request->email)->first();
+            if ($user->ProfileId != 8) {
+                throw new \Exception('Esta cuenta de correo no puede utilizarse para activar una tarjeta, por favor intenta con otra cuenta de correo', 400);
+            }
+
             if ($user && $user->Active == 0 && $user->ProfileId == 8 && $user->Name == 'Usuario' && $user->Lastname == 'Nuevo' && $user->Phone == '0000000000') {
                 $continueProcess = true;
                 User::where('Id', $user->Id)->delete();
