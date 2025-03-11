@@ -640,7 +640,7 @@ class Activate extends Controller
         try {
             $curl = curl_init();
             curl_setopt_array($curl, array(
-                CURLOPT_URL => "https://appapi.setpay.lat/api/user/password/reset/" . $user->id,
+                CURLOPT_URL => "https://appapi.setpay.net/api/user/password/reset/" . $user->id,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
