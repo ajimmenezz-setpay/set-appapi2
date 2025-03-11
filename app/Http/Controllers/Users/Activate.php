@@ -640,7 +640,7 @@ class Activate extends Controller
         try {
             $curl = curl_init();
             curl_setopt_array($curl, array(
-                CURLOPT_URL => "https://appapi.setpay.net/api/user/password/reset/" . $user->id,
+                CURLOPT_URL => "https://appapi.setpay.net/api/user/password/reset/" . $user->Id,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -650,10 +650,12 @@ class Activate extends Controller
                 CURLOPT_CUSTOMREQUEST => 'GET',
             ));
 
+            var_dump("https://appapi.setpay.net/api/user/password/reset/" . $user->Id);
+
             curl_exec($curl);
             curl_close($curl);
         } catch (\Exception $e) {
-            Log::error($e->getMessage());
+            throw new \Exception('Error al enviar el correo de acceso', 400);
         }
     }
 }
