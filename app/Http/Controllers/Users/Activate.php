@@ -90,7 +90,7 @@ class Activate extends Controller
             $continueProcess = false;
 
             $user = User::where('email', $request->email)->first();
-            if ($user->ProfileId != 8) {
+            if ($user && $user->ProfileId != 8) {
                 throw new \Exception('Esta cuenta de correo no puede utilizarse para activar una tarjeta, por favor intenta con otra cuenta de correo', 400);
             }
 
@@ -124,7 +124,7 @@ class Activate extends Controller
 
     /**
      * @OA\Post(
-     *      path="/api/users/validate-credentials",
+     *      path="/api/users/login",
      *      tags={"Activación de cuenta"},
      *      summary="Validar credenciales de usuario",
      *      description="Validar credenciales de usuario",
