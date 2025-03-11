@@ -218,7 +218,7 @@ class Activate extends Controller
                     'email' => $user->Email,
                     'name' => $user->Name,
                     'last_name' => $user->Lastname,
-                    'phone' => $user->Phone
+                    'phone' => $user->Phone ?? ""
                 ],
                 'temporal_code' => $temporalCode,
                 'google_secret' => '',
@@ -403,9 +403,9 @@ class Activate extends Controller
 
             User::where('Id', $user->Id)->update([
                 'Active' => 1,
-                'Name' => $request->name,
-                'Lastname' => $request->last_name,
-                'Phone' => $request->phone,
+                'Name' => $request->name ?? "",
+                'Lastname' => $request->last_name ?? "",
+                'Phone' => $request->phone ?? "",
                 'StpAccountId' => ""
             ]);
 
