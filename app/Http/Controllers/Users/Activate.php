@@ -21,6 +21,7 @@ use App\Models\Users\SecretPhrase;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class Activate extends Controller
 {
@@ -396,7 +397,7 @@ class Activate extends Controller
                 ]);
             }
 
-            // SecurityGoogleAuth::authorized($user->Id, $request->google_code);
+            SecurityGoogleAuth::authorized($user->Id, $request->google_code);
 
             DB::beginTransaction();
 
@@ -488,7 +489,10 @@ class Activate extends Controller
             }
 
             $operations[] = 'El dobble factor de autenticación ha sido activado';
+
             DB::commit();
+
+            self::send_access($user);
 
             return response()->json(['message' => $operations], 200);
         } catch (\Exception $e) {
@@ -586,8 +590,9 @@ class Activate extends Controller
         }
     }
 
-    public function cleanActivation(Request $request){
-        try{
+    public function cleanActivation(Request $request)
+    {
+        try {
             $this->validate($request, [
                 'email' => 'required|email'
             ], [
@@ -596,7 +601,7 @@ class Activate extends Controller
             ]);
 
             $user = User::where('email', $request->email)->where('ProfileId', 8)->first();
-            if($user){
+            if ($user) {
                 DB::beginTransaction();
                 CardAssigned::where('UserId', $user->Id)->delete();
                 GoogleAuth::where('UserId', $user->Id)->delete();
@@ -605,11 +610,11 @@ class Activate extends Controller
                 CompaniesAndUsers::where('UserId', $user->Id)->delete();
 
                 $company = CompanyProjection::where('Users', 'like', '%"id":"' . $user->Id . '"%')->first();
-                if($company){
+                if ($company) {
                     $companyUsers = json_decode($company->Users, true);
                     $newCompanyUsers = [];
-                    foreach($companyUsers as $companyUser){
-                        if($companyUser['id'] != $user->Id){
+                    foreach ($companyUsers as $companyUser) {
+                        if ($companyUser['id'] != $user->Id) {
                             $newCompanyUsers[] = $companyUser;
                         }
                     }
@@ -621,13 +626,34 @@ class Activate extends Controller
 
                 DB::commit();
                 return response()->json(['message' => 'El proceso de activación del usuario ha sido eliminado'], 200);
-
-            } else{
+            } else {
                 DB::rollBack();
                 throw new \Exception('El email no está registrado', 404);
             }
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return self::basicError($e->getMessage());
+        }
+    }
+
+    public function send_access($user)
+    {
+        try {
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => "https://appapi.setpay.lat/api/user/password/reset/" . $user->id,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'GET',
+            ));
+
+            curl_exec($curl);
+            curl_close($curl);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
         }
     }
 }

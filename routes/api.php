@@ -54,6 +54,12 @@ Route::middleware([VerifyJwt::class])->group(function () {
         });
     });
 
+    Route::group(['prefix' => 'speiCloud'], function () {
+        Route::group(['prefix' => 'transaction'], function () {
+            Route::post('/process-payments', [App\Http\Controllers\Stp\Transactions\SpeiOut::class, 'processPayments']);
+        });
+    });
+
     Route::group(['prefix' => 'ticket'], function () {
         Route::post('/', [App\Http\Controllers\Ticket\ClickupTicket::class, 'create']);
         Route::get('/', [App\Http\Controllers\Ticket\ClickupTicket::class, 'index']);
@@ -99,5 +105,5 @@ Route::group(['prefix' => 'users'], function () {
     Route::post('validate', [App\Http\Controllers\Users\Activate::class, 'validateEmail']);
     Route::post('login', [App\Http\Controllers\Users\Activate::class, 'validateCredentials']);
     Route::post('activate', [App\Http\Controllers\Users\Activate::class, 'activate']);
-    Route::delete('clean-activation', [App\Http\Controllers\Users\Activate::class, 'cleanActivation']);
+    Route::delete('clean', [App\Http\Controllers\Users\Activate::class, 'cleanActivation']);
 });
