@@ -8,6 +8,7 @@ use App\Http\Controllers\Security\Crypt;
 use App\Http\Controllers\Security\GoogleAuth as SecurityGoogleAuth;
 use App\Http\Controllers\Security\Password;
 use App\Models\Backoffice\Companies\CompanyProjection;
+use App\Models\Backoffice\Users\CompaniesAndUsers;
 use App\Models\CardCloud\CardAssigned;
 use App\Models\Security\GoogleAuth;
 use Illuminate\Http\Request;
@@ -452,8 +453,18 @@ class Activate extends Controller
                     ];
                 }
 
-                companyProjection::where('Id', $company->Id)->update([
+                CompanyProjection::where('Id', $company->Id)->update([
                     'Users' => json_encode($newCompanyUsers)
+                ]);
+
+                CompaniesAndUsers::create([
+                    'CompanyId' => $company->Id,
+                    'UserId' => $user->Id,
+                    'ProfileId' => 8,
+                    'Name' => $user->Name,
+                    'Lastname' => $user->Lastname,
+                    'Email' => $user->Email,
+                    'CreateDate' => Carbon::now('America/Mexico_City')->format('Y-m-d H:i:s')
                 ]);
 
                 CardAssigned::create([
@@ -569,6 +580,51 @@ class Activate extends Controller
             return $decodedJson;
         } catch (RequestException $e) {
             throw new \Exception('Los datos de la tarjeta no son válidos', 400);
+        }
+    }
+
+    public function cleanActivation(Request $request){
+        try{
+            $this->validate($request, [
+                'email' => 'required|email'
+            ], [
+                'email.required' => 'El email es requerido',
+                'email.email' => 'El email no es válido'
+            ]);
+
+            $user = User::where('email', $request->email)->where('ProfileId', 8)->first();
+            if($user){
+                DB::beginTransaction();
+                CardAssigned::where('UserId', $user->Id)->delete();
+                GoogleAuth::where('UserId', $user->Id)->delete();
+                SecretPhrase::where('UserId', $user->Id)->delete();
+                User::where('Id', $user->Id)->delete();
+                CompaniesAndUsers::where('UserId', $user->Id)->delete();
+
+                $company = CompanyProjection::where('Users', 'like', '%"id":"' . $user->Id . '"%')->first();
+                if($company){
+                    $companyUsers = json_decode($company->Users, true);
+                    $newCompanyUsers = [];
+                    foreach($companyUsers as $companyUser){
+                        if($companyUser['id'] != $user->Id){
+                            $newCompanyUsers[] = $companyUser;
+                        }
+                    }
+
+                    CompanyProjection::where('Id', $company->Id)->update([
+                        'Users' => json_encode($newCompanyUsers)
+                    ]);
+                }
+
+                DB::commit();
+                return response()->json(['message' => 'El proceso de activación del usuario ha sido eliminado'], 200);
+
+            } else{
+                DB::rollBack();
+                throw new \Exception('El email no está registrado', 404);
+            }
+        }catch(\Exception $e){
+            return self::basicError($e->getMessage());
         }
     }
 }
