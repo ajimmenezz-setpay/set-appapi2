@@ -205,8 +205,11 @@ class Activate extends Controller
                 throw new \Exception('La contraseña no coincide con la registrada', 401);
             }
 
-            $user->StpAccountId = substr(Uuid::uuid7(), -7);
-            $user->save();
+            $temporalCode = substr(Uuid::uuid7(), -7);
+
+            User::where('Id', $user->Id)->update([
+                'StpAccountId' => $temporalCode
+            ]);
 
             $returnArray = [
                 'user' => [
@@ -216,7 +219,7 @@ class Activate extends Controller
                     'last_name' => $user->Lastname,
                     'phone' => $user->Phone
                 ],
-                'temporal_code' => $user->StpAccountId,
+                'temporal_code' => $temporalCode,
                 'google_secret' => '',
                 'google_qrCode' => '',
                 'newUser' => false,
