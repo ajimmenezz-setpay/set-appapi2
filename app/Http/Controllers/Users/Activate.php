@@ -397,7 +397,7 @@ class Activate extends Controller
                 ]);
             }
 
-            // SecurityGoogleAuth::authorized($user->Id, $request->google_code);
+            SecurityGoogleAuth::authorized($user->Id, $request->google_code);
 
             DB::beginTransaction();
 
