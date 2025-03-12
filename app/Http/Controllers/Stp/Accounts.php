@@ -26,4 +26,34 @@ class Accounts extends Controller
     {
         return StpAccountsModel::where('Id', $id)->first();
     }
+
+    public static function getParentAccount($account_number){
+        $accounts = StpAccountsModel::get();
+        $better_coincidence = null;
+        $max_length_coincidence = 0;
+
+        foreach ($accounts as $acc) {
+            $common_prefix = self::getCommonPrefix($account_number, Crypt::decrypt($acc->Number));
+
+            if ($common_prefix > $max_length_coincidence) {
+                $max_length_coincidence = $common_prefix;
+                $better_coincidence = $acc;
+            }
+        }
+    }
+
+    public static function getCommonPrefix($subaccount, $account){
+        $length = min(strlen($subaccount), strlen($account));
+        $count = 0;
+
+        for ($i = 0; $i < $length; $i++) {
+            if ($subaccount[$i] == $account[$i]) {
+                $count++;
+            } else {
+                break;
+            }
+        }
+
+        return $count;
+    }
 }

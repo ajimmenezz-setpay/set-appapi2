@@ -4,338 +4,282 @@ namespace App\Http\Controllers\Stp\Transactions;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Security\Crypt;
-use App\Http\Services\STPApi;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Security\GoogleAuth;
+use App\Http\Controllers\Stp\ErrorRegisterOrder;
+use App\Http\Controllers\Stp\Transactions\Transactions;
 use App\Models\Backoffice\Companies\CompanyProjection;
-use App\Models\Backoffice\Companies\Company;
-use App\Models\Backoffice\Companies\CompanySpeiAccount;
-use App\Models\CardCloud\CardSpeiAccount;
 use App\Models\Speicloud\StpAccounts;
 use App\Models\Speicloud\StpTransaction;
+use App\Services\StpService;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\DB;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
-use Illuminate\Support\Facades\Log;
+use Ramsey\Uuid\Uuid;
 
 class SpeiOut extends Controller
 {
-    public function register(Request $request)
+    protected static $handlers = [
+        'business-account' => [
+            'business-account' => 'processBusinessToBusiness',
+            'company-account' => 'processBusinessToCompany',
+            'card-cloud-account' => 'processBusinessToCardCloud',
+            'company-card-cloud-account' => 'processBusinessToCompanyCardCloud',
+            'external-account' => 'processBusinessToExternal',
+        ],
+        'company-account' => [
+            'business-account' => 'processCompanyToBusiness',
+            'company-account' => 'processCompanyToCompany',
+            'card-cloud-account' => 'processCompanyToCardCloud',
+            'company-card-cloud-account' => 'processCompanyToCompanyCardCloud',
+            'external-account' => 'processCompanyToExternal',
+        ],
+        'card-cloud-account' => [
+            'business-account' => 'processCardCloudToBusiness',
+            'company-account' => 'processCardCloudToCompany',
+            'card-cloud-account' => 'processCardCloudToCardCloud',
+            'company-card-cloud-account' => 'processCardCloudToCompanyCardCloud',
+            'external-account' => 'processCardCloudToExternal',
+        ],
+    ];
+
+    public function processPayments(Request $request)
     {
-
-
-
-
-        $response = [];
-        $accounts = StpAccounts::where('Active', 1)->get();
-        $date = isset($request->date) ? $request->date : Carbon::now()->format('Ymd');
-        foreach ($accounts as $account) {
-            if (!isset($response[$account->Id])) {
-                $response[$account->Id] = [
-                    'company' => $account->Company,
-                    'movements' => [],
-                    'errors' => []
-                ];
-            }
-
-            try {
-                $movements = STPApi::collection(Crypt::decrypt($account->Url), Crypt::decrypt($account->Key), $account->Company, $date);
-                $movements = $this->processMovements($movements, $account);
-                $response[$account->Id]['movements'] = $movements;
-            } catch (\Exception $e) {
-                $response[$account->Id]['errors'][] = $e->getMessage() . " " . $e->getLine();
-                continue;
-            }
-        }
-
-        Transactions::fixBalances();
-
-        return response()->json($response);
-    }
-
-    private function processMovements($movements, $account)
-    {
-        $response = [];
-        foreach ($movements as $movement) {
-            if (StpTransaction::where('StpId', $movement->id)->exists()) {
-                $response[] = [
-                    'id' => $movement->id,
-                    'status' => 'Already registered'
-                ];
-                continue;
-            }
-
-            if ($this->searchByBusinessAcount($movement->cuentaBeneficiario, Crypt::decrypt($account->Number))) {
-                $response[] = $this->processAsBusiness($movement, $account->BusinessId);
-                continue;
-            }
-
-            $company = $this->searchByCompanyAccount($movement->cuentaBeneficiario);
-            if (!is_null($company)) {
-                $response[] = $this->processAsCompany($movement, $company);
-                continue;
-            }
-
-            $cardCloudCompany = $this->searchByCardCloudCompanyAccount($movement->cuentaBeneficiario);
-            if (!is_null($cardCloudCompany)) {
-                $response[] = $this->processCardCloudMovement($movement, 'company', $cardCloudCompany->CompanyId);
-                continue;
-            }
-
-            $cardCloud = $this->searchByCardCloud($movement->cuentaBeneficiario);
-            if (!is_null($cardCloud)) {
-                $response[] = $this->processCardCloudMovement($movement, 'card', null, $cardCloud->CardId);
-                continue;
-            }
-        }
-
-        return $response;
-    }
-
-    private function searchByBusinessAcount($beneficiaryAccount, $businessAccount)
-    {
-        if ($beneficiaryAccount == $businessAccount) {
-            return true;
-        }
-        return false;
-    }
-
-    private function processAsBusiness($movement, $businessId)
-    {
-        $comissions = json_encode([
-            "speiOut" => 0,
-            "speiIn" => 0,
-            "internal" => 0,
-            "feeStp" => 0,
-            "stpAccount" => 0,
-            "total" => $movement->monto
-        ]);
-        $transaction = self::transactionBase($movement, $businessId, $comissions);
-        $transaction->save();
-        return [
-            'id' => $movement->id,
-            'destination' => $movement->cuentaBeneficiario,
-            'amount' => $movement->monto,
-            'status' => 'Registered as business'
-        ];
-    }
-
-    private function searchByCompanyAccount($beneficiaryAccount)
-    {
-        $company = CompanyProjection::where('Services', 'like', '%' . $beneficiaryAccount . '%')->first();
-        if ($company) {
-            $services = json_decode($company->Services);
-            $isSpeiCloudCompany = false;
-            foreach ($services as $service) {
-                if ($service->type = 4 && $service->bankAccountNumber == $beneficiaryAccount) {
-                    $isSpeiCloudCompany = true;
-                    break;
-                }
-            }
-
-            if ($isSpeiCloudCompany) {
-                return $company;
-            }
-        }
-        return null;
-    }
-
-    private function processAsCompany($movement, $company)
-    {
-        $comissions = $this->calculateCompanyCommission($company->Commissions, $movement->monto);
-        $companyBalance = $company->Balance + $comissions['total'];
-
-        DB::beginTransaction();
         try {
-            CompanyProjection::where('Id', $company->Id)
-                ->update([
-                    'Balance' => $companyBalance
-                ]);
+            $actions = Crypt::opensslDecrypt($request->all());
+            $actions = json_decode($actions);
+            // GoogleAuth::authorized($request->attributes->get('jwt')->id, $actions->googleAuthenticatorCode);
 
-            Company::where('Id', $company->Id)
-                ->update([
-                    'Balance' => $companyBalance
-                ]);
+            $total = $this->totalTransactions($actions->destinationsAccounts);
+            $origin = $this->getOrigin($actions->originBankAccount);
 
-            $transaction = self::transactionBase($movement, $company->BusinessId, json_encode($comissions), $companyBalance);
-            $transaction->save();
-            DB::commit();
+            if ($origin['type'] == 'business-account') {
+                Transactions::updateAccountBalance($origin['id']);
+            }
 
-            return [
-                'id' => $movement->id,
-                'destination' => $movement->cuentaBeneficiario,
-                'amount' => $movement->monto,
-                'status' => 'Registered as company'
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw new \Exception('Error al registrar la transacción. ' . $e->getMessage());
-        }
+            $destinos = [];
 
-        return $comissions;
-    }
+            $errors = [];
 
-    private function calculateCompanyCommission($comissions = null, $amount)
-    {
-        $response = [
-            'speiOut' => 0,
-            'speiIn' => 0,
-            'internal' => 0,
-            'feeStp' => 0,
-            'stpAccount' => 0,
-            'total' => $amount
-        ];
+            foreach ($actions->destinationsAccounts as $d) {
+                try {
+                    $destination = $this->getDestination($d->bankAccount);
+                    if (is_null($destination)) {
+                        throw new \Exception('Cuenta ' . $d->bankAccount . ' destino no encontrada');
+                    }
 
-        if (!is_null($comissions)) {
-            $comissions = json_decode($comissions);
+                    if ($origin['id'] == $destination['id'] && $origin['type'] == $destination['type']) {
+                        throw new \Exception('No es posible realizar transferencias a la misma cuenta');
+                    }
 
-            foreach ($comissions as $commission) {
-                if ($commission->type == 2) {
-                    $response['speiIn'] = $amount * ($commission->speiIn / 100);
-                    $response['total'] -= $response['speiIn'];
+                    $handler = self::$handlers[$origin['type']][$d->type]($origin, $destination, $d->amount, $actions->concept, $request);
+
+                    $destinos[] = $destination;
+                } catch (\Exception $e) {
+                    $errors[] = 'No se ha podido procesar la cuenta ' . $d->bankAccount . ' destino. ' . $e->getMessage();
                 }
             }
-        }
 
-        return $response;
+            if ($total > $origin['balance']) {
+                throw new \Exception('Fondos insuficientes, por favor verifique su saldo o espere a que se acrediten los fondos pendientes');
+            }
+
+
+            $actions->total = $total;
+            $actions->origin = $origin;
+
+            return response()->json([
+                'destinations' => $destinos,
+                'errors' => $errors,
+                'actions' => $actions
+            ]);
+        } catch (\Exception $e) {
+            return self::basicError($e->getMessage());
+        }
     }
 
-    public static function transactionBase($movement, $businessId, $comissions, $destinationBalance = 0, $cardCloudAccount = null)
+    private function totalTransactions($transactions)
     {
-        $transaction = new StpTransaction();
-        $transaction->Id = Uuid::uuid7();
-        $transaction->BusinessId = $businessId;
-        $transaction->TypeId = 2;
-        $transaction->StatusId = 3;
-        $transaction->Reference = $movement->referenciaNumerica;
-        $transaction->TrackingKey = $movement->claveRastreo;
-        $transaction->Concept = $movement->conceptoPago;
-        $transaction->SourceAccount = $movement->cuentaOrdenante;
-        $transaction->SourceName = $movement->nombreOrdenante;
-        $transaction->SourceBalance = 0;
-        $transaction->SourceEmail = "";
-        $transaction->DestinationAccount = ($cardCloudAccount) ? $cardCloudAccount : $movement->cuentaBeneficiario;
-        $transaction->DestinationName = $movement->nombreBeneficiario;
-        $transaction->DestinationBalance = $destinationBalance;
-        $transaction->DestinationEmail = "";
-        $transaction->DestinationBankCode = 90646;
-        $transaction->Amount = $movement->monto;
-        $transaction->Commissions = $comissions;
-
-        $date = Carbon::createFromTimestampMs($movement->tsLiquidacion)->setTimezone('America/Mexico_City');
-
-        $transaction->LiquidationDate = $date->toDateTimeString();
-        $transaction->UrlCEP = "";
-        $transaction->StpId = $movement->id;
-        $transaction->ApiData = json_encode($movement);
-        $transaction->CreatedByUser = "";
-        $transaction->CreateDate = Carbon::now('America/Mexico_City')->toDateTimeString();
-        $transaction->Active = 0;
-        return $transaction;
+        $total = 0;
+        foreach ($transactions as $transaction) {
+            $total += $transaction->amount;
+        }
+        return $total;
     }
 
-    public function searchByCardCloudCompanyAccount($beneficiaryAccount)
+    private function getOrigin($account)
     {
-        $company = CompanySpeiAccount::where('Clabe', $beneficiaryAccount)->first();
-        if ($company) {
-            return $company;
-        }
+        $stpAccount = Transactions::searchByBusinessAccount($account, true);
+        if (!is_null($stpAccount)) return $stpAccount;
+
+        $company = Transactions::searchByCompanyAccount($account);
+        if (!is_null($company)) return $company;
+
+        $cardCloud = Transactions::searchByCardCloudAccount($account);
+        if (!is_null($cardCloud)) return $cardCloud;
+
         return null;
     }
 
-    public function searchByCardCloud($beneficiaryAccount)
+    private function getDestination($account)
     {
-        $card = CardSpeiAccount::where('Clabe', $beneficiaryAccount)->first();
-        if ($card) {
-            return $card;
-        }
+        $stpAccount = Transactions::searchByBusinessAccount($account);
+        if (!is_null($stpAccount)) return $stpAccount;
+
+        $company = Transactions::searchByCompanyAccount($account);
+        if (!is_null($company)) return $company;
+
+        $companyCardCloud = Transactions::searchByCardCloudCompanyAccount($account);
+        if (!is_null($companyCardCloud)) return $companyCardCloud;
+
+        $cardCloud = Transactions::searchByCardCloudAccount($account);
+        if (!is_null($cardCloud)) return $cardCloud;
+
+        $externalAccount = Transactions::searchByExternalAccount($account);
+        if (!is_null($externalAccount)) return $externalAccount;
+
         return null;
     }
 
-    public function processCardCloudMovement($movement, $type, $cardCloudCompany = null, $cardCloudCard = null)
+    protected static function processBusinessToBusiness($origin, $destination, $amount, $concept, $request)
     {
-        $company = Company::where('Id', env('CARD_CLOUD_MAIN_COMPANY_ID'))->first();
-        $comissions = $this->calculateCompanyCommission(null, $movement->monto);
-        $companyBalance = $company->Balance + $comissions['total'];
-
         try {
             DB::beginTransaction();
 
-            if ($type == 'company') {
-                $this->processCardCloudCompany($cardCloudCompany, $movement);
-            } else if ($type == 'card') {
-                $this->processCardCloudCard($cardCloudCard, $movement);
+            $stpAccount = StpAccounts::where('Id', $origin['id'])->first();
+            $original_balance = $stpAccount->Balance;
+            $traceKey = $stpAccount->Acronym . date('YmdHis') . rand(1000, 9999);
+            $reference = random_int(1000000, 9999999);
+
+            if (env('APP_ENV') == 'production') {
+                $response = StpService::speiOut(
+                    Crypt::decrypt($stpAccount->Url),
+                    Crypt::decrypt($stpAccount->Key),
+                    $stpAccount->Company,
+                    $amount,
+                    $traceKey,
+                    $concept,
+                    Crypt::decrypt($stpAccount->Number),
+                    $stpAccount->Company,
+                    "",
+                    Crypt::decrypt($destination['account']),
+                    $destination['name'],
+                    $reference,
+                    90646,
+                    "",
+                    40,
+                    90646,
+                    40
+                );
+
+                if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
+                    $stpId = $response->respuesta->id;
+                    StpAccounts::where('Id', $origin['id'])->update([
+                        'Balance' => $stpAccount->Balance - $amount,
+                        'PendingCharges' => $stpAccount->PendingCharges + $amount,
+                        'BalanceDate' => Carbon::now(new \DateTimeZone('America/Mexico_City'))->format('Y-m-d H:i:s')
+                    ]);
+                } else {
+                    DB::commit();
+                    throw new \Exception("Error al registrar la orden en STP. Error:" . ErrorRegisterOrder::error($response->respuesta->id));
+                }
+            } else {
+                $response = new \stdClass();
+                $response->resultado = new \stdClass();
+                $response->resultado->id = "1111111111";
+                $stpId = $response->resultado->id;
             }
 
-            CompanyProjection::where('Id', $company->Id)
-                ->update([
-                    'Balance' => $companyBalance
-                ]);
-
-            Company::where('Id', $company->Id)
-                ->update([
-                    'Balance' => $companyBalance
-                ]);
-
-            $transaction = self::transactionBase($movement, $company->BusinessId, json_encode($comissions), $companyBalance, env('CARD_CLOUD_MAIN_STP_ACCOUNT'));
-            $transaction->save();
+            StpTransaction::create([
+                'Id' => Uuid::uuid7(),
+                'BusinessId' => $stpAccount->BusinessId,
+                'TypeId' => 1,
+                'StatusId' => 1,
+                'Reference' => $reference,
+                'TrackingKey' => $traceKey,
+                'Concept' => $concept,
+                'SourceAccount' => Crypt::decrypt($stpAccount->Number),
+                'SourceName' => $stpAccount->Company,
+                'SourceBalance' => number_format((float)$original_balance, 2, '.', ''),
+                'SourceEmail' => "",
+                'DestinationAccount' => Crypt::decrypt($destination['account']),
+                'DestinationName' => $destination['name'],
+                'DestinationBalance' => number_format((float)$original_balance, 2, '.', ''),
+                'DestinationEmail' => "",
+                'DestinationBankCode' => 90646,
+                'Amount' => number_format((float)$original_balance, 2, '.', ''),
+                'Commissions' => json_encode($origin['commissions']),
+                'LiquidationDate' => "0000-00-00 00:00:00",
+                'UrlCEP' => "",
+                'StpId' => $stpId,
+                'ApiData' => '[]',
+                'CreatedByUser' => $request->attributes->get('jwt')->id,
+                'CreateDate' => Carbon::now(new \DateTimeZone('America/Mexico_City'))->format('Y-m-d H:i:s'),
+                'Active' => 1
+            ]);
 
             DB::commit();
-
-            return [
-                'id' => $movement->id,
-                'destination' => $movement->cuentaBeneficiario,
-                'amount' => $movement->monto,
-                'status' => 'Registered as company card cloud'
-            ];
         } catch (\Exception $e) {
             DB::rollBack();
-            throw new \Exception('Error al registrar la transacción. ' . $e->getMessage());
+            throw $e;
         }
     }
-
-    public function processCardCloudCompany($company, $movement)
-    {
-        try {
-            $client = new Client();
-            $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/subaccount/' . $company . '/deposit', [
-                'headers' => [
-                    'Content-Type' => 'application/json'
-                ],
-                'json' => [
-                    'movement_id' => $movement->id,
-                    'amount' => $movement->monto,
-                    'reference' => $movement->claveRastreo
-                ]
-            ]);
-
-            return true;
-        } catch (RequestException $e) {
-            Log::error('Error al registrar la transacción. ' . $e->getMessage());
-            throw new \Exception('Error al registrar la transacción. ' . $e->getMessage());
-        }
+    protected static function processBusinessToCompany($origin, $destination, $amount) {}
+    protected static function processBusinessToCardCloud($origin, $destination, $amount) {}
+    protected static function processBusinessToCompanyCardCloud($origin, $destination, $amount)
+    { /* ... */
+    }
+    protected static function processBusinessToExternal($origin, $destination, $amount)
+    { /* ... */
     }
 
-    public function processCardCloudCard($card, $movement)
+    protected static function processCompanyToBusiness($origin, $destination, $amount)
     {
-        try {
-            $client = new Client();
-            $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/card/' . $card . '/deposit', [
-                'headers' => [
-                    'Content-Type' => 'application/json'
-                ],
-                'json' => [
-                    'movement_id' => $movement->id,
-                    'amount' => $movement->monto,
-                    'reference' => $movement->claveRastreo
-                ]
-            ]);
+        try{
+            DB::beginTransaction();
 
-            return true;
-        } catch (RequestException $e) {
-            Log::error('Error al registrar la transacción. ' . $e->getMessage());
-            throw new \Exception('Error al registrar la transacción. ' . $e->getMessage());
+            $company = CompanyProjection::where('Id', $origin['id'])->first();
+
+            if($origin['business'] != $destination['business']){
+
+            }
+
+
+
+            $stpAccount = StpAccounts::where('Id', $destination['id'])->first();
+
+
+
+
+        }catch(\Exception $e){
+            throw $e;
         }
+    }
+    protected static function processCompanyToCompany($origin, $destination, $amount)
+    { /* ... */
+    }
+    protected static function processCompanyToCardCloud($origin, $destination, $amount)
+    { /* ... */
+    }
+    protected static function processCompanyToCompanyCardCloud($origin, $destination, $amount)
+    { /* ... */
+    }
+    protected static function processCompanyToExternal($origin, $destination, $amount)
+    { /* ... */
+    }
+
+    protected static function processCardCloudToBusiness($origin, $destination, $amount)
+    { /* ... */
+    }
+    protected static function processCardCloudToCompany($origin, $destination, $amount)
+    { /* ... */
+    }
+    protected static function processCardCloudToCardCloud($origin, $destination, $amount)
+    { /* ... */
+    }
+    protected static function processCardCloudToCompanyCardCloud($origin, $destination, $amount)
+    { /* ... */
+    }
+    protected static function processCardCloudToExternal($origin, $destination, $amount)
+    { /* ... */
     }
 }
