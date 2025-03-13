@@ -841,6 +841,131 @@
                         "bearerAuth": []
                     }
                 ]
+            },
+            "patch": {
+                "tags": [
+                    "Card Cloud - Contactos"
+                ],
+                "summary": "Actualizar contacto",
+                "description": "Actualizar contacto",
+                "operationId": "c5a490755563c2aeca22d4cccc19725f",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "Contact UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "alias",
+                                    "institution"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Contacto 1"
+                                    },
+                                    "alias": {
+                                        "type": "string",
+                                        "example": "Contacto 1"
+                                    },
+                                    "institution": {
+                                        "type": "integer",
+                                        "example": "0"
+                                    },
+                                    "account": {
+                                        "type": "string",
+                                        "example": "123456789012345678"
+                                    },
+                                    "client_id": {
+                                        "type": "string",
+                                        "example": "SP0001275"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Contacto actualizado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "contact_id": {
+                                            "type": "string",
+                                            "example": "01935c81-abe0-7238-8635-46a8486259be"
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Contacto 1"
+                                        },
+                                        "institution_id": {
+                                            "type": "integer",
+                                            "example": "0"
+                                        },
+                                        "institution_name": {
+                                            "type": "string",
+                                            "example": "Card Cloud"
+                                        },
+                                        "account": {
+                                            "type": "string",
+                                            "example": "123456789012345678"
+                                        },
+                                        "client_id": {
+                                            "type": "string",
+                                            "example": "SP0001275"
+                                        },
+                                        "alias": {
+                                            "type": "string",
+                                            "example": "Contacto 1"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al actualizar el contacto",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error al actualizar el contacto"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/cardCloud/institution": {
@@ -2147,14 +2272,14 @@
                 }
             }
         },
-        "/api/users/validate-credentials": {
+        "/api/users/login": {
             "post": {
                 "tags": [
                     "Activación de cuenta"
                 ],
                 "summary": "Validar credenciales de usuario",
                 "description": "Validar credenciales de usuario",
-                "operationId": "d219b5314f61413a8a137bc7ca4c1a25",
+                "operationId": "dd9b2536591bc88bf1c97a35a431212d",
                 "requestBody": {
                     "required": true,
                     "content": {

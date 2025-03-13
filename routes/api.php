@@ -47,6 +47,7 @@ Route::middleware([VerifyJwt::class])->group(function () {
             Route::post('/', [App\Http\Controllers\CardCloud\ContactController::class, 'store']);
             Route::get('/{uuid}', [App\Http\Controllers\CardCloud\ContactController::class, 'show']);
             Route::delete('/{uuid}', [App\Http\Controllers\CardCloud\ContactController::class, 'delete']);
+            Route::patch('/{uuid}', [App\Http\Controllers\CardCloud\ContactController::class, 'update']);
         });
 
         Route::group(['prefix' => 'institution'], function () {
