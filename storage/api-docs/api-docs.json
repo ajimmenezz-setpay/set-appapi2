@@ -2272,6 +2272,80 @@
                 }
             }
         },
+        "/api/users/validate-code": {
+            "post": {
+                "tags": [
+                    "Activación de cuenta"
+                ],
+                "summary": "Validar código de verificación",
+                "description": "Validar código de verificación",
+                "operationId": "eb55a1fef0cdda188e333ccad77bb1b8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "code"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "  [email protected]"
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Código de verificación correcto",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "El código de verificación es correcto"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al validar el código de verificación",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "No se ha solicitado un código de verificación | El código de verificación no es válido"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Email no registrado",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "El email no está registrado"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/users/login": {
             "post": {
                 "tags": [

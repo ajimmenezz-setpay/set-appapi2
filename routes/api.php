@@ -104,6 +104,7 @@ Route::group(['prefix' => 'stp'], function () {
 
 Route::group(['prefix' => 'users'], function () {
     Route::post('validate', [App\Http\Controllers\Users\Activate::class, 'validateEmail']);
+    Route::post('validate-code', [App\Http\Controllers\Users\Activate::class, 'validateCode']);
     Route::post('login', [App\Http\Controllers\Users\Activate::class, 'validateCredentials']);
     Route::post('activate', [App\Http\Controllers\Users\Activate::class, 'activate']);
     Route::delete('clean', [App\Http\Controllers\Users\Activate::class, 'cleanActivation']);

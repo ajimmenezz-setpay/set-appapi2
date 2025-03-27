@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Security\Crypt;
 use App\Http\Controllers\Security\GoogleAuth as SecurityGoogleAuth;
 use App\Http\Controllers\Security\Password;
+use App\Mail\VerificationAccountCode;
 use App\Models\Backoffice\Companies\CompanyProjection;
 use App\Models\Backoffice\Users\CompaniesAndUsers;
 use App\Models\CardCloud\CardAssigned;
@@ -18,10 +19,12 @@ use Ramsey\Uuid\Uuid;
 use PragmaRX\Google2FA\Google2FA;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\Users\SecretPhrase;
+use Google\Service\MyBusinessVerifications\Verification;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class Activate extends Controller
 {
@@ -104,6 +107,17 @@ class Activate extends Controller
             if (!$user || $continueProcess) {
                 $user = $this->createTemporalUser($request->email);
 
+                $code = rand(100000, 999999);
+
+                DB::table('t_users_codes')->where('UserId', $user->Id)->delete();
+                DB::table('t_users_codes')->insert([
+                    'UserId' => $user->Id,
+                    'Code' => $code,
+                    'Register' => Carbon::now('America/Mexico_City')->format('Y-m-d H:i:s')
+                ]);
+
+                Mail::to($request->email)->send(new VerificationAccountCode($code));
+
                 $secret = $this->generateSecret($user);
 
                 $returnArray['user'] = [
@@ -119,6 +133,77 @@ class Activate extends Controller
                 return response()->json($returnArray);
             }
             return response()->json(['message' => 'Para continuar con la activación de tu cuenta, por favor inicia sesión'], 202);
+        } catch (\Exception $e) {
+            return self::basicError($e->getMessage());
+        }
+    }
+
+    /**
+     * @OA\Post(
+     *      path="/api/users/validate-code",
+     *      tags={"Activación de cuenta"},
+     *      summary="Validar código de verificación",
+     *      description="Validar código de verificación",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"email", "code"},
+     *              @OA\Property(property="email", type="string", example="  [email protected]"),
+     *              @OA\Property(property="code", type="string", example="123456")
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Código de verificación correcto",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="El código de verificación es correcto")
+     *         )
+     *     ),
+     *
+     *      @OA\Response(
+     *          response=400,
+     *          description="Error al validar el código de verificación",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="No se ha solicitado un código de verificación | El código de verificación no es válido"))
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=404,
+     *          description="Email no registrado",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="El email no está registrado"))
+     *      )
+     *
+     * )
+     */
+
+    public function validateCode(Request $request)
+    {
+        try {
+            $this->validate($request, [
+                'email' => 'required|email',
+                'code' => 'required|numeric'
+            ], [
+                'email.required' => 'El email es requerido',
+                'email.email' => 'El email no es válido',
+                'code.required' => 'El código de verificación es requerido',
+                'code.numeric' => 'El código de verificación no es válido'
+            ]);
+
+            $user = User::where('Email', $request->email)->first();
+            if (!$user) {
+                throw new \Exception('El email no está registrado', 404);
+            }
+
+            $code = DB::table('t_users_codes')->where('UserId', $user->Id)->orderBy('Register', 'desc')->first();
+            if (!$code) {
+                throw new \Exception('No se ha solicitado un código de verificación', 400);
+            }
+
+            if ($code->Code != $request->code) {
+                throw new \Exception('El código de verificación no es válido', 400);
+            }
+
+            return response()->json(['message' => 'El código de verificación es correcto'], 200);
         } catch (\Exception $e) {
             return self::basicError($e->getMessage());
         }
