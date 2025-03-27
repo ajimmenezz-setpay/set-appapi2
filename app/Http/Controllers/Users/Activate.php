@@ -19,11 +19,9 @@ use Ramsey\Uuid\Uuid;
 use PragmaRX\Google2FA\Google2FA;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\Users\SecretPhrase;
-use Google\Service\MyBusinessVerifications\Verification;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class Activate extends Controller
@@ -720,12 +718,12 @@ class Activate extends Controller
         }
     }
 
-    public function send_access($user)
+    public static function send_access($user)
     {
         try {
             $curl = curl_init();
             curl_setopt_array($curl, array(
-                CURLOPT_URL => "https://appapi.setpay.net/api/user/password/reset/" . $user->Id,
+                CURLOPT_URL =>  env('APP_API_URL') . "/api/user/password/reset/" . $user->Id,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -734,8 +732,6 @@ class Activate extends Controller
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'GET',
             ));
-
-            var_dump("https://appapi.setpay.net/api/user/password/reset/" . $user->Id);
 
             curl_exec($curl);
             curl_close($curl);

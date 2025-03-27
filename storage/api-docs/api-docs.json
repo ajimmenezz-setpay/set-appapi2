@@ -2584,6 +2584,136 @@
                 }
             }
         },
+        "/api/users/forgot-password": {
+            "post": {
+                "tags": [
+                    "Usuarios - Autenticación"
+                ],
+                "summary": "Recuperar contraseña",
+                "operationId": "44f14a055e333157f394995226fb8b6b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "  [email protected]"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Correo electrónico enviado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Se ha enviado un correo electrónico con el código de verificación"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al validar el email",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "El correo electrónico no está registrado"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/reset-password": {
+            "post": {
+                "tags": [
+                    "Usuarios - Autenticación"
+                ],
+                "summary": "Restablecer contraseña",
+                "operationId": "9476e8917c960034011276433248d0df",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "code"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "  [email protected]"
+                                    },
+                                    "code": {
+                                        "type": "integer",
+                                        "example": 123456
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Correo electrónico enviado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Se ha enviado un correo electrónico con las nuevas credenciales"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al validar el email",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "No se ha solicitado un código de verificación | El código de verificación no es válido"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Error al validar el email",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "El email no está registrado"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/users/secret-phrase": {
             "get": {
                 "tags": [
@@ -2913,6 +3043,10 @@
         {
             "name": "Activación de cuenta",
             "description": "Activación de cuenta"
+        },
+        {
+            "name": "Usuarios - Autenticación",
+            "description": "Usuarios - Autenticación"
         },
         {
             "name": "Usuarios - Frase secreta",

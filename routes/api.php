@@ -108,4 +108,6 @@ Route::group(['prefix' => 'users'], function () {
     Route::post('login', [App\Http\Controllers\Users\Activate::class, 'validateCredentials']);
     Route::post('activate', [App\Http\Controllers\Users\Activate::class, 'activate']);
     Route::delete('clean', [App\Http\Controllers\Users\Activate::class, 'cleanActivation']);
+    Route::post('forgot-password', [App\Http\Controllers\Users\ForgotPassword::class, 'forgotPassword']);
+    Route::post('reset-password', [App\Http\Controllers\Users\ForgotPassword::class, 'resetPassword']);
 });
