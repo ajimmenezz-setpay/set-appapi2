@@ -36,6 +36,8 @@ Route::middleware([VerifyJwt::class])->group(function () {
             Route::post('/activate', [App\Http\Controllers\CardCloud\CardManagementController::class, 'activateCard']);
             Route::post('/buy_virtual_card', [App\Http\Controllers\CardCloud\CardManagementController::class, 'buyVirtualCard']);
             Route::get('/virtual_card_price', [App\Http\Controllers\CardCloud\CardManagementController::class, 'getVirtualCardPrice']);
+            Route::get('/{cardId}/sensitive', [App\Http\Controllers\CardCloud\CardSensitiveController::class, 'sensitive']);
+            Route::get('/{cardId}/cvv', [App\Http\Controllers\CardCloud\CardSensitiveController::class, 'dynamicCvv']);
         });
 
         Route::group(['prefix' => 'movement'], function () {

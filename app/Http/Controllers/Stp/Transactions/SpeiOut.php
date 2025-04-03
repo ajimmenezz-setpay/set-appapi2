@@ -493,12 +493,67 @@ class SpeiOut extends Controller
         }
     }
 
-    protected static function processCompanyToCardCloud($origin, $destination, $amount, $concept, $request) {
+    protected static function processCompanyToCardCloud($origin, $destination, $amount, $concept, $request)
+    {
+        try {
+            DB::beginTransaction();
 
+            if ($origin['business'] == env('CARD_CLOUD_MAIN_BUSINESS_ID')) {
+                $out = self::setOutMovement($origin, $destination, $concept, $amount, $request, '');
+                self::setNewBalance($origin, $out->SourceBalance);
+
+                $in = self::setInMovementCardCloud($origin, $destination, $concept, $amount, $request, $out->Reference, $out->TrackingKey);
+                self::setNewBalance($destination, $in->DestinationBalance);
+
+                StpTransaction::where('Id', $out->Id)->update([
+                    'StatusId' => 3,
+                    'LiquidationDate' => Carbon::now(new \DateTimeZone('America/Mexico_City'))->format('Y-m-d H:i:s'),
+                    'Active' => 0
+                ]);
+
+                try {
+                    $client = new Client();
+                    $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/card/' . $destination['id'] . '/deposit', [
+                        'headers' => [
+                            'Content-Type' => 'application/json'
+                        ],
+                        'json' => [
+                            'movement_id' => rand(1000000, 9999999),
+                            'amount' => $amount,
+                            'reference' => $out->TrackingKey
+                        ]
+                    ]);
+                } catch (RequestException $e) {
+                    throw new \Exception('Error al registrar el movimiento en CardCloud: ' . $e->getMessage());
+                }
+            }
+
+            DB::commit();
+
+            return [
+                'destinationsAccount' => $destination['name'],
+                'url'  => env('APP_API_URL') . "/spei/transaccion/" . $out['Id'],
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::channel('spei_out')->error(
+                "Error al tranferir los fondos a la cuenta " . $destination['account'] . ".",
+                [
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
+            );
+            return [
+                'error' => "Error al tranferir los fondos a la cuenta " . $destination['account'] . " de " . $destination['name']
+            ];
+        }
     }
 
 
-    protected static function processCompanyToExternal($origin, $destination, $amount) {}
+    protected static function processCompanyToExternal($origin, $destination, $amount) {
+
+    }
 
     protected static function processCardCloudToBusiness($origin, $destination, $amount) {}
     protected static function processCardCloudToCompany($origin, $destination, $amount) {}

@@ -496,6 +496,162 @@
                 ]
             }
         },
+        "/api/v1/card/{cardId}/sensitive": {
+            "get": {
+                "tags": [
+                    "Card Cloud"
+                ],
+                "summary": "Obtener datos sensibles de la tarjeta",
+                "description": "Obtener datos sensibles de la tarjeta",
+                "operationId": "sensitive",
+                "parameters": [
+                    {
+                        "name": "cardId",
+                        "in": "path",
+                        "description": "ID de la tarjeta",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Datos sensibles de la tarjeta",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "pan": {
+                                            "type": "string",
+                                            "example": "5161520880102992"
+                                        },
+                                        "expiration_date": {
+                                            "type": "string",
+                                            "example": "2029-08-01"
+                                        },
+                                        "pin": {
+                                            "type": "string",
+                                            "example": "1911"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Bad Request"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Not Found"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Internal Server Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/card/{cardId}/cvv": {
+            "get": {
+                "tags": [
+                    "Card Cloud"
+                ],
+                "summary": "Obtener CVV dinámico de la tarjeta",
+                "description": "Obtener CVV dinámico de la tarjeta",
+                "operationId": "dynamicCvv",
+                "parameters": [
+                    {
+                        "name": "cardId",
+                        "in": "path",
+                        "description": "ID de la tarjeta",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "CVV dinámico de la tarjeta",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "cvv": {
+                                            "type": "string",
+                                            "example": "275"
+                                        },
+                                        "expiration": {
+                                            "type": "integer",
+                                            "example": 1880236800
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Bad Request"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/cardCloud/contact": {
             "get": {
                 "tags": [
