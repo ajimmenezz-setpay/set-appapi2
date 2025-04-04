@@ -8,13 +8,17 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Security\GoogleAuth;
 use App\Http\Controllers\Stp\ErrorRegisterOrder;
 use App\Http\Controllers\Stp\Transactions\Transactions;
+use App\Models\Backoffice\Companies\Company;
 use App\Models\Backoffice\Companies\CompanyProjection;
 use App\Models\Speicloud\StpAccounts;
 use App\Models\Speicloud\StpTransaction;
 use App\Services\StpService;
 use Carbon\Carbon;
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
+use Illuminate\Support\Facades\Log;
+use GuzzleHttp\Exception\RequestException;
 
 class SpeiOut extends Controller
 {
@@ -49,7 +53,6 @@ class SpeiOut extends Controller
             $actions = json_decode($actions);
             // GoogleAuth::authorized($request->attributes->get('jwt')->id, $actions->googleAuthenticatorCode);
 
-            $total = $this->totalTransactions($actions->destinationsAccounts);
             $origin = $this->getOrigin($actions->originBankAccount);
 
             if ($origin['type'] == 'business-account') {
@@ -71,39 +74,43 @@ class SpeiOut extends Controller
                         throw new \Exception('No es posible realizar transferencias a la misma cuenta');
                     }
 
-                    $handler = self::$handlers[$origin['type']][$d->type]($origin, $destination, $d->amount, $actions->concept, $request);
+                    if ($origin['balance'] < $d->amount) {
+                        throw new \Exception('No hay suficiente saldo en la cuenta ' . $origin['account'] . ' para realizar la transferencia a la cuenta ' . $d->bankAccount);
+                    }
 
-                    $destinos[] = $destination;
+                    $method = self::$handlers[$origin['type']][$destination['type']];
+                    $handler = self::$method($origin, $destination, $d->amount, $actions->concept, $request);
+
+                    if (isset($handler['error'])) {
+                        $errors[] = $handler['error'];
+                    } else {
+                        $destinos[] = [
+                            'destinationsAccount' => $handler['destinationsAccount'],
+                            'url'  => $handler['url']
+                        ];
+
+                        $origin['balance'] -= $d->amount;
+                    }
                 } catch (\Exception $e) {
-                    $errors[] = 'No se ha podido procesar la cuenta ' . $d->bankAccount . ' destino. ' . $e->getMessage();
+                    Log::channel('spei_out')->error(
+                        "Error al tranferir los fondos a la cuenta " . $d->bankAccount . ". Error:",
+                        [
+                            'message' => $e->getMessage(),
+                            'file' => $e->getFile(),
+                            'line' => $e->getLine()
+                        ]
+                    );
+                    $errors[] = "Error al tranferir los fondos a la cuenta " . $d->bankAccount . ", intentelo más tarde o contacte a soporte";
                 }
             }
 
-            if ($total > $origin['balance']) {
-                throw new \Exception('Fondos insuficientes, por favor verifique su saldo o espere a que se acrediten los fondos pendientes');
-            }
-
-
-            $actions->total = $total;
-            $actions->origin = $origin;
-
-            return response()->json([
-                'destinations' => $destinos,
-                'errors' => $errors,
-                'actions' => $actions
-            ]);
+            return response()->json($destinos);
         } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ]);
             return self::basicError($e->getMessage());
         }
-    }
-
-    private function totalTransactions($transactions)
-    {
-        $total = 0;
-        foreach ($transactions as $transaction) {
-            $total += $transaction->amount;
-        }
-        return $total;
     }
 
     private function getOrigin($account)
@@ -225,61 +232,508 @@ class SpeiOut extends Controller
     }
     protected static function processBusinessToCompany($origin, $destination, $amount) {}
     protected static function processBusinessToCardCloud($origin, $destination, $amount) {}
-    protected static function processBusinessToCompanyCardCloud($origin, $destination, $amount)
-    { /* ... */
-    }
-    protected static function processBusinessToExternal($origin, $destination, $amount)
-    { /* ... */
-    }
+    protected static function processBusinessToCompanyCardCloud($origin, $destination, $amount) {}
+    protected static function processBusinessToExternal($origin, $destination, $amount) {}
 
-    protected static function processCompanyToBusiness($origin, $destination, $amount)
+    protected static function processCompanyToBusiness($origin, $destination, $amount, $concept, $request)
     {
-        try{
+        try {
             DB::beginTransaction();
 
-            $company = CompanyProjection::where('Id', $origin['id'])->first();
+            if ($origin['business'] == $destination['business']) {
+                $out = self::setOutMovement($origin, $destination, $concept, $amount, $request, '');
+                self::setNewBalance($origin, $out->SourceBalance);
 
-            if($origin['business'] != $destination['business']){
+                self::setInMovement($origin, $destination, $concept, $amount, $request, $out);
 
+                StpTransaction::where('Id', $out->Id)->update([
+                    'StatusId' => 3,
+                    'LiquidationDate' => Carbon::now(new \DateTimeZone('America/Mexico_City'))->format('Y-m-d H:i:s'),
+                    'Active' => 0
+                ]);
+            } else {
+                $out = self::setOutMovement($origin, $destination, $concept, $amount, $request, 'external');
+                self::setNewBalance($origin, $out->SourceBalance);
+
+                $commissions = self::calculateOutCommissions('external', $amount, $origin['commissions']);
+                $amount = $commissions['total'];
+
+                if (env('APP_ENV') == 'production') {
+                    $response = StpService::speiOut(
+                        $origin['stpAccount']['url'],
+                        $origin['stpAccount']['key'],
+                        $origin['stpAccount']['company'],
+                        $amount,
+                        $out->TrackingKey,
+                        substr(preg_replace('/[^a-zA-Z0-9\s]/', '', $concept), 0, 38),
+                        $origin['stpAccount']['number'],
+                        $origin['name'],
+                        "",
+                        $destination['account'],
+                        $destination['name'],
+                        $out->Reference,
+                        $origin['institution'],
+                        "",
+                        40,
+                        $destination['institution'],
+                        40
+                    );
+
+                    if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
+                        $stpId = $response->respuesta->id;
+                    } else {
+                        DB::rollBack();
+                        throw new \Exception("Error:" . ErrorRegisterOrder::error($response->respuesta->id));
+                    }
+                } else {
+                    $stpId = "1111111111";
+                }
+
+                StpTransaction::where('Id', $out->Id)->update([
+                    'StpId' => $stpId
+                ]);
             }
 
+            DB::commit();
+            return [
+                'destinationsAccount' => $destination['name'],
+                'url'  => env('APP_API_URL') . "/spei/transaccion/" . $out['Id'],
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::channel('spei_out')->error(
+                "Error al tranferir los fondos a la cuenta " . $destination['account'] . ". Error:",
+                [
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
+            );
 
-
-            $stpAccount = StpAccounts::where('Id', $destination['id'])->first();
-
-
-
-
-        }catch(\Exception $e){
-            throw $e;
+            return [
+                'error' => "Error al tranferir los fondos a la cuenta " . $destination['account'] . ", intentelo más tarde o contacte a soporte"
+            ];
         }
     }
-    protected static function processCompanyToCompany($origin, $destination, $amount)
-    { /* ... */
-    }
-    protected static function processCompanyToCardCloud($origin, $destination, $amount)
-    { /* ... */
-    }
-    protected static function processCompanyToCompanyCardCloud($origin, $destination, $amount)
-    { /* ... */
-    }
-    protected static function processCompanyToExternal($origin, $destination, $amount)
-    { /* ... */
+
+    protected static function processCompanyToCompany($origin, $destination, $amount, $concept, $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            if ($origin['business'] == $destination['business']) {
+                $out = self::setOutMovement($origin, $destination, $concept, $amount, $request, '');
+                self::setNewBalance($origin, $out->SourceBalance);
+
+                $in = self::setInMovement($origin, $destination, $concept, $amount, $request, $out);
+                self::setNewBalance($destination, $in->DestinationBalance);
+
+                StpTransaction::where('Id', $out->Id)->update([
+                    'StatusId' => 3,
+                    'LiquidationDate' => Carbon::now(new \DateTimeZone('America/Mexico_City'))->format('Y-m-d H:i:s'),
+                    'Active' => 0
+                ]);
+            } else {
+                $out = self::setOutMovement($origin, $destination, $concept, $amount, $request, 'external');
+                self::setNewBalance($origin, $out->SourceBalance);
+
+                $commissions = self::calculateOutCommissions('external', $amount, $origin['commissions']);
+                $amount = $commissions['total'];
+
+                if (env('APP_ENV') == 'production') {
+                    $response = StpService::speiOut(
+                        $origin['stpAccount']['url'],
+                        $origin['stpAccount']['key'],
+                        $origin['stpAccount']['company'],
+                        $amount,
+                        $out->TrackingKey,
+                        substr(preg_replace('/[^a-zA-Z0-9\s]/', '', $concept), 0, 38),
+                        $origin['stpAccount']['number'],
+                        $origin['name'],
+                        "",
+                        $destination['account'],
+                        $destination['name'],
+                        $out->Reference,
+                        90646,
+                        "",
+                        40,
+                        90646,
+                        40
+                    );
+
+                    if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
+                        $stpId = $response->respuesta->id;
+                    } else {
+                        DB::rollBack();
+                        throw new \Exception("Error:" . ErrorRegisterOrder::error($response->respuesta->id));
+                    }
+                } else {
+                    $stpId = "1111111111";
+                }
+
+                StpTransaction::where('Id', $out->Id)->update([
+                    'StpId' => $stpId
+                ]);
+            }
+
+            DB::commit();
+            return [
+                'destinationsAccount' => $destination['name'],
+                'url'  => env('APP_API_URL') . "/spei/transaccion/" . $out['Id'],
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::channel('spei_out')->error(
+                "Error al tranferir los fondos a la cuenta " . $destination['account'] . ". Error:" . $e->getMessage(),
+                [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
+            );
+
+            return [
+                'error' => "Error al tranferir los fondos a la cuenta " . $destination['account']
+            ];
+        }
     }
 
-    protected static function processCardCloudToBusiness($origin, $destination, $amount)
-    { /* ... */
+    protected static function processCompanyToCompanyCardCloud($origin, $destination, $amount, $concept, $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            if ($origin['business'] == env('CARD_CLOUD_MAIN_BUSINESS_ID')) {
+                $out = self::setOutMovement($origin, $destination, $concept, $amount, $request, '');
+                self::setNewBalance($origin, $out->SourceBalance);
+
+                $in = self::setInMovementCardCloud($origin, $destination, $concept, $amount, $request, $out->Reference, $out->TrackingKey);
+                self::setNewBalance($destination, $in->DestinationBalance);
+
+                StpTransaction::where('Id', $out->Id)->update([
+                    'StatusId' => 3,
+                    'LiquidationDate' => Carbon::now(new \DateTimeZone('America/Mexico_City'))->format('Y-m-d H:i:s'),
+                    'Active' => 0
+                ]);
+
+                try {
+                    $client = new Client();
+                    $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/subaccount/' . $destination['companyId'] . '/deposit', [
+                        'headers' => [
+                            'Content-Type' => 'application/json'
+                        ],
+                        'json' => [
+                            'movement_id' => Carbon::now(new \DateTimeZone('America/Mexico_City'))->format('ymdhis'),
+                            'amount' => $amount,
+                            'reference' => $out->TrackingKey
+                        ]
+                    ]);
+                } catch (RequestException $e) {
+                    throw new \Exception('Error al registrar el movimiento en CardCloud: ' . $e->getMessage());
+                }
+            } else {
+                $out = self::setOutMovement($origin, $destination, $concept, $amount, $request, 'external');
+                self::setNewBalance($origin, $out->SourceBalance);
+
+                $commissions = self::calculateOutCommissions('external', $amount, $origin['commissions']);
+                $amount = $commissions['total'];
+
+                if (env('APP_ENV') == 'production') {
+                    $response = StpService::speiOut(
+                        $origin['stpAccount']['url'],
+                        $origin['stpAccount']['key'],
+                        $origin['stpAccount']['company'],
+                        $amount,
+                        $out->TrackingKey,
+                        substr(preg_replace('/[^a-zA-Z0-9\s]/', '', $concept), 0, 38),
+                        $origin['stpAccount']['number'],
+                        $origin['name'],
+                        "",
+                        env('CARD_CLOUD_MAIN_STP_ACCOUNT'),
+                        $destination['name'],
+                        $out->Reference,
+                        90646,
+                        "",
+                        40,
+                        90646,
+                        40
+                    );
+
+                    if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
+                        $stpId = $response->respuesta->id;
+                    } else {
+                        throw new \Exception("Error:" . ErrorRegisterOrder::error($response->respuesta->id));
+                    }
+                } else {
+                    $stpId = "1111111111";
+                }
+
+                StpTransaction::where('Id', $out->Id)->update([
+                    'StpId' => $stpId
+                ]);
+            }
+
+            DB::commit();
+            return [
+                'destinationsAccount' => $destination['name'],
+                'url'  => env('APP_API_URL') . "/spei/transaccion/" . $out['Id'],
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::channel('spei_out')->error(
+                "Error al tranferir los fondos a la cuenta " . $destination['account'] . ".",
+                [
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
+            );
+            return [
+                'error' => "Error al tranferir los fondos a la cuenta " . $destination['account'] . " de " . $destination['name']
+            ];
+        }
     }
-    protected static function processCardCloudToCompany($origin, $destination, $amount)
-    { /* ... */
+
+    protected static function processCompanyToCardCloud($origin, $destination, $amount, $concept, $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            if ($origin['business'] == env('CARD_CLOUD_MAIN_BUSINESS_ID')) {
+                $out = self::setOutMovement($origin, $destination, $concept, $amount, $request, '');
+                self::setNewBalance($origin, $out->SourceBalance);
+
+                $in = self::setInMovementCardCloud($origin, $destination, $concept, $amount, $request, $out->Reference, $out->TrackingKey);
+                self::setNewBalance($destination, $in->DestinationBalance);
+
+                StpTransaction::where('Id', $out->Id)->update([
+                    'StatusId' => 3,
+                    'LiquidationDate' => Carbon::now(new \DateTimeZone('America/Mexico_City'))->format('Y-m-d H:i:s'),
+                    'Active' => 0
+                ]);
+
+                try {
+                    $client = new Client();
+                    $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/card/' . $destination['id'] . '/deposit', [
+                        'headers' => [
+                            'Content-Type' => 'application/json'
+                        ],
+                        'json' => [
+                            'movement_id' => rand(1000000, 9999999),
+                            'amount' => $amount,
+                            'reference' => $out->TrackingKey
+                        ]
+                    ]);
+                } catch (RequestException $e) {
+                    throw new \Exception('Error al registrar el movimiento en CardCloud: ' . $e->getMessage());
+                }
+            }
+
+            DB::commit();
+
+            return [
+                'destinationsAccount' => $destination['name'],
+                'url'  => env('APP_API_URL') . "/spei/transaccion/" . $out['Id'],
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::channel('spei_out')->error(
+                "Error al tranferir los fondos a la cuenta " . $destination['account'] . ".",
+                [
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
+            );
+            return [
+                'error' => "Error al tranferir los fondos a la cuenta " . $destination['account'] . " de " . $destination['name']
+            ];
+        }
     }
-    protected static function processCardCloudToCardCloud($origin, $destination, $amount)
-    { /* ... */
+
+
+    protected static function processCompanyToExternal($origin, $destination, $amount) {
+
     }
-    protected static function processCardCloudToCompanyCardCloud($origin, $destination, $amount)
-    { /* ... */
+
+    protected static function processCardCloudToBusiness($origin, $destination, $amount) {}
+    protected static function processCardCloudToCompany($origin, $destination, $amount) {}
+    protected static function processCardCloudToCardCloud($origin, $destination, $amount) {}
+    protected static function processCardCloudToCompanyCardCloud($origin, $destination, $amount) {}
+    protected static function processCardCloudToExternal($origin, $destination, $amount) {}
+
+
+    protected static function setOutMovement($origin, $destination, $concept, $amount, $request, $type)
+    {
+        $commissions = self::calculateOutCommissions($type, $amount, $origin['commissions']);
+
+        $transaction = new StpTransaction();
+        $transaction->Id = Uuid::uuid7();
+        $transaction->BusinessId = $origin['business'];
+        $transaction->TypeId = 1;
+        $transaction->StatusId = 1;
+        $transaction->Reference =  random_int(1000000, 9999999);
+        $transaction->TrackingKey = $origin['stpAccount']['acronym'] . date('YmdHis') . rand(1000, 9999);
+        $transaction->Concept = $concept;
+        $transaction->SourceAccount = $origin['account'];
+        $transaction->SourceName = $origin['name'];
+        $transaction->SourceBalance = number_format((float)$origin['balance'] - (float)$commissions['total'], 2, '.', '');
+        $transaction->SourceEmail = "";
+        $transaction->DestinationAccount = $destination['account'];
+        $transaction->DestinationName = $destination['name'];
+        $transaction->DestinationBalance = number_format((float)$destination['balance'] + (float)$amount, 2, '.', '');
+        $transaction->DestinationEmail = "";
+        $transaction->DestinationBankCode = $destination['institution'];
+        $transaction->Amount = $amount;
+        $transaction->Commissions = json_encode($commissions);
+        $transaction->LiquidationDate = null;
+        $transaction->UrlCEP = "";
+        $transaction->StpId = 0;
+        $transaction->ApiData = '[]';
+        $transaction->CreatedByUser = $request->attributes->get('jwt')->id;
+        $transaction->CreateDate = Carbon::now(new \DateTimeZone('America/Mexico_City'))->format('Y-m-d H:i:s');
+        $transaction->Active = 1;
+        $transaction->save();
+
+        return $transaction;
     }
-    protected static function processCardCloudToExternal($origin, $destination, $amount)
-    { /* ... */
+
+    protected static function setInMovement($origin, $destination, $concept, $amount, $request, $outMovement)
+    {
+        $commissions = [
+            'speiOut' => 0,
+            'speiIn' => 0,
+            'internal' => 0,
+            'feeStp' => 0,
+            'stpAccount' => 0,
+            'total' => $amount
+        ];
+
+        $transaction = new StpTransaction();
+        $transaction->Id = Uuid::uuid7();
+        $transaction->BusinessId = $origin['business'];
+        $transaction->TypeId = 2;
+        $transaction->StatusId = 3;
+        $transaction->Reference =  $outMovement->Reference;
+        $transaction->TrackingKey = $outMovement->TrackingKey;
+        $transaction->Concept = $concept;
+        $transaction->SourceAccount = $origin['account'];
+        $transaction->SourceName = $origin['name'];
+        $transaction->SourceBalance = number_format((float)$origin['balance'] - (float)$amount, 2, '.', '');
+        $transaction->SourceEmail = "";
+        $transaction->DestinationAccount = $destination['account'];
+        $transaction->DestinationName = $destination['name'];
+        $transaction->DestinationBalance = number_format($destination['balance'] + $amount, 2, '.', '');
+        $transaction->DestinationEmail = "";
+        $transaction->DestinationBankCode = $destination['institution'];
+        $transaction->Amount = $amount;
+        $transaction->Commissions = json_encode($commissions);
+        $transaction->LiquidationDate = Carbon::now(new \DateTimeZone('America/Mexico_City'))->format('Y-m-d H:i:s');
+        $transaction->UrlCEP = "";
+        $transaction->StpId = 0;
+        $transaction->ApiData = '[]';
+        $transaction->CreatedByUser = $request->attributes->get('jwt')->id;
+        $transaction->CreateDate = Carbon::now(new \DateTimeZone('America/Mexico_City'))->format('Y-m-d H:i:s');
+        $transaction->Active = 0;
+        $transaction->save();
+
+        return $transaction;
+    }
+
+    public static function setInMovementCardCloud($origin, $destination, $concept, $amount, $request, $reference, $trackingKey)
+    {
+        $commissions = [
+            'speiOut' => 0,
+            'speiIn' => 0,
+            'internal' => 0,
+            'feeStp' => 0,
+            'stpAccount' => 0,
+            'total' => $amount
+        ];
+
+        $transaction = new StpTransaction();
+        $transaction->Id = Uuid::uuid7();
+        $transaction->BusinessId = $origin['business'];
+        $transaction->TypeId = 2;
+        $transaction->StatusId = 3;
+        $transaction->Reference =  $reference;
+        $transaction->TrackingKey = $trackingKey;
+        $transaction->Concept = $concept;
+        $transaction->SourceAccount = $origin['account'];
+        $transaction->SourceName = $origin['name'];
+        $transaction->SourceBalance = number_format((float)$origin['balance'] - (float)$amount, 2, '.', '');
+        $transaction->SourceEmail = "";
+        $transaction->DestinationAccount = env('CARD_CLOUD_MAIN_STP_ACCOUNT');
+        $transaction->DestinationName = $destination['name'];
+        $transaction->DestinationBalance = number_format($destination['balance'] + $amount, 2, '.', '');
+        $transaction->DestinationEmail = "";
+        $transaction->DestinationBankCode = 90646;
+        $transaction->Amount = $amount;
+        $transaction->Commissions = json_encode($commissions);
+        $transaction->LiquidationDate = Carbon::now(new \DateTimeZone('America/Mexico_City'))->format('Y-m-d H:i:s');
+        $transaction->UrlCEP = "";
+        $transaction->StpId = 0;
+        $transaction->ApiData = '[]';
+        $transaction->CreatedByUser = $request->attributes->get('jwt')->id;
+        $transaction->CreateDate = Carbon::now(new \DateTimeZone('America/Mexico_City'))->format('Y-m-d H:i:s');
+        $transaction->Active = 0;
+        $transaction->save();
+
+        return $transaction;
+    }
+
+    public static function setNewBalance($account, $newBalance)
+    {
+        switch ($account['type']) {
+            case 'company-account':
+                CompanyProjection::where('Id', $account['id'])->update([
+                    'Balance' => $newBalance
+                ]);
+
+                Company::where('Id', $account['id'])->update([
+                    'Balance' => $newBalance
+                ]);
+                break;
+            case 'company-card-cloud-account':
+                $company = Company::where('Id', env('CARD_CLOUD_MAIN_COMPANY_ID'))->first();
+                $balance = $company->Balance + $newBalance;
+
+                Company::where('Id', env('CARD_CLOUD_MAIN_COMPANY_ID'))->update([
+                    'Balance' => $balance
+                ]);
+
+                CompanyProjection::where('Id', env('CARD_CLOUD_MAIN_COMPANY_ID'))->update([
+                    'Balance' => $balance
+                ]);
+
+                break;
+        }
+    }
+
+    public static function calculateOutCommissions($type, $amount, $commissions)
+    {
+        $commissionsReturn = [
+            'speiOut' => 0,
+            'speiIn' => 0,
+            'internal' => 0,
+            'feeStp' => 0,
+            'stpAccount' => 0,
+            'total' => $amount
+        ];
+        switch ($type) {
+            case 'internal':
+                $commissionsReturn['internal'] = $amount * ($commissions['internal'] / 100);
+                $commissionsReturn['total'] = $amount + $commissionsReturn['internal'];
+                break;
+            case 'external':
+                $commissionsReturn['speiOut'] = $amount * ($commissions['speiOut'] / 100);
+                $commissionsReturn['total'] = $amount + $commissionsReturn['speiOut'];
+                $commissionsReturn['feeStp'] = $commissions['feeStp'];
+                $commissionsReturn['total'] += $commissionsReturn['feeStp'];
+                break;
+            default:
+                break;
+        }
+
+        return $commissionsReturn;
     }
 }

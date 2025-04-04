@@ -127,6 +127,13 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'spei_out' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/spei_out.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
+
     ],
 
 ];

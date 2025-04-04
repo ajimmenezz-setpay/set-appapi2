@@ -17,7 +17,7 @@ class SecretPhrase extends Controller
      *      summary="Obtener frase secreta",
      *     description="Obtener frase secreta",
      *     security={{"bearerAuth":{}}},
-     * 
+     *
      *    @OA\Response(
      *          response=200,
      *              description="Frase secreta",
@@ -25,13 +25,13 @@ class SecretPhrase extends Controller
      *                  @OA\Property(property="phrase", type="string", example="Frase secreta")
      *              )
      *     ),
-     * 
+     *
      *    @OA\Response(
      *          response=400,
      *          description="Error al obtener la frase secreta",
      *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="Error al obtener la frase secreta"))
      *    ),
-     * 
+     *
      *   @OA\Response(
      *      response=401,
      *      description="Unauthorized",
@@ -96,19 +96,24 @@ class SecretPhrase extends Controller
     {
         try {
             $this->validate($request, [
-                'phrase' => 'required',
-                'code' => 'required|min:6|max:6'
+                'phrase' => 'required'
             ], [
-                'phrase.required' => 'La frase secreta es requerida',
-                'code.required' => 'El código de autenticación es requerido',
-                'code.min' => 'El código de autenticación debe tener al menos 6 caracteres',
-                'code.max' => 'El código de autenticación debe tener como máximo 6 caracteres'
+                'phrase.required' => 'La frase secreta es requerida'
             ]);
 
             $exist = UsersSecretPhrase::where('UserId', $request->attributes->get('jwt')->id)->first();
             if ($exist) throw new \Exception('El usuario ya tiene una frase secreta');
 
-            GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->code);
+            if ($request->has('code')) {
+                $this->validate($request, [
+                    'code' => 'required|min:6|max:6'
+                ], [
+                    'code.required' => 'El código de autenticación es requerido',
+                    'code.min' => 'El código de autenticación debe tener al menos 6 caracteres',
+                    'code.max' => 'El código de autenticación debe tener como máximo 6 caracteres'
+                ]);
+                GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->code);
+            }
 
             $secretPhrase = new UsersSecretPhrase();
             $secretPhrase->UserId = $request->attributes->get('jwt')->id;
@@ -166,18 +171,23 @@ class SecretPhrase extends Controller
         try {
             $this->validate($request, [
                 'phrase' => 'required',
-                'code' => 'required|min:6|max:6'
             ], [
-                'phrase.required' => 'La frase secreta es requerida',
-                'code.required' => 'El código de autenticación es requerido',
-                'code.min' => 'El código de autenticación debe tener al menos 6 caracteres',
-                'code.max' => 'El código de autenticación debe tener como máximo 6 caracteres'
+                'phrase.required' => 'La frase secreta es requerida'
             ]);
 
             $secretPhrase = UsersSecretPhrase::where('UserId', $request->attributes->get('jwt')->id)->first();
             if (!$secretPhrase) throw new \Exception('El usuario no tiene una frase secreta');
 
-            GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->code);
+            if ($request->has('code')) {
+                $this->validate($request, [
+                    'code' => 'required|min:6|max:6'
+                ], [
+                    'code.required' => 'El código de autenticación es requerido',
+                    'code.min' => 'El código de autenticación debe tener al menos 6 caracteres',
+                    'code.max' => 'El código de autenticación debe tener como máximo 6 caracteres'
+                ]);
+                GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->code);
+            }
 
             $secretPhrase->SecretPhrase = $request->phrase;
             $secretPhrase->save();
@@ -228,15 +238,17 @@ class SecretPhrase extends Controller
     public function delete(Request $request)
     {
         try {
-            $this->validate($request, [
-                'code' => 'required|min:6|max:6'
-            ], [
-                'code.required' => 'El código de autenticación es requerido',
-                'code.min' => 'El código de autenticación debe tener al menos 6 caracteres',
-                'code.max' => 'El código de autenticación debe tener como máximo 6 caracteres'
-            ]);
+            if ($request->has('code')) {
+                $this->validate($request, [
+                    'code' => 'required|min:6|max:6'
+                ], [
+                    'code.required' => 'El código de autenticación es requerido',
+                    'code.min' => 'El código de autenticación debe tener al menos 6 caracteres',
+                    'code.max' => 'El código de autenticación debe tener como máximo 6 caracteres'
+                ]);
 
-            GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->code);
+                GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->code);
+            }
 
             $secretPhrase = UsersSecretPhrase::where('UserId', $request->attributes->get('jwt')->id)->first();
             if (!$secretPhrase) throw new \Exception('El usuario no tiene una frase secreta');

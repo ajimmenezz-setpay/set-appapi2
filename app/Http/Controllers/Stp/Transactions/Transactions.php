@@ -121,6 +121,15 @@ class Transactions extends Controller
                         'internal' => 0,
                         'feeStp' => 0,
                         'stpAccount' => 0
+                    ],
+                    'stpAccount' => [
+                        'id' => $stpAccount->Id,
+                        'acronym' => $stpAccount->Acronym,
+                        'number' => Crypt::decrypt($stpAccount->Number),
+                        'url' => Crypt::decrypt($stpAccount->Url),
+                        'key' => Crypt::decrypt($stpAccount->Key),
+                        'company' => $stpAccount->Company,
+                        'balance' => $stpAccount->Balance
                     ]
                 ];
             }
@@ -134,9 +143,11 @@ class Transactions extends Controller
         if ($company) {
             $services = json_decode($company->Services);
             $isSpeiCloudCompany = false;
+            $stpAccount = null;
             foreach ($services as $service) {
                 if ($service->type = 4 && $service->bankAccountNumber == $account) {
                     $isSpeiCloudCompany = true;
+                    $stpAccount = StpAccounts::where('Id', $service->stpAccountId)->first();
                     break;
                 }
             }
@@ -169,7 +180,12 @@ class Transactions extends Controller
                     'name' => $company->TradeName,
                     'institution' => 90646,
                     'id' => $company->Id,
-                    'commissions' => $companyCommissions
+                    'commissions' => $companyCommissions,
+                    'stpAccount' => [
+                        'id' => $stpAccount->Id,
+                        'acronym' => $stpAccount->Acronym,
+                        'number' => Crypt::decrypt($stpAccount->Number),
+                    ]
                 ];
             }
         }
@@ -179,7 +195,14 @@ class Transactions extends Controller
     public static function searchByCardCloudCompanyAccount($account)
     {
         $company = CompanySpeiAccount::join('t_backoffice_companies_projection', 't_backoffice_companies_projection.Id', '=', 't_backoffice_companies_spei_accounts.CompanyId')
-            ->where('t_backoffice_companies_spei_accounts.Clabe', $account)->first();
+            ->where('t_backoffice_companies_spei_accounts.Clabe', $account)
+            ->select(
+                't_backoffice_companies_projection.BusinessId',
+                't_backoffice_companies_projection.TradeName',
+                't_backoffice_companies_projection.Id',
+                't_backoffice_companies_spei_accounts.CompanyId'
+            )
+            ->first();
         if ($company) {
             return [
                 'type' => 'company-card-cloud-account',
@@ -188,7 +211,8 @@ class Transactions extends Controller
                 'account' => $account,
                 'name' => $company->TradeName,
                 'institution' => 90646,
-                'id' => $company->Id
+                'id' => $company->Id,
+                'companyId' => $company->CompanyId
 
             ];
         }
@@ -207,14 +231,22 @@ class Transactions extends Controller
             )
             ->first();
         if ($card) {
+            $stpAccount = StpAccounts::where('Id', env('CARD_CLOUD_MAIN_STP_ACCOUNT_ID', '7882dcd5-2ce8-4dd7-a1a8-42d5e8a2434a'))->first();
+
+
             return [
                 'type' => 'card-cloud-account',
                 'business' => $card->BusinessId ?? null,
                 'balance' => 0,
                 'account' => $account,
                 'name' => $card->Name . ' ' . $card->Lastname,
-                'card' => $card->CardId,
-                'institution' => 90646
+                'institution' => 90646,
+                'id' => $card->CardId,
+                'stpAccount' => [
+                    'id' => $stpAccount->Id,
+                    'acronym' => $stpAccount->Acronym,
+                    'number' => Crypt::decrypt($stpAccount->Number),
+                ]
             ];
         }
     }

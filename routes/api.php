@@ -36,6 +36,8 @@ Route::middleware([VerifyJwt::class])->group(function () {
             Route::post('/activate', [App\Http\Controllers\CardCloud\CardManagementController::class, 'activateCard']);
             Route::post('/buy_virtual_card', [App\Http\Controllers\CardCloud\CardManagementController::class, 'buyVirtualCard']);
             Route::get('/virtual_card_price', [App\Http\Controllers\CardCloud\CardManagementController::class, 'getVirtualCardPrice']);
+            Route::get('/{cardId}/sensitive', [App\Http\Controllers\CardCloud\CardSensitiveController::class, 'sensitive']);
+            Route::get('/{cardId}/cvv', [App\Http\Controllers\CardCloud\CardSensitiveController::class, 'dynamicCvv']);
         });
 
         Route::group(['prefix' => 'movement'], function () {
@@ -104,7 +106,10 @@ Route::group(['prefix' => 'stp'], function () {
 
 Route::group(['prefix' => 'users'], function () {
     Route::post('validate', [App\Http\Controllers\Users\Activate::class, 'validateEmail']);
+    Route::post('validate-code', [App\Http\Controllers\Users\Activate::class, 'validateCode']);
     Route::post('login', [App\Http\Controllers\Users\Activate::class, 'validateCredentials']);
     Route::post('activate', [App\Http\Controllers\Users\Activate::class, 'activate']);
     Route::delete('clean', [App\Http\Controllers\Users\Activate::class, 'cleanActivation']);
+    Route::post('forgot-password', [App\Http\Controllers\Users\ForgotPassword::class, 'forgotPassword']);
+    Route::post('reset-password', [App\Http\Controllers\Users\ForgotPassword::class, 'resetPassword']);
 });

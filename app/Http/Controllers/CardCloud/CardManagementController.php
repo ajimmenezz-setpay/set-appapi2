@@ -388,19 +388,25 @@ class CardManagementController extends Controller
         try {
             $this->validate($request, [
                 'source_card' => 'required',
-                'months' => 'required|numeric|min:1',
-                'auth_code' => 'required|min:6|max:6'
+                'months' => 'required|numeric|min:1'
             ], [
                 'source_card.required' => 'La tarjeta de origen es requerida',
                 'months.required' => 'Los meses de la tarjeta virtual son requeridos',
                 'months.numeric' => 'Los meses de la tarjeta virtual deben ser un número',
-                'months.min' => 'Los meses de la tarjeta virtual deben ser mayor a 0',
-                'auth_code.required' => 'El código de autenticación es requerido.',
-                'auth_code.min' => 'El código de autenticación debe tener 6 caracteres.',
-                'auth_code.max' => 'El código de autenticación debe tener 6 caracteres.'
+                'months.min' => 'Los meses de la tarjeta virtual deben ser mayor a 0'
             ]);
 
-            GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->auth_code);
+            if ($request->has('auth_code')) {
+                $this->validate($request, [
+                    'auth_code' => 'required|min:6|max:6'
+                ], [
+                    'auth_code.required' => 'El código de autenticación es requerido',
+                    'auth_code.min' => 'El código de autenticación debe tener 6 caracteres',
+                    'auth_code.max' => 'El código de autenticación debe tener 6 caracteres'
+                ]);
+                GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->auth_code);
+            }
+
 
             if (CardAssigned::where('CardCloudId', $request->source_card)->where('UserId', $request->attributes->get('jwt')->id)->count() == 0) {
                 return self::basicError("La tarjeta de origen no está asignada al usuario");

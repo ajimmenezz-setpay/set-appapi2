@@ -496,6 +496,162 @@
                 ]
             }
         },
+        "/api/v1/card/{cardId}/sensitive": {
+            "get": {
+                "tags": [
+                    "Card Cloud"
+                ],
+                "summary": "Obtener datos sensibles de la tarjeta",
+                "description": "Obtener datos sensibles de la tarjeta",
+                "operationId": "sensitive",
+                "parameters": [
+                    {
+                        "name": "cardId",
+                        "in": "path",
+                        "description": "ID de la tarjeta",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Datos sensibles de la tarjeta",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "pan": {
+                                            "type": "string",
+                                            "example": "5161520880102992"
+                                        },
+                                        "expiration_date": {
+                                            "type": "string",
+                                            "example": "2029-08-01"
+                                        },
+                                        "pin": {
+                                            "type": "string",
+                                            "example": "1911"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Bad Request"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Not Found"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Internal Server Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/card/{cardId}/cvv": {
+            "get": {
+                "tags": [
+                    "Card Cloud"
+                ],
+                "summary": "Obtener CVV dinámico de la tarjeta",
+                "description": "Obtener CVV dinámico de la tarjeta",
+                "operationId": "dynamicCvv",
+                "parameters": [
+                    {
+                        "name": "cardId",
+                        "in": "path",
+                        "description": "ID de la tarjeta",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "CVV dinámico de la tarjeta",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "cvv": {
+                                            "type": "string",
+                                            "example": "275"
+                                        },
+                                        "expiration": {
+                                            "type": "integer",
+                                            "example": 1880236800
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Bad Request"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/cardCloud/contact": {
             "get": {
                 "tags": [
@@ -2272,6 +2428,80 @@
                 }
             }
         },
+        "/api/users/validate-code": {
+            "post": {
+                "tags": [
+                    "Activación de cuenta"
+                ],
+                "summary": "Validar código de verificación",
+                "description": "Validar código de verificación",
+                "operationId": "eb55a1fef0cdda188e333ccad77bb1b8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "code"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "  [email protected]"
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Código de verificación correcto",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "El código de verificación es correcto"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al validar el código de verificación",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "No se ha solicitado un código de verificación | El código de verificación no es válido"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Email no registrado",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "El email no está registrado"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/users/login": {
             "post": {
                 "tags": [
@@ -2503,6 +2733,136 @@
                                         }
                                     },
                                     "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/forgot-password": {
+            "post": {
+                "tags": [
+                    "Usuarios - Autenticación"
+                ],
+                "summary": "Recuperar contraseña",
+                "operationId": "44f14a055e333157f394995226fb8b6b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "  [email protected]"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Correo electrónico enviado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Se ha enviado un correo electrónico con el código de verificación"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al validar el email",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "El correo electrónico no está registrado"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/reset-password": {
+            "post": {
+                "tags": [
+                    "Usuarios - Autenticación"
+                ],
+                "summary": "Restablecer contraseña",
+                "operationId": "9476e8917c960034011276433248d0df",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "code"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "  [email protected]"
+                                    },
+                                    "code": {
+                                        "type": "integer",
+                                        "example": 123456
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Correo electrónico enviado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Se ha enviado un correo electrónico con las nuevas credenciales"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al validar el email",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "No se ha solicitado un código de verificación | El código de verificación no es válido"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Error al validar el email",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "El email no está registrado"
                                 }
                             }
                         }
@@ -2839,6 +3199,10 @@
         {
             "name": "Activación de cuenta",
             "description": "Activación de cuenta"
+        },
+        {
+            "name": "Usuarios - Autenticación",
+            "description": "Usuarios - Autenticación"
         },
         {
             "name": "Usuarios - Frase secreta",
