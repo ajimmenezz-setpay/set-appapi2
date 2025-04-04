@@ -15,7 +15,7 @@ class CardSensitiveController extends Controller
 
     /**
      *  @OA\Get(
-     *      path="/api/v1/card/{cardId}/sensitive",
+     *      path="/api/cardCloud/card/{cardId}/sensitive",
      *      tags={"Card Cloud"},
      *      summary="Obtener datos sensibles de la tarjeta",
      *      description="Obtener datos sensibles de la tarjeta",
@@ -117,7 +117,7 @@ class CardSensitiveController extends Controller
 
     /**
      *  @OA\Get(
-     *      path="/api/v1/card/{cardId}/cvv",
+     *      path="/api/cardCloud/card/{cardId}/cvv",
      *      tags={"Card Cloud"},
      *      summary="Obtener CVV dinámico de la tarjeta",
      *      description="Obtener CVV dinámico de la tarjeta",

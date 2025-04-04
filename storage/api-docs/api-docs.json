@@ -496,7 +496,7 @@
                 ]
             }
         },
-        "/api/v1/card/{cardId}/sensitive": {
+        "/api/cardCloud/card/{cardId}/sensitive": {
             "get": {
                 "tags": [
                     "Card Cloud"
@@ -587,7 +587,7 @@
                 }
             }
         },
-        "/api/v1/card/{cardId}/cvv": {
+        "/api/cardCloud/card/{cardId}/cvv": {
             "get": {
                 "tags": [
                     "Card Cloud"
