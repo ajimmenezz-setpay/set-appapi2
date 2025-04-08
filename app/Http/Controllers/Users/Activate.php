@@ -22,6 +22,7 @@ use App\Models\Users\SecretPhrase;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class Activate extends Controller
@@ -580,6 +581,14 @@ class Activate extends Controller
             return response()->json(['message' => $operations], 200);
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error al activar cuenta de usuario: ', [
+                'user_id' => $request->user_id,
+                'temporal_code' => $request->temporal_code,
+                'google_code' => $request->google_code,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request' => $request->all()
+            ]);
             return self::basicError($e->getMessage());
         }
     }

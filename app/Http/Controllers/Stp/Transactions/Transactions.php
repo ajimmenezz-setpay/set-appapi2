@@ -104,7 +104,7 @@ class Transactions extends Controller
             if ($account == Crypt::decrypt($stpAccount->Number)) {
 
                 if ($origin) {
-                    $stpAccount = self::updateAccountBalance($stpAccount);
+                    $stpAccount = self::updateAccountBalance($stpAccount->Id);
                 }
 
                 return [
@@ -279,6 +279,9 @@ class Transactions extends Controller
     public static function updateAccountBalance($account_id)
     {
         $stpAccount = StpAccounts::where('Id', $account_id)->first();
+        if (is_null($stpAccount)) {
+            throw new \Exception('No se ha podido obtener la cuenta concentradora. Por favor intente más tarde.');
+        }
 
         $balance = StpService::getBalance(
             Crypt::decrypt($stpAccount->Url),
