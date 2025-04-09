@@ -101,6 +101,13 @@ class SpeiOut extends Controller
                 }
             }
 
+            if (count($errors) > 0) {
+                return response()->json([
+                    'error' => $errors,
+                    'destinos' => $destinos
+                ]);
+            }
+
             return response()->json($destinos);
         } catch (\Exception $e) {
             return response()->json([

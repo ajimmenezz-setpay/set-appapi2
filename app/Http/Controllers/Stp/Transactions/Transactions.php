@@ -269,7 +269,13 @@ class Transactions extends Controller
                 'balance' => 0,
                 'account' => $account,
                 'name' => $destination->Beneficiary,
-                'institution' => $destination->Code
+                'institution' => $destination->Code,
+                'id' => 0,
+                'stpAccount' => [
+                    'id' => 0,
+                    'acronym' => '',
+                    'number' => ''
+                ]
             ];
         }
 
