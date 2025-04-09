@@ -485,7 +485,71 @@ class SpeiOut extends Controller
         }
     }
 
-    protected static function processBusinessToExternal($origin, $destination, $amount) {}
+    protected static function processBusinessToExternal($origin, $destination, $amount, $concept, $request)
+    {
+        try {
+            $out = self::setOutMovement($origin, $destination, $concept, $amount, $request, 'external');
+            self::setNewBalance($origin, $out->SourceBalance);
+
+            $commissions = self::calculateOutCommissions('external', $amount, $origin['commissions']);
+            $amount = $commissions['total'];
+
+            if (env('APP_ENV') == 'production') {
+                $response = StpService::speiOut(
+                    $origin['stpAccount']['url'],
+                    $origin['stpAccount']['key'],
+                    $origin['stpAccount']['company'],
+                    $amount,
+                    $out->TrackingKey,
+                    substr(preg_replace('/[^a-zA-Z0-9\s]/', '', $concept), 0, 38),
+                    $origin['stpAccount']['number'],
+                    $origin['name'],
+                    "",
+                    $destination['account'],
+                    $destination['name'],
+                    $out->Reference,
+                    90646,
+                    "",
+                    40,
+                    90646,
+                    40
+                );
+
+                if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
+                    $stpId = $response->respuesta->id;
+                } else {
+                    DB::rollBack();
+                    throw new \Exception("Error:" . ErrorRegisterOrder::error($response->respuesta->id));
+                }
+            } else {
+                $stpId = "1111111111";
+            }
+
+            StpTransaction::where('Id', $out->Id)->update([
+                'StpId' => $stpId
+            ]);
+
+            DB::commit();
+
+            return [
+                'destinationsAccount' => $destination['name'],
+                'url'  => env('APP_API_URL') . "/spei/transaccion/" . $out['Id'],
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::channel('spei_out')->error(
+                "Error al tranferir los fondos a la cuenta " . $destination['account'] . ".",
+                [
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
+            );
+            return [
+                'error' => "Error al tranferir los fondos a la cuenta " . $destination['account'] . " de " . $destination['name']
+            ];
+        }
+    }
 
     protected static function processCompanyToBusiness($origin, $destination, $amount, $concept, $request)
     {
@@ -700,7 +764,7 @@ class SpeiOut extends Controller
                         $origin['stpAccount']['number'],
                         $origin['name'],
                         "",
-                        env('CARD_CLOUD_MAIN_STP_ACCOUNT'),
+                        $destination['account'],
                         $destination['name'],
                         $out->Reference,
                         90646,
@@ -796,7 +860,7 @@ class SpeiOut extends Controller
                         $origin['stpAccount']['number'],
                         $origin['name'],
                         "",
-                        env('CARD_CLOUD_MAIN_STP_ACCOUNT'),
+                        $destination['account'],
                         $destination['name'],
                         $out->Reference,
                         90646,
@@ -843,7 +907,71 @@ class SpeiOut extends Controller
     }
 
 
-    protected static function processCompanyToExternal($origin, $destination, $amount, $concept, $request) {}
+    protected static function processCompanyToExternal($origin, $destination, $amount, $concept, $request)
+    {
+        try {
+            $out = self::setOutMovement($origin, $destination, $concept, $amount, $request, 'external');
+            self::setNewBalance($origin, $out->SourceBalance);
+
+            $commissions = self::calculateOutCommissions('external', $amount, $origin['commissions']);
+            $amount = $commissions['total'];
+
+            if (env('APP_ENV') == 'production') {
+                $response = StpService::speiOut(
+                    $origin['stpAccount']['url'],
+                    $origin['stpAccount']['key'],
+                    $origin['stpAccount']['company'],
+                    $amount,
+                    $out->TrackingKey,
+                    substr(preg_replace('/[^a-zA-Z0-9\s]/', '', $concept), 0, 38),
+                    $origin['stpAccount']['number'],
+                    $origin['name'],
+                    "",
+                    $destination['account'],
+                    $destination['name'],
+                    $out->Reference,
+                    90646,
+                    "",
+                    40,
+                    90646,
+                    40
+                );
+
+                if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
+                    $stpId = $response->respuesta->id;
+                } else {
+                    DB::rollBack();
+                    throw new \Exception("Error:" . ErrorRegisterOrder::error($response->respuesta->id));
+                }
+            } else {
+                $stpId = "1111111111";
+            }
+
+            StpTransaction::where('Id', $out->Id)->update([
+                'StpId' => $stpId
+            ]);
+
+            DB::commit();
+
+            return [
+                'destinationsAccount' => $destination['name'],
+                'url'  => env('APP_API_URL') . "/spei/transaccion/" . $out['Id'],
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::channel('spei_out')->error(
+                "Error al tranferir los fondos a la cuenta " . $destination['account'] . ".",
+                [
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
+            );
+            return [
+                'error' => "Error al tranferir los fondos a la cuenta " . $destination['account'] . " de " . $destination['name']
+            ];
+        }
+    }
 
     protected static function processCardCloudToBusiness($origin, $destination, $amount) {}
     protected static function processCardCloudToCompany($origin, $destination, $amount) {}
