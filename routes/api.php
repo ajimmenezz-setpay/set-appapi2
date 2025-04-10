@@ -113,3 +113,8 @@ Route::group(['prefix' => 'users'], function () {
     Route::post('forgot-password', [App\Http\Controllers\Users\ForgotPassword::class, 'forgotPassword']);
     Route::post('reset-password', [App\Http\Controllers\Users\ForgotPassword::class, 'resetPassword']);
 });
+
+Route::group(['prefix' => 'app-scrapper'], function () {
+    Route::get('google-play/{id}', [App\Http\Controllers\Scrapper\AppScrapperController::class, 'google']);
+    Route::get('play-store/{id}', [App\Http\Controllers\Scrapper\AppScrapperController::class, 'apple']);
+});
