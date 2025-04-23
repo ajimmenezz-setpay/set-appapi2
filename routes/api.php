@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Security\Password;
+use App\Http\Middleware\ValidateEnvironmentAdminProfile;
 use App\Http\Middleware\VerifyJwt;
 use Illuminate\Support\Facades\Route;
 
@@ -60,6 +61,20 @@ Route::middleware([VerifyJwt::class])->group(function () {
     Route::group(['prefix' => 'speiCloud'], function () {
         Route::group(['prefix' => 'transaction'], function () {
             Route::post('/process-payments', [App\Http\Controllers\Stp\Transactions\SpeiOut::class, 'processPayments']);
+        });
+
+        Route::group(['prefix' => 'authorization'], function () {
+            Route::group(['prefix' => 'rules'], function () {
+                Route::get('/', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizationRulesController::class, 'rules']);
+                Route::post('/enable', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizationRulesController::class, 'enableRules']);
+                Route::post('/disable', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizationRulesController::class, 'disableRules']);
+            });
+
+            Route::group(['prefix' => 'authorizing-users'], function () {
+                Route::get('/', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizingUsers::class, 'index']);
+                Route::post('/', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizingUsers::class, 'store']);
+                Route::delete('/', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizingUsers::class, 'delete']);
+            });
         });
     });
 

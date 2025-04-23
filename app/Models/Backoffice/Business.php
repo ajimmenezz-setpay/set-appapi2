@@ -15,6 +15,7 @@ class Business extends Model
         'Id',
         'Name',
         'TemplateFile',
+        'AuthorizationRules',
         'Domain',
         'Active'
     ];

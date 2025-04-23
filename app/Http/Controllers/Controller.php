@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Validator;
 use App\Exceptions\ValidationException;
+use Illuminate\Routing\Controller as BaseController;
 
-abstract class Controller
+abstract class Controller extends BaseController
 {
     /**
      * @OA\Info(
