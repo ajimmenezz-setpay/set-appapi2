@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Middleware\ValidateEnvironmentAdminProfile;
 use Illuminate\Http\Request;
 use App\Models\Backoffice\Business;
-use App\Models\SpeiCloud\Authorization\AuthorizingUsers as AuthorizationAuthorizingUsers;
+use App\Models\Speicloud\Authorization\AuthorizingUsers as AuthorizationAuthorizingUsers;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
