@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\SpeiCloud\Authorization;
+namespace App\Models\Speicloud\Authorization;
 
 use Illuminate\Database\Eloquent\Model;
 
