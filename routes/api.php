@@ -75,6 +75,7 @@ Route::middleware([VerifyJwt::class])->group(function () {
                 Route::post('/', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizingUsers::class, 'store']);
                 Route::delete('/', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizingUsers::class, 'delete']);
             });
+
         });
     });
 
@@ -92,6 +93,11 @@ Route::middleware([VerifyJwt::class])->group(function () {
             Route::delete('/', [App\Http\Controllers\Users\SecretPhrase::class, 'delete']);
             Route::get('/', [App\Http\Controllers\Users\SecretPhrase::class, 'index']);
         });
+
+        Route::group(['prefix' => 'address'], function () {
+            Route::post('/', [App\Http\Controllers\Users\Address::class, 'setAddress']);
+            Route::get('/', [App\Http\Controllers\Users\Address::class, 'getAddress']);
+        });
     });
 
     Route::group(['prefix' => 'administration'], function () {
@@ -100,6 +106,11 @@ Route::middleware([VerifyJwt::class])->group(function () {
             Route::get('/{id}', [App\Http\Controllers\Administration\Company::class, 'show']);
         });
     });
+});
+
+Route::group(['prefix' => 'address'], function () {
+    Route::get('/countries', [App\Http\Controllers\Address\Countries::class, 'index']);
+    Route::get('/states', [App\Http\Controllers\Address\States::class, 'index']);
 });
 
 Route::group(['prefix' => 'clickup'], function () {

@@ -9,6 +9,145 @@
         "version": "2.0.0"
     },
     "paths": {
+        "/api/address/countries": {
+            "get": {
+                "tags": [
+                    "Address"
+                ],
+                "summary": "Get countries",
+                "description": "Get countries",
+                "operationId": "getCountries",
+                "responses": {
+                    "200": {
+                        "description": "Countries",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "Id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Mexico"
+                                            },
+                                            "official_name": {
+                                                "type": "string",
+                                                "example": "Estados Unidos Mexicanos"
+                                            },
+                                            "iso2": {
+                                                "type": "string",
+                                                "example": "MX"
+                                            },
+                                            "iso3": {
+                                                "type": "string",
+                                                "example": "MEX"
+                                            },
+                                            "phone_code": {
+                                                "type": "string",
+                                                "example": "+52"
+                                            },
+                                            "currency_code_alpha": {
+                                                "type": "string",
+                                                "example": "MXN"
+                                            },
+                                            "currency_code_numeric": {
+                                                "type": "string",
+                                                "example": "484"
+                                            },
+                                            "currency_name": {
+                                                "type": "string",
+                                                "example": "Peso Mexicano"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error getting countries",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error al obtener los países"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/address/states": {
+            "get": {
+                "tags": [
+                    "Address"
+                ],
+                "summary": "Get states",
+                "description": "Get states",
+                "operationId": "getStates",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "countryId"
+                                ],
+                                "properties": {
+                                    "countryId": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "States",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "Id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Aguascalientes"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error getting states",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error al obtener los estados"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/cardCloud/card/{cardId}/nip": {
             "post": {
                 "tags": [
@@ -3206,6 +3345,262 @@
                 }
             }
         },
+        "/api/users/address": {
+            "get": {
+                "tags": [
+                    "Usuarios - Dirección"
+                ],
+                "summary": "Get user address",
+                "description": "Get user address",
+                "operationId": "getUserAddress",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id"
+                                ],
+                                "properties": {
+                                    "user_id": {
+                                        "type": "string",
+                                        "example": "12345678-1234-1234-1234-123456789012"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User address retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "country_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "country": {
+                                            "type": "string",
+                                            "example": "Mexico"
+                                        },
+                                        "state_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "state": {
+                                            "type": "string",
+                                            "example": "Mexico"
+                                        },
+                                        "city": {
+                                            "type": "string",
+                                            "example": "Mexico City"
+                                        },
+                                        "postal_code": {
+                                            "type": "string",
+                                            "example": "12345"
+                                        },
+                                        "street": {
+                                            "type": "string",
+                                            "example": "Main St"
+                                        },
+                                        "external_number": {
+                                            "type": "string",
+                                            "example": "123"
+                                        },
+                                        "internal_number": {
+                                            "type": "string",
+                                            "example": "A"
+                                        },
+                                        "reference": {
+                                            "type": "string",
+                                            "example": "Near the park"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error getting user address",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Error al obtener la dirección: Error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "El usuario no existe o no tiene una dirección establecida"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Usuarios - Dirección"
+                ],
+                "summary": "Set user address",
+                "description": "Set user address",
+                "operationId": "setUserAddress",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id",
+                                    "country_id",
+                                    "state_id",
+                                    "city",
+                                    "postal_code",
+                                    "street",
+                                    "external_number"
+                                ],
+                                "properties": {
+                                    "user_id": {
+                                        "type": "string",
+                                        "example": "12345678-1234-1234-1234-123456789012"
+                                    },
+                                    "country_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "state_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "example": "Mexico City"
+                                    },
+                                    "postal_code": {
+                                        "type": "string",
+                                        "example": "12345"
+                                    },
+                                    "street": {
+                                        "type": "string",
+                                        "example": "Main St"
+                                    },
+                                    "external_number": {
+                                        "type": "string",
+                                        "example": "123"
+                                    },
+                                    "internal_number": {
+                                        "type": "string",
+                                        "example": "A"
+                                    },
+                                    "reference": {
+                                        "type": "string",
+                                        "example": "Near the park"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User address set successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "La dirección del usuario se ha establecido correctamente"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error setting user address",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Error setting address: El usuario no existe"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/users/forgot-password": {
             "post": {
                 "tags": [
@@ -3635,6 +4030,10 @@
     },
     "tags": [
         {
+            "name": "Address",
+            "description": "Address"
+        },
+        {
             "name": "Card Cloud",
             "description": "Card Cloud"
         },
@@ -3673,6 +4072,10 @@
         {
             "name": "Activación de cuenta",
             "description": "Activación de cuenta"
+        },
+        {
+            "name": "Usuarios - Dirección",
+            "description": "Usuarios - Dirección"
         },
         {
             "name": "Usuarios - Autenticación",
