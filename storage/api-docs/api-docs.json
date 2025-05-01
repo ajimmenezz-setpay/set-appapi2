@@ -2186,9 +2186,12 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "user_id": {
-                                        "type": "string",
-                                        "example": "12345678-1234-1234-1234-123456789012"
+                                    "users_id": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": "82438ecc-829a-4c2d-9df8-c7babbd32372"
+                                        }
                                     }
                                 },
                                 "type": "object"

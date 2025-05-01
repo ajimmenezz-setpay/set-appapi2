@@ -80,22 +80,33 @@ class AuthorizingUsers extends Controller
                 return $this->basicError('El ambiente no existe o no tienes acceso a él', 404);
             }
 
-            return $this->success([
-                'authorizers' => self::authorizers($business->Id),
-                'users' => self::users($business->Id),
-            ]);
+            return $this->success(self::allUsers($business->Id));
         } catch (\Exception $e) {
-            var_dump($e->getMessage());
             return $this->basicError('No se pudo obtener la información de los usuarios autorizadores');
         }
     }
 
-    public static function users($businessId)
+    public static function allUsers($businessId)
+    {
+        $authorizers = self::authorizers($businessId);
+        $authorizersId = [];
+        foreach ($authorizers as $authorizer) {
+            $authorizersId[] = $authorizer->Id;
+        }
+
+        return [
+            'authorizers' => $authorizers,
+            'users' => self::users($businessId, $authorizersId),
+        ];
+    }
+
+    public static function users($businessId, $authorizers = [])
     {
         return User::join('cat_profile', 'cat_profile.Id', '=', 't_users.ProfileId')
             ->where('t_users.BusinessId', $businessId)
             ->where('t_users.Active', 1)
             ->whereIn('t_users.ProfileId', [5, 7])
+            ->whereNotIn('t_users.Id', $authorizers)
             ->get([
                 't_users.Id',
                 't_users.Name',
@@ -136,7 +147,7 @@ class AuthorizingUsers extends Controller
      *  @OA\RequestBody(
      *      required=true,
      *      @OA\JsonContent(
-     *          @OA\Property(property="user_id", type="string", example="12345678-1234-1234-1234-123456789012"),
+     *          @OA\Property(property="users_id", type="array", @OA\Items(type="string", example="82438ecc-829a-4c2d-9df8-c7babbd32372")),
      *      )
      *  ),
      *
@@ -206,11 +217,11 @@ class AuthorizingUsers extends Controller
             $this->validate(
                 $request,
                 [
-                    'user_id' => 'required|string',
+                    'users_id' => 'required|array'
                 ],
                 [
-                    'user_id.required' => 'El campo user_id es obligatorio',
-                    'user_id.string' => 'El campo user_id debe ser una cadena de texto',
+                    'users_id.required' => 'El campo user_id es obligatorio',
+                    'users_id.array' => 'El campo user_id debe ser un arreglo'
                 ]
             );
 
@@ -221,36 +232,32 @@ class AuthorizingUsers extends Controller
                 return $this->basicError('El ambiente no existe o no tienes acceso a él', 404);
             }
 
-            $user = User::where('Id', $request->input('user_id'))->first();
-            if (!$user) {
-                return $this->basicError('El usuario no existe o no tienes acceso a él', 404);
-            }
+            foreach ($request->input('users_id') as $userId) {
+                $user = User::where('Id', $userId)->first();
+                if (!$user) {
+                    throw new \Exception('Algun usuario no existe o no tienes acceso a él');
+                }
 
-            $userExists = AuthorizationAuthorizingUsers::where('BusinessId', $business->Id)
-                ->where('UserId', $user->Id)
-                ->first();
-            if ($userExists && $userExists->Active == 1) {
-                return $this->basicError('El usuario ya existe como autorizador', 400);
-            } else if ($userExists && $userExists->Active == 0) {
-                $userExists->Active = 1;
-                $userExists->save();
-                return $this->success([
-                    'authorizers' => self::authorizers($business->Id),
-                    'users' => self::users($business->Id),
-                ]);
+                $userExists = AuthorizationAuthorizingUsers::where('BusinessId', $business->Id)
+                    ->where('UserId', $user->Id)
+                    ->first();
+                if ($userExists && $userExists->Active == 1) {
+                    throw new \Exception('Alguno de los ususarios seleccionados ya existe como autorizador');
+                } else if ($userExists && $userExists->Active == 0) {
+                    $userExists->Active = 1;
+                    $userExists->save();
+                } else {
+                    AuthorizationAuthorizingUsers::create([
+                        'BusinessId' => $business->Id,
+                        'UserId' => $user->Id,
+                        'CreatedBy' => $request->attributes->get('jwt')->id,
+                    ]);
+                }
             }
-
-            AuthorizationAuthorizingUsers::create([
-                'BusinessId' => $business->Id,
-                'UserId' => $user->Id,
-                'CreatedBy' => $request->attributes->get('jwt')->id,
-            ]);
 
             DB::commit();
-            return $this->success([
-                'authorizers' => self::authorizers($business->Id),
-                'users' => self::users($business->Id),
-            ]);
+
+            return $this->success(self::allUsers($business->Id));
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->basicError($e->getMessage());

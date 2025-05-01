@@ -188,7 +188,7 @@ class CardSensitiveController extends Controller
                         $statusCode = $e->getResponse()->getStatusCode();
                         $responseBody = $e->getResponse()->getBody()->getContents();
                         $decodedJson = json_decode($responseBody, true);
-                        $message = 'No hemos posido obtener el cvv de la tarjeta.';
+                        $message = 'No hemos podido obtener el cvv de la tarjeta.';
 
                         if (json_last_error() === JSON_ERROR_NONE) {
                             $message .= " " . $decodedJson['message'];
