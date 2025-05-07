@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id('Id');
             $table->unsignedBigInteger('RuleId')->index();
             $table->string('SourceAccount', 20)->index();
+            $table->string('SourceAccountName', 200)->index('SourceAccountNameRules');
             $table->timestamps();
         });
     }

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('t_speicloud_authorization_rules_processors', function (Blueprint $table) {
+        Schema::create('t_speicloud_authorization_rules_authorizers', function (Blueprint $table) {
             $table->id('Id');
             $table->unsignedBigInteger('RuleId')->index();
             $table->string('UserId', 36)->index();
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('t_speicloud_authorization_rules_processors');
+        Schema::dropIfExists('t_speicloud_authorization_rules_authorizers');
     }
 };

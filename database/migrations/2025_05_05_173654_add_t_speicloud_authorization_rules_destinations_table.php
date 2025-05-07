@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id('Id');
             $table->unsignedBigInteger('RuleId')->index();
             $table->string('DestinationAccount', 20)->index('DestinationAccountRules');
+            $table->string('DestinationAccountName', 200)->index('DestinationAccountNameRules');
+            $table->string('DestinationAccountBankId', 20)->index('DestinationAccountBankIdRules');
             $table->timestamps();
         });
     }

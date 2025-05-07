@@ -66,6 +66,7 @@ Route::middleware([VerifyJwt::class])->group(function () {
         Route::group(['prefix' => 'authorization'], function () {
             Route::group(['prefix' => 'rules'], function () {
                 Route::get('/', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizationRulesController::class, 'rules']);
+                Route::post('/', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizationRulesController::class, 'store']);
                 Route::post('/enable', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizationRulesController::class, 'enableRules']);
                 Route::post('/disable', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizationRulesController::class, 'disableRules']);
             });
@@ -75,6 +76,17 @@ Route::middleware([VerifyJwt::class])->group(function () {
                 Route::post('/', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizingUsers::class, 'store']);
                 Route::delete('/', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizingUsers::class, 'delete']);
             });
+
+            Route::group(['prefix' => 'users'], function () {
+                Route::get('/processors', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizingUsers::class, 'processorUsers']);
+                Route::get('/authorizers', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizingUsers::class, 'authorizerUsers']);
+            });
+
+            Route::group(['prefix' => 'accounts'], function () {
+                Route::get('/origin', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizationAccountsController::class, 'origins']);
+                Route::get('/destination', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizationAccountsController::class, 'destinations']);
+            });
+
 
         });
     });

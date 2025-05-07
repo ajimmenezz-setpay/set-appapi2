@@ -2002,6 +2002,150 @@
                 ]
             }
         },
+        "/api/speiCloud/authorization/accounts/origin": {
+            "get": {
+                "tags": [
+                    "SpeiCloud Authorization Accounts"
+                ],
+                "summary": "Get origin accounts",
+                "description": "Get origin accounts",
+                "operationId": "getOriginAccounts",
+                "responses": {
+                    "200": {
+                        "description": "Origin accounts",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "company": {
+                                            "type": "string",
+                                            "example": "Company Name"
+                                        },
+                                        "accountNumber": {
+                                            "type": "string",
+                                            "example": "123456789012345678"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error getting origin accounts",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error al obtener las cuentas de origen"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Business not found",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "El ambiente no existe o no tienes acceso a él"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/speiCloud/authorization/accounts/destination": {
+            "get": {
+                "tags": [
+                    "SpeiCloud Authorization Accounts"
+                ],
+                "summary": "Get destination accounts",
+                "description": "Get destination accounts",
+                "operationId": "getDestinationAccounts",
+                "responses": {
+                    "200": {
+                        "description": "Destination accounts",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "accountNumber": {
+                                            "type": "string",
+                                            "example": "123456789012345678"
+                                        },
+                                        "beneficiary": {
+                                            "type": "string",
+                                            "example": "Beneficiary Name"
+                                        },
+                                        "bank": {
+                                            "type": "string",
+                                            "example": "Bank Name"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error getting destination accounts",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error al obtener las cuentas de destino"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Business not found",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "El ambiente no existe o no tienes acceso a él"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/speiCloud/authorization/rules": {
             "get": {
                 "tags": [
@@ -2051,6 +2195,288 @@
                                 "schema": {
                                     "type": "string",
                                     "example": "El ambiente no existe o no tienes acceso a él"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "SpeiCloud Authorization Rules"
+                ],
+                "summary": "Create authorization rule",
+                "description": "Create authorization rule",
+                "operationId": "createAuthorizationRule",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "type",
+                                    "amount",
+                                    "authorizers",
+                                    "priority"
+                                ],
+                                "properties": {
+                                    "type": {
+                                        "description": "1: SpeiOut, 2: SpeiIn",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "amount": {
+                                        "description": "Monto a partir del cual se aplica la regla",
+                                        "type": "number",
+                                        "example": 1000
+                                    },
+                                    "dailyMovements": {
+                                        "description": "Número de movimientos diarios permitidos",
+                                        "type": "integer",
+                                        "example": 0
+                                    },
+                                    "monthlyMovements": {
+                                        "description": "Número de movimientos mensuales permitidos",
+                                        "type": "integer",
+                                        "example": 0
+                                    },
+                                    "originAccounts": {
+                                        "description": "Cuentas de origen a las que se aplica la regla",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "accountNumber": {
+                                                    "type": "string",
+                                                    "example": "uuid1"
+                                                },
+                                                "company": {
+                                                    "type": "string",
+                                                    "example": "Cuenta de origen 1"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "destinationAccounts": {
+                                        "description": "Cuentas de destino a las que se aplica la regla",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "accountNumber": {
+                                                    "type": "string",
+                                                    "example": "uuid1"
+                                                },
+                                                "beneficiary": {
+                                                    "type": "string",
+                                                    "example": "Cuenta de destino 1"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "authorizers": {
+                                        "description": "UUIDs de los usuarios autorizadores",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "example": [
+                                            "uuid1",
+                                            "uuid2"
+                                        ]
+                                    },
+                                    "processors": {
+                                        "description": "UUIDs de los usuarios procesadores",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "example": [
+                                            "uuid1",
+                                            "uuid2"
+                                        ]
+                                    },
+                                    "priority": {
+                                        "description": "Prioridad de la regla",
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Authorization rule created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "enabled": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "rules": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/speiCloud/authorization/rules/enable": {
+            "post": {
+                "tags": [
+                    "SpeiCloud Authorization Rules"
+                ],
+                "summary": "Enable authorization rules",
+                "description": "Enable authorization rules",
+                "operationId": "enableAuthorizationRules",
+                "responses": {
+                    "200": {
+                        "description": "Authorization rules enabled",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "enabled": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "rules": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "No tienes permisos para acceder a este recurso"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Business not found",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "El ambiente no existe o no tienes acceso a él"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error enabling authorization rules",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "No se pudo habilitar las reglas de autorización"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/speiCloud/authorization/rules/disable": {
+            "post": {
+                "tags": [
+                    "SpeiCloud Authorization Rules"
+                ],
+                "summary": "Disable authorization rules",
+                "description": "Disable authorization rules",
+                "operationId": "disableAuthorizationRules",
+                "responses": {
+                    "200": {
+                        "description": "Authorization rules disabled",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "enabled": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "rules": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "No tienes permisos para acceder a este recurso"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Business not found",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "El ambiente no existe o no tienes acceso a él"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error disabling authorization rules",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "No se pudo deshabilitar las reglas de autorización"
                                 }
                             }
                         }
@@ -2459,6 +2885,154 @@
                                 "schema": {
                                     "type": "string",
                                     "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/speiCloud/authorization/users/processors": {
+            "get": {
+                "tags": [
+                    "SpeiCloud Authorization Processor Users"
+                ],
+                "summary": "Get processor users",
+                "description": "Get processor users",
+                "operationId": "getProcessorUsers",
+                "responses": {
+                    "200": {
+                        "description": "Processor users",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "Id": {
+                                                "type": "string",
+                                                "example": "82438ecc-829a-4c2d-9df8-c7babbd32374"
+                                            },
+                                            "Name": {
+                                                "type": "string",
+                                                "example": "Administrador"
+                                            },
+                                            "Lastname": {
+                                                "type": "string",
+                                                "example": "SET"
+                                            },
+                                            "Email": {
+                                                "type": "string",
+                                                "example": "admin@email.com"
+                                            },
+                                            "ProfileName": {
+                                                "type": "string",
+                                                "example": "Administrador Ambiente"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "El ambiente no existe o no tienes acceso a él | No se ha encontrado información de los usuarios procesadores",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "El ambiente no existe o no tienes acceso a él"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/speiCloud/authorization/users/authorizers": {
+            "get": {
+                "tags": [
+                    "SpeiCloud Authorization Authorizer Users"
+                ],
+                "summary": "Get authorizer users",
+                "description": "Get authorizer users",
+                "operationId": "getAuthorizerUsers",
+                "responses": {
+                    "200": {
+                        "description": "Authorizer users",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "Id": {
+                                                "type": "string",
+                                                "example": "82438ecc-829a-4c2d-9df8-c7babbd32374"
+                                            },
+                                            "Name": {
+                                                "type": "string",
+                                                "example": "Administrador"
+                                            },
+                                            "Lastname": {
+                                                "type": "string",
+                                                "example": "SET"
+                                            },
+                                            "Email": {
+                                                "type": "string",
+                                                "example": "admin@email.com"
+                                            },
+                                            "ProfileName": {
+                                                "type": "string",
+                                                "example": "Administrador Ambiente"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "El ambiente no existe o no tienes acceso a él | No se ha encontrado información de los usuarios autorizadores",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "El ambiente no existe o no tienes acceso a él"
                                 }
                             }
                         }
@@ -4057,12 +4631,24 @@
             "description": "Security"
         },
         {
+            "name": "SpeiCloud Authorization Accounts",
+            "description": "SpeiCloud Authorization Accounts"
+        },
+        {
             "name": "SpeiCloud Authorization Rules",
             "description": "SpeiCloud Authorization Rules"
         },
         {
             "name": "SpeiCloud Authorization Users",
             "description": "SpeiCloud Authorization Users"
+        },
+        {
+            "name": "SpeiCloud Authorization Processor Users",
+            "description": "SpeiCloud Authorization Processor Users"
+        },
+        {
+            "name": "SpeiCloud Authorization Authorizer Users",
+            "description": "SpeiCloud Authorization Authorizer Users"
         },
         {
             "name": "Commissions",

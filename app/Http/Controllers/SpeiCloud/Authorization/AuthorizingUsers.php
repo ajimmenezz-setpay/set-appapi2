@@ -107,6 +107,8 @@ class AuthorizingUsers extends Controller
             ->where('t_users.Active', 1)
             ->whereIn('t_users.ProfileId', [5, 7])
             ->whereNotIn('t_users.Id', $authorizers)
+            ->orderBy('t_users.Name', 'asc')
+            ->orderBy('t_users.Lastname', 'asc')
             ->get([
                 't_users.Id',
                 't_users.Name',
@@ -125,6 +127,8 @@ class AuthorizingUsers extends Controller
             ->where('t_users.Active', 1)
             ->where('t_backoffice_speicloud_authorizing_users.Active', 1)
             ->whereIn('t_users.ProfileId', [5, 7])
+            ->orderBy('t_users.Name', 'asc')
+            ->orderBy('t_users.Lastname', 'asc')
             ->get([
                 't_users.Id',
                 't_users.Name',
@@ -383,6 +387,114 @@ class AuthorizingUsers extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->basicError('No se pudo eliminar el usuario autorizador');
+        }
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/speiCloud/authorization/users/processors",
+     *      tags={"SpeiCloud Authorization Processor Users"},
+     *      summary="Get processor users",
+     *      description="Get processor users",
+     *      operationId="getProcessorUsers",
+     *      security={{"bearerAuth":{}}},
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Processor users",
+     *          @OA\JsonContent(
+     *              type="array",
+     *              @OA\Items(
+     *                  type="object",
+     *                  @OA\Property(property="Id", type="string", example="82438ecc-829a-4c2d-9df8-c7babbd32374"),
+     *                  @OA\Property(property="Name", type="string", example="Administrador"),
+     *                  @OA\Property(property="Lastname", type="string", example="SET"),
+     *                  @OA\Property(property="Email", type="string", example="admin@email.com"),
+     *                  @OA\Property(property="ProfileName", type="string", example="Administrador Ambiente")
+     *              )
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=401,
+     *         description="Unauthorized",
+     *         @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="Unauthorized"))
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=404,
+     *          description="El ambiente no existe o no tienes acceso a él | No se ha encontrado información de los usuarios procesadores",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="El ambiente no existe o no tienes acceso a él"))
+     *      )
+     *  )
+     */
+
+    public function processorUsers()
+    {
+        $business = Business::where('Id', request()->attributes->get('jwt')->businessId)->first();
+        if (!$business) {
+            return $this->basicError('El ambiente no existe o no tienes acceso a él', 404);
+        }
+
+        try {
+            return $this->success(self::users($business->Id));
+        } catch (\Exception $e) {
+            return $this->basicError('No se ha encontrado información de los usuarios procesadores', 404);
+        }
+    }
+
+
+    /**
+     *  @OA\Get(
+     *      path="/api/speiCloud/authorization/users/authorizers",
+     *      tags={"SpeiCloud Authorization Authorizer Users"},
+     *      summary="Get authorizer users",
+     *      description="Get authorizer users",
+     *      operationId="getAuthorizerUsers",
+     *      security={{"bearerAuth":{}}},
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Authorizer users",
+     *          @OA\JsonContent(
+     *              type="array",
+     *              @OA\Items(
+     *                  type="object",
+     *                  @OA\Property(property="Id", type="string", example="82438ecc-829a-4c2d-9df8-c7babbd32374"),
+     *                  @OA\Property(property="Name", type="string", example="Administrador"),
+     *                  @OA\Property(property="Lastname", type="string", example="SET"),
+     *                  @OA\Property(property="Email", type="string", example="admin@email.com"),
+     *                  @OA\Property(property="ProfileName", type="string", example="Administrador Ambiente")
+     *              )
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="Unauthorized"))
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=404,
+     *          description="El ambiente no existe o no tienes acceso a él | No se ha encontrado información de los usuarios autorizadores",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="El ambiente no existe o no tienes acceso a él"))
+     *      )
+     *
+     *  )
+     */
+
+    public function authorizerUsers()
+    {
+        $business = Business::where('Id', request()->attributes->get('jwt')->businessId)->first();
+        if (!$business) {
+            return $this->basicError('El ambiente no existe o no tienes acceso a él', 404);
+        }
+
+        try {
+            return $this->success(self::authorizers($business->Id));
+        } catch (\Exception $e) {
+            return $this->basicError('No se ha encontrado información de los usuarios autorizadores', 404);
         }
     }
 }
