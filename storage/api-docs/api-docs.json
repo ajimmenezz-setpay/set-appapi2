@@ -2156,18 +2156,124 @@
                 "operationId": "getAuthorizationRules",
                 "responses": {
                     "200": {
-                        "description": "Authorization rules",
+                        "description": "Authorization rules disabled",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "enabled": {
                                             "type": "boolean",
-                                            "example": true
+                                            "example": false
                                         },
                                         "rules": {
                                             "type": "array",
                                             "items": {
+                                                "properties": {
+                                                    "ruleType": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "ruleTypeName": {
+                                                        "type": "string",
+                                                        "example": "SpeiOut"
+                                                    },
+                                                    "amount": {
+                                                        "type": "number",
+                                                        "example": 100000
+                                                    },
+                                                    "dailyMovements": {
+                                                        "type": "integer",
+                                                        "example": 0
+                                                    },
+                                                    "monthlyMovements": {
+                                                        "type": "integer",
+                                                        "example": 0
+                                                    },
+                                                    "priority": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    },
+                                                    "createdBy": {
+                                                        "type": "string",
+                                                        "example": "00000000-1111-2222-3333-444444444444"
+                                                    },
+                                                    "active": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "processors": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "userId": {
+                                                                    "type": "string",
+                                                                    "example": "00000000-1111-2222-3333-444444444444"
+                                                                },
+                                                                "userName": {
+                                                                    "type": "string",
+                                                                    "example": "User"
+                                                                },
+                                                                "userEmail": {
+                                                                    "type": "string",
+                                                                    "example": "admin@email.com"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "authorizers": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "userId": {
+                                                                    "type": "string",
+                                                                    "example": "00000000-1111-2222-3333-444444444444"
+                                                                },
+                                                                "userName": {
+                                                                    "type": "string",
+                                                                    "example": "User"
+                                                                },
+                                                                "userEmail": {
+                                                                    "type": "string",
+                                                                    "example": "admin@email.com"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "sourceAccounts": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "accountNumber": {
+                                                                    "type": "string",
+                                                                    "example": "001122334455667788"
+                                                                },
+                                                                "company": {
+                                                                    "type": "string",
+                                                                    "example": "Company Name"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "destinationAccounts": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "accountNumber": {
+                                                                    "type": "string",
+                                                                    "example": "001122334455667788"
+                                                                },
+                                                                "beneficiary": {
+                                                                    "type": "string",
+                                                                    "example": "Beneficiary Name"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
                                                 "type": "object"
                                             }
                                         }
@@ -2245,14 +2351,14 @@
                                         "type": "integer",
                                         "example": 0
                                     },
-                                    "originAccounts": {
+                                    "sourceAccounts": {
                                         "description": "Cuentas de origen a las que se aplica la regla",
                                         "type": "array",
                                         "items": {
                                             "properties": {
                                                 "accountNumber": {
                                                     "type": "string",
-                                                    "example": "uuid1"
+                                                    "example": "00000000-1111-2222-3333-444444444444"
                                                 },
                                                 "company": {
                                                     "type": "string",
@@ -2269,7 +2375,7 @@
                                             "properties": {
                                                 "accountNumber": {
                                                     "type": "string",
-                                                    "example": "uuid1"
+                                                    "example": "00000000-1111-2222-3333-444444444444"
                                                 },
                                                 "beneficiary": {
                                                     "type": "string",
@@ -2287,8 +2393,8 @@
                                             "format": "uuid"
                                         },
                                         "example": [
-                                            "uuid1",
-                                            "uuid2"
+                                            "00000000-1111-2222-3333-444444444444",
+                                            "00000000-1111-2222-3333-444444444455"
                                         ]
                                     },
                                     "processors": {
@@ -2299,8 +2405,8 @@
                                             "format": "uuid"
                                         },
                                         "example": [
-                                            "uuid1",
-                                            "uuid2"
+                                            "00000000-1111-2222-3333-444444444466",
+                                            "00000000-1111-2222-3333-444444444477"
                                         ]
                                     },
                                     "priority": {
@@ -2316,18 +2422,124 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Authorization rule created",
+                        "description": "Authorization rules disabled",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "enabled": {
                                             "type": "boolean",
-                                            "example": true
+                                            "example": false
                                         },
                                         "rules": {
                                             "type": "array",
                                             "items": {
+                                                "properties": {
+                                                    "ruleType": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "ruleTypeName": {
+                                                        "type": "string",
+                                                        "example": "SpeiOut"
+                                                    },
+                                                    "amount": {
+                                                        "type": "number",
+                                                        "example": 100000
+                                                    },
+                                                    "dailyMovements": {
+                                                        "type": "integer",
+                                                        "example": 0
+                                                    },
+                                                    "monthlyMovements": {
+                                                        "type": "integer",
+                                                        "example": 0
+                                                    },
+                                                    "priority": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    },
+                                                    "createdBy": {
+                                                        "type": "string",
+                                                        "example": "00000000-1111-2222-3333-444444444444"
+                                                    },
+                                                    "active": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "processors": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "userId": {
+                                                                    "type": "string",
+                                                                    "example": "00000000-1111-2222-3333-444444444444"
+                                                                },
+                                                                "userName": {
+                                                                    "type": "string",
+                                                                    "example": "User"
+                                                                },
+                                                                "userEmail": {
+                                                                    "type": "string",
+                                                                    "example": "admin@email.com"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "authorizers": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "userId": {
+                                                                    "type": "string",
+                                                                    "example": "00000000-1111-2222-3333-444444444444"
+                                                                },
+                                                                "userName": {
+                                                                    "type": "string",
+                                                                    "example": "User"
+                                                                },
+                                                                "userEmail": {
+                                                                    "type": "string",
+                                                                    "example": "admin@email.com"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "sourceAccounts": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "accountNumber": {
+                                                                    "type": "string",
+                                                                    "example": "001122334455667788"
+                                                                },
+                                                                "company": {
+                                                                    "type": "string",
+                                                                    "example": "Company Name"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "destinationAccounts": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "accountNumber": {
+                                                                    "type": "string",
+                                                                    "example": "001122334455667788"
+                                                                },
+                                                                "beneficiary": {
+                                                                    "type": "string",
+                                                                    "example": "Beneficiary Name"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
                                                 "type": "object"
                                             }
                                         }
@@ -2367,22 +2579,117 @@
                                         "rules": {
                                             "type": "array",
                                             "items": {
+                                                "properties": {
+                                                    "ruleType": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "ruleTypeName": {
+                                                        "type": "string",
+                                                        "example": "SpeiOut"
+                                                    },
+                                                    "amount": {
+                                                        "type": "number",
+                                                        "example": 100000
+                                                    },
+                                                    "dailyMovements": {
+                                                        "type": "integer",
+                                                        "example": 0
+                                                    },
+                                                    "monthlyMovements": {
+                                                        "type": "integer",
+                                                        "example": 0
+                                                    },
+                                                    "priority": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    },
+                                                    "createdBy": {
+                                                        "type": "string",
+                                                        "example": "00000000-1111-2222-3333-444444444444"
+                                                    },
+                                                    "active": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "processors": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "userId": {
+                                                                    "type": "string",
+                                                                    "example": "00000000-1111-2222-3333-444444444444"
+                                                                },
+                                                                "userName": {
+                                                                    "type": "string",
+                                                                    "example": "User"
+                                                                },
+                                                                "userEmail": {
+                                                                    "type": "string",
+                                                                    "example": "admin@email.com"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "authorizers": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "userId": {
+                                                                    "type": "string",
+                                                                    "example": "00000000-1111-2222-3333-444444444444"
+                                                                },
+                                                                "userName": {
+                                                                    "type": "string",
+                                                                    "example": "User"
+                                                                },
+                                                                "userEmail": {
+                                                                    "type": "string",
+                                                                    "example": "admin@email.com"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "sourceAccounts": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "accountNumber": {
+                                                                    "type": "string",
+                                                                    "example": "001122334455667788"
+                                                                },
+                                                                "company": {
+                                                                    "type": "string",
+                                                                    "example": "Company Name"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "destinationAccounts": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "accountNumber": {
+                                                                    "type": "string",
+                                                                    "example": "001122334455667788"
+                                                                },
+                                                                "beneficiary": {
+                                                                    "type": "string",
+                                                                    "example": "Beneficiary Name"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
                                                 "type": "object"
                                             }
                                         }
                                     },
                                     "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "text/plain": {
-                                "schema": {
-                                    "type": "string",
-                                    "example": "No tienes permisos para acceder a este recurso"
                                 }
                             }
                         }
@@ -2439,22 +2746,117 @@
                                         "rules": {
                                             "type": "array",
                                             "items": {
+                                                "properties": {
+                                                    "ruleType": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "ruleTypeName": {
+                                                        "type": "string",
+                                                        "example": "SpeiOut"
+                                                    },
+                                                    "amount": {
+                                                        "type": "number",
+                                                        "example": 100000
+                                                    },
+                                                    "dailyMovements": {
+                                                        "type": "integer",
+                                                        "example": 0
+                                                    },
+                                                    "monthlyMovements": {
+                                                        "type": "integer",
+                                                        "example": 0
+                                                    },
+                                                    "priority": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    },
+                                                    "createdBy": {
+                                                        "type": "string",
+                                                        "example": "00000000-1111-2222-3333-444444444444"
+                                                    },
+                                                    "active": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "processors": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "userId": {
+                                                                    "type": "string",
+                                                                    "example": "00000000-1111-2222-3333-444444444444"
+                                                                },
+                                                                "userName": {
+                                                                    "type": "string",
+                                                                    "example": "User"
+                                                                },
+                                                                "userEmail": {
+                                                                    "type": "string",
+                                                                    "example": "admin@email.com"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "authorizers": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "userId": {
+                                                                    "type": "string",
+                                                                    "example": "00000000-1111-2222-3333-444444444444"
+                                                                },
+                                                                "userName": {
+                                                                    "type": "string",
+                                                                    "example": "User"
+                                                                },
+                                                                "userEmail": {
+                                                                    "type": "string",
+                                                                    "example": "admin@email.com"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "sourceAccounts": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "accountNumber": {
+                                                                    "type": "string",
+                                                                    "example": "001122334455667788"
+                                                                },
+                                                                "company": {
+                                                                    "type": "string",
+                                                                    "example": "Company Name"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "destinationAccounts": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "accountNumber": {
+                                                                    "type": "string",
+                                                                    "example": "001122334455667788"
+                                                                },
+                                                                "beneficiary": {
+                                                                    "type": "string",
+                                                                    "example": "Beneficiary Name"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
                                                 "type": "object"
                                             }
                                         }
                                     },
                                     "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "text/plain": {
-                                "schema": {
-                                    "type": "string",
-                                    "example": "No tienes permisos para acceder a este recurso"
                                 }
                             }
                         }
@@ -4599,6 +5001,39 @@
                         "schema": {
                             "type": "string",
                             "example": "Unauthorized"
+                        }
+                    }
+                }
+            },
+            "400": {
+                "description": "Error creating authorization rule",
+                "content": {
+                    "text/plain": {
+                        "schema": {
+                            "type": "string",
+                            "example": "Las reglas de autorización están inhabilitadas"
+                        }
+                    }
+                }
+            },
+            "404": {
+                "description": "Business not found",
+                "content": {
+                    "text/plain": {
+                        "schema": {
+                            "type": "string",
+                            "example": "El ambiente no existe o no tienes acceso a él"
+                        }
+                    }
+                }
+            },
+            "500": {
+                "description": "Error creating authorization rule",
+                "content": {
+                    "text/plain": {
+                        "schema": {
+                            "type": "string",
+                            "example": "No se pudo guardar la regla de autorización"
                         }
                     }
                 }

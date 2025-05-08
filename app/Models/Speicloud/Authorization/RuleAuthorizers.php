@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class RuleAuthorizers extends Model
 {
-    protected $table = 't_speicloud_authorization_rules';
+    protected $table = 't_speicloud_authorization_rules_authorizers';
     protected $primaryKey = 'Id';
     public $timestamps = true;
     protected $fillable = [

@@ -12,8 +12,6 @@ class RuleDestinationAccount extends Model
     protected $fillable = [
         'RuleId',
         'DestinationAccount',
-        'DestinationAccountName',
-        'DestinationAccountBankId',
-
+        'DestinationAccountName'
     ];
 }

@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::create('t_speicloud_authorization_rules', function (Blueprint $table) {
             $table->id('Id');
+            $table->string('BusinessId', 36)->index();
             $table->integer('RuleType')->default(1)->index()->comment('1: Spei Out, 2: Spei In');
             $table->decimal('Amount', 10, 2)->nullable();
             $table->integer('DailyMovementsLimit')->nullable();
             $table->integer('MonthlyMovementsLimit')->nullable();
             $table->integer('Priority')->default(0)->comment('Bigger number means higher priority around the other rules');
             $table->string('CreatedBy', 36)->index();
+            $table->boolean('Active')->default(true);
             $table->timestamps();
         });
     }
