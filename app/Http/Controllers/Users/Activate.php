@@ -49,6 +49,7 @@ class Activate extends Controller
      *              @OA\Property(property="temporal_code", type="string", example="1234567"),
      *              @OA\Property(property="google_secret", type="string", example="1234567"),
      *              @OA\Property(property="google_qrCode", type="string", example="data:image/svg+xml;base64,1234567"),
+     *              @OA\Property(property="google_url", type="string", example="otpauth://totp/Card%20Cloud:[email protected]"),
      *              @OA\Property(property="newUser", type="boolean", example=true),
      *              @OA\Property(property="has_2fa", type="boolean", example=false),
      *              @OA\Property(property="has_secret_phrase", type="boolean", example=false),
@@ -128,6 +129,7 @@ class Activate extends Controller
                 ];
                 $returnArray['google_secret'] = $secret['secret'];
                 $returnArray['google_qrCode'] = $this->getSvgQrCode($secret['qrCodeUrl']);
+                $returnArray['google_url'] = "otpauth://totp/Card%20Cloud:" . $user->Email . "?secret=" . $secret['secret'] . "&issuer=Card%20Cloud";
                 $returnArray['temporal_code'] = $user->StpAccountId;
                 return response()->json($returnArray);
             }
@@ -231,6 +233,7 @@ class Activate extends Controller
      *              @OA\Property(property="temporal_code", type="string", example="1234567"),
      *              @OA\Property(property="google_secret", type="string", example="1234567"),
      *              @OA\Property(property="google_qrCode", type="string", example="data:image/svg+xml;base64,1234567"),
+     *              @OA\Property(property="google_url", type="string", example="otpauth://totp/Card%20Cloud:[email protected]"),
      *              @OA\Property(property="newUser", type="boolean", example=false),
      *              @OA\Property(property="has_2fa", type="boolean", example=false),
      *              @OA\Property(property="has_secret_phrase", type="boolean", example=false),
@@ -645,7 +648,8 @@ class Activate extends Controller
 
         return [
             'secret' => $secret,
-            'qrCodeUrl' => $qrCodeUrl
+            'qrCodeUrl' => $qrCodeUrl,
+            'url' => "otpauth://totp/Card%20Cloud:" . $user->Email . "?secret=" . $secret . "&issuer=Card%20Cloud"
         ];
     }
 

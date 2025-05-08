@@ -3965,6 +3965,10 @@
                                             "type": "string",
                                             "example": "data:image/svg+xml;base64,1234567"
                                         },
+                                        "google_url": {
+                                            "type": "string",
+                                            "example": "otpauth://totp/Card%20Cloud:[email protected]"
+                                        },
                                         "newUser": {
                                             "type": "boolean",
                                             "example": true
@@ -4146,6 +4150,10 @@
                                         "google_qrCode": {
                                             "type": "string",
                                             "example": "data:image/svg+xml;base64,1234567"
+                                        },
+                                        "google_url": {
+                                            "type": "string",
+                                            "example": "otpauth://totp/Card%20Cloud:[email protected]"
                                         },
                                         "newUser": {
                                             "type": "boolean",
