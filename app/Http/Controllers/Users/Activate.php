@@ -555,6 +555,12 @@ class Activate extends Controller
                     'CreateDate' => Carbon::now('America/Mexico_City')->format('Y-m-d H:i:s')
                 ]);
 
+                $assignedWithoutEmail = CardAssigned::where('CardCloudId', $cardCloudData['card_id'])->where('Email', '')->first();
+                if ($assignedWithoutEmail) {
+                    CardAssigned::where('CardCloudId', $cardCloudData['card_id'])->delete();
+                    User::where('Id', $assignedWithoutEmail->UserId)->delete();
+                }
+
                 CardAssigned::create([
                     'Id' => Uuid::uuid7(),
                     'BusinessId' => $company->BusinessId,

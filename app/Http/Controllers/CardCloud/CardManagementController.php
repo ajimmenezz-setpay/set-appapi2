@@ -313,7 +313,7 @@ class CardManagementController extends Controller
 
     public static function validateAlreadyAssigned($cardId)
     {
-        return CardAssigned::where('CardCloudId', $cardId)->count() > 0;
+        return CardAssigned::where('CardCloudId', $cardId)->where('Email', '!=', "")->whereNotNull('Email')->count() > 0;
     }
 
     /**
