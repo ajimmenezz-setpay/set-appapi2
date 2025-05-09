@@ -40,6 +40,7 @@ class AuthorizationRulesController extends Controller
      *                 type="array",
      *                 @OA\Items(
      *                     type="object",
+     *                     @OA\Property(property="ruleId", type="integer", example=1),
      *                     @OA\Property(property="ruleType", type="integer", example=1),
      *                     @OA\Property(property="ruleTypeName", type="string", example="SpeiOut"),
      *                     @OA\Property(property="amount", type="number", example=100000.00),
@@ -144,6 +145,7 @@ class AuthorizationRulesController extends Controller
      *                 type="array",
      *                 @OA\Items(
      *                     type="object",
+     *                     @OA\Property(property="ruleId", type="integer", example=1),
      *                     @OA\Property(property="ruleType", type="integer", example=1),
      *                     @OA\Property(property="ruleTypeName", type="string", example="SpeiOut"),
      *                     @OA\Property(property="amount", type="number", example=100000.00),
@@ -249,6 +251,7 @@ class AuthorizationRulesController extends Controller
      *                 type="array",
      *                 @OA\Items(
      *                     type="object",
+     *                     @OA\Property(property="ruleId", type="integer", example=1),
      *                     @OA\Property(property="ruleType", type="integer", example=1),
      *                     @OA\Property(property="ruleTypeName", type="string", example="SpeiOut"),
      *                     @OA\Property(property="amount", type="number", example=100000.00),
@@ -333,6 +336,265 @@ class AuthorizationRulesController extends Controller
         }
     }
 
+    /**
+     *  @OA\Post(
+     *      path="/api/speiCloud/authorization/rules/{ruleId}",
+     *      tags={"SpeiCloud Authorization Rules"},
+     *      summary="Update authorization rule",
+     *      description="Update authorization rule",
+     *      operationId="updateAuthorizationRule",
+     *      security={{"bearerAuth":{}}},
+     *
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"amount", "authorizers", "priority"},
+     *              @OA\Property(property="amount", type="number", example=1000, description="Monto a partir del cual se aplica la regla"),
+     *              @OA\Property(property="dailyMovements", type="integer", example=0, description="Número de movimientos diarios permitidos"),
+     *              @OA\Property(property="monthlyMovements", type="integer", example=0, description="Número de movimientos mensuales permitidos"),
+     *
+     *              @OA\Property(
+     *                  property="sourceAccounts",
+     *                  type="array",
+     *                  description="Cuentas de origen a las que se aplica la regla",
+     *                  @OA\Items(
+     *                      type="object",
+     *                      @OA\Property(property="accountNumber", type="string", example="00000000-1111-2222-3333-444444444444"),
+     *                      @OA\Property(property="company", type="string", example="Cuenta de origen 1")
+     *                  )
+     *              ),
+     *
+     *              @OA\Property(
+     *                  property="destinationAccounts",
+     *                  type="array",
+     *                  description="Cuentas de destino a las que se aplica la regla",
+     *                  @OA\Items(
+     *                      type="object",
+     *                      @OA\Property(property="accountNumber", type="string", example="00000000-1111-2222-3333-444444444444"),
+     *                      @OA\Property(property="beneficiary", type="string", example="Cuenta de destino 1")
+     *                  )
+     *              ),
+     *
+     *              @OA\Property(
+     *                  property="authorizers",
+     *                  type="array",
+     *                  @OA\Items(type="string", format="uuid"),
+     *                  example={"00000000-1111-2222-3333-444444444444", "00000000-1111-2222-3333-444444444455"},
+     *                  description="UUIDs de los usuarios autorizadores"
+     *              ),
+     *
+     *              @OA\Property(
+     *                  property="processors",
+     *                  type="array",
+     *                  @OA\Items(type="string", format="uuid"),
+     *                  example={"00000000-1111-2222-3333-444444444466", "00000000-1111-2222-3333-444444444477"},
+     *                  description="UUIDs de los usuarios procesadores"
+     *              ),
+     *
+     *              @OA\Property(
+     *                  property="priority",
+     *                  type="integer",
+     *                  example=1,
+     *                  description="Prioridad de la regla"
+     *              )
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Authorization rules disabled",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="enabled", type="boolean", example=false),
+     *              @OA\Property(
+     *                  property="rules",
+     *                  type="array",
+     *                  @OA\Items(
+     *                      type="object",
+     *                      @OA\Property(property="ruleId", type="integer", example=1),
+     *                      @OA\Property(property="ruleType", type="integer", example=1),
+     *                      @OA\Property(property="ruleTypeName", type="string", example="SpeiOut"),
+     *                      @OA\Property(property="amount", type="number", example=100000.00),
+     *                      @OA\Property(property="dailyMovements", type="integer", example=0),
+     *                      @OA\Property(property="monthlyMovements", type="integer", example=0),
+     *                      @OA\Property(property="priority", type="integer", example=10),
+     *                      @OA\Property(property="createdBy", type="string", example="00000000-1111-2222-3333-444444444444"),
+     *                      @OA\Property(property="active", type="boolean", example=true),
+     *
+     *                      @OA\Property(
+     *                          property="processors",
+     *                          type="array",
+     *                          @OA\Items(
+     *                              type="object",
+     *                              @OA\Property(property="userId", type="string", example="00000000-1111-2222-3333-444444444444"),
+     *                              @OA\Property(property="userName", type="string", example="User"),
+     *                              @OA\Property(property="userEmail", type="string", example="admin@email.com")
+     *                          )
+     *                      ),
+     *
+     *                      @OA\Property(
+     *                          property="authorizers",
+     *                          type="array",
+     *                          @OA\Items(
+     *                              type="object",
+     *                              @OA\Property(property="userId", type="string", example="00000000-1111-2222-3333-444444444444"),
+     *                              @OA\Property(property="userName", type="string", example="User"),
+     *                              @OA\Property(property="userEmail", type="string", example="admin@email.com")
+     *                          )
+     *                      ),
+     *
+     *                      @OA\Property(
+     *                          property="sourceAccounts",
+     *                          type="array",
+     *                          @OA\Items(
+     *                              type="object",
+     *                              @OA\Property(property="accountNumber", type="string", example="001122334455667788"),
+     *                              @OA\Property(property="company", type="string", example="Company Name")
+     *                          )
+     *                      ),
+     *
+     *                      @OA\Property(
+     *                          property="destinationAccounts",
+     *                          type="array",
+     *                          @OA\Items(
+     *                              type="object",
+     *                              @OA\Property(property="accountNumber", type="string", example="001122334455667788"),
+     *                              @OA\Property(property="beneficiary", type="string", example="Beneficiary Name")
+     *                          )
+     *                      )
+     *                  )
+     *              )
+     *          )
+     *      )
+     *  ),
+     *
+     *      @OA\Response(
+     *          response=400,
+     *          description="Error updating authorization rule",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="Las reglas de autorización están inhabilitadas por lo que no se puede actualizar"))
+     *     ),
+     *
+     *      @OA\Response(
+     *          response=404,
+     *          description="Business not found",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="El ambiente no existe o no tienes acceso a él"))
+     *      ),
+     *
+     *      @OA\Response(
+     *         response=500,
+     *         description="Error updating authorization rule",
+     *         @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="No se pudo guardar el cambio de la regla de autorización"))
+     *      )
+     *  )
+     */
+
+    public function update(Request $request, $ruleId)
+    {
+        $business = Business::where('Id', $request->attributes->get('jwt')->businessId)->first();
+        if (!$business) {
+            return $this->basicError('El ambiente no existe o no tienes acceso a él', 404);
+        }
+
+        if ($business->AuthorizationRules == 0) {
+            return $this->basicError('Las reglas de autorización están inhabilitadas', 400);
+        }
+
+        $rule = AuthorizationRules::where('Id', $ruleId)->where('BusinessId', $business->Id)->first();
+        if (!$rule) {
+            return $this->basicError('La regla de autorización no existe o no tienes acceso a ella', 404);
+        }
+
+
+        try {
+            $this->validate($request, [
+                'amount' => 'required|numeric|min:0',
+                'authorizers' => 'required|array',
+                'authorizers.*' => 'required|string|min:36|max:36',
+                'priority' => 'required|integer|min:0|max:10000',
+            ], [
+                'amount.required' => 'El monto es requerido (amount)',
+                'amount.min' => 'El monto mínimo es 0',
+                'authorizers.*.string' => 'El autoriza debe ser un UUID',
+                'authorizers.*.min' => 'El autoriza debe ser un UUID',
+                'authorizers.*.max' => 'El autoriza debe ser un UUID',
+                'priority.integer' => 'La prioridad debe ser un número entero',
+                'priority.min' => 'La prioridad debe ser un número mayor o igual a 0',
+                'priority.max' => 'La prioridad debe ser un número menor o igual a 10000'
+            ]);
+
+            $this->validateAuthorizers($business->Id, $request->input('authorizers'));
+
+            if ($request->input('processors') && count($request->input('processors')) > 0) {
+                $this->validateProcessorUsers($business->Id, $request->input('processors'));
+            }
+
+            DB::beginTransaction();
+
+            AuthorizationRules::where('Id', $rule->Id)->update([
+                'Amount' => $request->input('amount'),
+                'DailyMovementsLimit' => $request->input('dailyMovements') ? $request->input('dailyMovements') : 0,
+                'MonthlyMovementsLimit' => $request->input('monthlyMovements') ? $request->input('monthlyMovements') : 0,
+                'Priority' => $request->input('priority')
+            ]);
+
+            if ($request->input('processors') && count($request->input('processors')) > 0) {
+                RuleProcessors::where('RuleId', $rule->Id)->delete();
+
+                foreach ($request->input('processors') as $processor) {
+                    RuleProcessors::create([
+                        'RuleId' => $rule->Id,
+                        'UserId' => $processor
+                    ]);
+                }
+            }
+
+            if ($request->input('sourceAccounts') && count($request->input('sourceAccounts')) > 0) {
+                RuleSourceAccount::where('RuleId', $rule->Id)->delete();
+
+                foreach ($request->input('sourceAccounts') as $account) {
+                    RuleSourceAccount::create([
+                        'RuleId' => $rule->Id,
+                        'SourceAccount' => $account['accountNumber'],
+                        'SourceAccountName' => $account['company']
+                    ]);
+                }
+            }
+
+
+            if ($request->input('destinationAccounts') && count($request->input('destinationAccounts')) > 0) {
+                RuleDestinationAccount::where('RuleId', $rule->Id)->delete();
+
+                foreach ($request->input('destinationAccounts') as $account) {
+                    RuleDestinationAccount::create([
+                        'RuleId' => $rule->Id,
+                        'DestinationAccount' => $account['accountNumber'],
+                        'DestinationAccountName' => $account['beneficiary']
+                    ]);
+                }
+            }
+
+            if ($request->input('authorizers') && count($request->input('authorizers')) > 0) {
+                RuleAuthorizers::where('RuleId', $rule->Id)->delete();
+
+                foreach ($request->input('authorizers') as $authorizer) {
+                    RuleAuthorizers::create([
+                        'RuleId' => $rule->Id,
+                        'UserId' => $authorizer
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return $this->success([
+                'enabled' => true,
+                'rules' => self::getRules($business->Id)
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->basicError('No se pudo guardar la regla de autorización', 500);
+        }
+    }
+
     public static function getRules($businessId)
     {
         $rules = AuthorizationRules::where('BusinessId', $businessId)->orderBy('Priority', 'desc')->get();
@@ -377,6 +639,7 @@ class AuthorizationRulesController extends Controller
             )->get();
 
         return [
+            'ruleId' => $rule->Id,
             'ruleType' => $rule->RuleType,
             'ruleTypeName' => $rule->RuleType == 1 ? 'SpeiOut' : 'SpeiIn',
             'amount' => $rule->Amount,
@@ -469,6 +732,7 @@ class AuthorizationRulesController extends Controller
      *                  type="array",
      *                  @OA\Items(
      *                      type="object",
+     *                      @OA\Property(property="ruleId", type="integer", example=1),
      *                      @OA\Property(property="ruleType", type="integer", example=1),
      *                      @OA\Property(property="ruleTypeName", type="string", example="SpeiOut"),
      *                      @OA\Property(property="amount", type="number", example=100000.00),
@@ -523,25 +787,8 @@ class AuthorizationRulesController extends Controller
      *              )
      *          )
      *      )
-     *  ),
+     *  )
      *
-     *      @OA\Response(
-     *          response=400,
-     *          description="Error creating authorization rule",
-     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="Las reglas de autorización están inhabilitadas"))
-     *     ),
-     *
-     *      @OA\Response(
-     *          response=404,
-     *          description="Business not found",
-     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="El ambiente no existe o no tienes acceso a él"))
-     *      ),
-     *
-     *      @OA\Response(
-     *         response=500,
-     *         description="Error creating authorization rule",
-     *         @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="No se pudo guardar la regla de autorización"))
-     *      )
      *  )
      */
 
@@ -642,8 +889,7 @@ class AuthorizationRulesController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            // dd($e->getTrace());
-            return $this->basicError('No se pudo guardar la regla de autorización', 500);
+            return $this->basicError('No se pudo guardar la regla de autorización.'. ((env('APP_ENV') == 'production') ? '' : $e->getMessage()), 500);
         }
     }
 
@@ -668,6 +914,147 @@ class AuthorizationRulesController extends Controller
             if (!in_array($authorizer, $authorizerUsers)) {
                 throw new \Exception('El usuario no es un autorizador válido. Revisa los autorizadores seleccionados');
             }
+        }
+    }
+
+    /**
+     *  @OA\Post(
+     *      path="/api/speiCloud/authorization/rules/{ruleId}/enable",
+     *      tags={"SpeiCloud Authorization Rules"},
+     *      summary="Disable authorization rule",
+     *      description="Disable authorization rule",
+     *      operationId="enableAuthorizationRule",
+     *      security={{"bearerAuth":{}}},
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Authorization rule disabled",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="enabled", type="boolean", example=false),
+     *              @OA\Property(property="rules", type="array", @OA\Items(type="object"))
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *         response=400,
+     *         description="Error disabling authorization rules",
+     *         @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="Las reglas de autorización están inhabilitadas"))
+     *      ),
+     *
+     *      @OA\Response(
+     *         response=404,
+     *         description="Business not found",
+     *         @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="El ambiente no existe o no tienes acceso a él"))
+     *      ),
+     *
+     *      @OA\Response(
+     *         response=500,
+     *         description="Error disabling authorization rules",
+     *         @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="No se pudo deshabilitar las reglas de autorización"))
+     *      )
+     *  )
+     */
+
+    public function enable(Request $request, $ruleId)
+    {
+        try {
+            $business = Business::where('Id', $request->attributes->get('jwt')->businessId)->first();
+            if (!$business) {
+                return $this->basicError('El ambiente no existe o no tienes acceso a él', 404);
+            }
+
+            if ($business->AuthorizationRules == 0) {
+                return $this->basicError('Las reglas de autorización están inhabilitadas', 400);
+            }
+
+            $rule = AuthorizationRules::where('Id', $ruleId)->where('BusinessId', $business->Id)->first();
+            if (!$rule) {
+                return $this->basicError('La regla de autorización no existe o no tienes acceso a ella', 404);
+            }
+
+            DB::beginTransaction();
+            AuthorizationRules::where('Id', $rule->Id)->update([
+                'Active' => 1
+            ]);
+            DB::commit();
+            return $this->success([
+                'enabled' => true,
+                'rules' => self::getRules($business->Id)
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->basicError('No se pudo habilitar la regla de autorización', 500);
+        }
+    }
+
+
+    /**
+     * @OA\Post(
+     *      path="/api/speiCloud/authorization/rules/{ruleId}/disable",
+     *      tags={"SpeiCloud Authorization Rules"},
+     *      summary="Disable authorization rule",
+     *      description="Disable authorization rule",
+     *      operationId="disableAuthorizationRule",
+     *      security={{"bearerAuth":{}}},
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Authorization rule disabled",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="enabled", type="boolean", example=false),
+     *              @OA\Property(property="rules", type="array", @OA\Items(type="object"))
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *         response=400,
+     *         description="Error disabling authorization rules",
+     *         @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="Las reglas de autorización están inhabilitadas"))
+     *      ),
+     *
+     *      @OA\Response(
+     *         response=404,
+     *         description="Business not found",
+     *         @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="El ambiente no existe o no tienes acceso a él"))
+     *      ),
+     *
+     *      @OA\Response(
+     *         response=500,
+     *         description="Error disabling authorization rules",
+     *         @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="No se pudo deshabilitar las reglas de autorización"))
+     *      )
+     *  )
+     */
+    public function disable(Request $request, $ruleId)
+    {
+        try {
+            $business = Business::where('Id', $request->attributes->get('jwt')->businessId)->first();
+            if (!$business) {
+                return $this->basicError('El ambiente no existe o no tienes acceso a él', 404);
+            }
+
+            if ($business->AuthorizationRules == 0) {
+                return $this->basicError('Las reglas de autorización están inhabilitadas', 400);
+            }
+
+            $rule = AuthorizationRules::where('Id', $ruleId)->where('BusinessId', $business->Id)->first();
+            if (!$rule) {
+                return $this->basicError('La regla de autorización no existe o no tienes acceso a ella', 404);
+            }
+            DB::beginTransaction();
+            AuthorizationRules::where('Id', $rule->Id)->update([
+                'Active' => 0
+            ]);
+            DB::commit();
+            return $this->success([
+                'enabled' => true,
+                'rules' => self::getRules($business->Id)
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->basicError('No se pudo deshabilitar la regla de autorización', 500);
         }
     }
 }

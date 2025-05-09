@@ -69,6 +69,9 @@ Route::middleware([VerifyJwt::class])->group(function () {
                 Route::post('/', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizationRulesController::class, 'store']);
                 Route::post('/enable', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizationRulesController::class, 'enableRules']);
                 Route::post('/disable', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizationRulesController::class, 'disableRules']);
+                Route::post('/{ruleId}', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizationRulesController::class, 'update']);
+                Route::post('/{ruleId}/enable', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizationRulesController::class, 'enable']);
+                Route::post('/{ruleId}/disable', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizationRulesController::class, 'disable']);
             });
 
             Route::group(['prefix' => 'authorizing-users'], function () {
