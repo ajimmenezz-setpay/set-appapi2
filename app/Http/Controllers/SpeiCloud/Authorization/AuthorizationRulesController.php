@@ -546,6 +546,8 @@ class AuthorizationRulesController extends Controller
                         'UserId' => $processor
                     ]);
                 }
+            } else{
+                RuleProcessors::where('RuleId', $rule->Id)->delete();
             }
 
             if ($request->input('sourceAccounts') && count($request->input('sourceAccounts')) > 0) {
@@ -558,6 +560,8 @@ class AuthorizationRulesController extends Controller
                         'SourceAccountName' => $account['company']
                     ]);
                 }
+            } else{
+                RuleSourceAccount::where('RuleId', $rule->Id)->delete();
             }
 
 
@@ -571,6 +575,8 @@ class AuthorizationRulesController extends Controller
                         'DestinationAccountName' => $account['beneficiary']
                     ]);
                 }
+            } else{
+                RuleDestinationAccount::where('RuleId', $rule->Id)->delete();
             }
 
             if ($request->input('authorizers') && count($request->input('authorizers')) > 0) {
@@ -582,6 +588,8 @@ class AuthorizationRulesController extends Controller
                         'UserId' => $authorizer
                     ]);
                 }
+            } else{
+                RuleAuthorizers::where('RuleId', $rule->Id)->delete();
             }
 
             DB::commit();
