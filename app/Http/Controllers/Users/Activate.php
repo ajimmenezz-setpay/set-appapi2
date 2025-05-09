@@ -418,7 +418,7 @@ class Activate extends Controller
                 'temporal_code' => 'required',
                 'google_code' => 'required|string|min:6|max:6'
             ], [
-                'user_id.required' => 'El id del usuario es requerido',
+                'user_id.required' => '¡Que pena! el proceso no pudo completarse de forma exitosa, refresque la página y vuelva a intentarlo',
                 'temporal_code.required' => 'El código temporal es requerido',
                 'google_code.required' => 'El código de google es requerido',
                 'google_code.string' => 'El código de google no es válido',
