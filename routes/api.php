@@ -56,6 +56,14 @@ Route::middleware([VerifyJwt::class])->group(function () {
         Route::group(['prefix' => 'institution'], function () {
             Route::get('/', [App\Http\Controllers\CardCloud\InstitutionController::class, 'index']);
         });
+
+        Route::group(['prefix' => 'sub-account'], function () {
+            Route::get('/{uuid}/cards', [App\Http\Controllers\CardCloud\SubaccountCardController::class, 'index']);
+        });
+
+        Route::group(['prefix' => 'cards'], function () {
+            Route::post('/assign-user-from-file', [App\Http\Controllers\CardCloud\SubaccountCardController::class, 'assignUserFromFile']);
+        });
     });
 
     Route::group(['prefix' => 'speiCloud'], function () {

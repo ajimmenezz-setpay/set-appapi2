@@ -23,7 +23,7 @@ abstract class Controller extends BaseController
     {
         return response()->json([
             'error' => $error
-        ]);
+        ], 400);
     }
 
     public static function basicError($error)
@@ -56,5 +56,37 @@ abstract class Controller extends BaseController
         }
 
         echo "SQL: $sql\n";
+    }
+
+    static public function encrypt($data)
+    {
+        $encrypter = new \Illuminate\Encryption\Encrypter(env('APP_SECURITY_KEY'), 'AES-256-CBC');
+        return $encrypter->encrypt($data);
+    }
+
+    static public function decrypt($data)
+    {
+        $encrypter = new \Illuminate\Encryption\Encrypter(env('APP_SECURITY_KEY'), 'AES-256-CBC');
+        return $encrypter->decrypt($data);
+    }
+
+    static public function getClientId($prefix, $id)
+    {
+        return $prefix . str_pad($id, 7, '0', STR_PAD_LEFT);
+    }
+
+    public static function splitClientId($input)
+    {
+        if (preg_match('/^([A-Za-z]+)(\d+)$/', $input, $matches)) {
+            $prefix = $matches[1]; // Primer grupo de captura: letras
+            $number = (int) $matches[2]; // Segundo grupo de captura: números convertido a entero
+            return [
+                'prefix' => $prefix,
+                'number' => $number,
+            ];
+        }
+
+        // Retornar null si no coincide el patrón
+        return null;
     }
 }
