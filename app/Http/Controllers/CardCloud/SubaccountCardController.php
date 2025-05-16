@@ -46,6 +46,8 @@ class SubaccountCardController extends Controller
             ->where('card_setup.Status', '<>', 'CANCELED')
             ->whereNotNull('cards.Pan')
             ->where('cards.SubAccountId', $subaccount->Id);
+        var_dump(self::printQuery($cards));
+        die();
 
         $cards = $cards->get();
         $dates['3'] = Carbon::now();
