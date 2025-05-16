@@ -63,7 +63,7 @@ return [
         ],
 
         'card_cloud' => [
-            'driver' => 'mysql',
+            'driver' => 'mariadb',
             'url' => env('DB_URL_2'),
             'host' => env('DB_HOST_2', '127.0.0.1'),
             'port' => env('DB_PORT_2', '3306'),
