@@ -45,13 +45,10 @@ class SubaccountCardController extends Controller
             ->leftJoin('card_pan', 'card_pan.CardId', '=', 'cards.Id')
             ->where('card_setup.Status', '<>', 'CANCELED')
             ->whereNotNull('cards.Pan')
-            ->where('cards.SubAccountId', $subaccount->Id);
-        var_dump(self::printQuery($cards));
-        die();
+            ->where('cards.SubAccountId', $subaccount->Id)
+            ->get();
 
-        $cards = $cards->get();
         $dates['3'] = Carbon::now();
-
 
         $cards = $cards->map(function ($card) use ($businessUsers) {
             return [
