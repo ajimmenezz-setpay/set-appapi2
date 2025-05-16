@@ -64,6 +64,7 @@ return [
 
         'card_cloud' => [
             'driver' => 'mysql',
+            'url' => env('DB_URL_2'),
             'host' => env('DB_HOST_2', '127.0.0.1'),
             'port' => env('DB_PORT_2', '3306'),
             'database' => env('DB_DATABASE_2', 'dock.api'),
@@ -73,8 +74,12 @@ return [
             'charset' => env('DB_CHARSET_2', 'utf8mb4'),
             'collation' => env('DB_COLLATION_2', 'utf8mb4_general_ci'),
             'prefix' => '',
+            'prefix_indexes' => true,
             'strict' => true,
-            'engine' => null
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA_2'),
+            ]) : [],
         ],
 
         'mariadb' => [
