@@ -12,7 +12,6 @@ use App\Http\Controllers\Security\Password;
 use App\Models\Backoffice\Companies\CompanyProjection;
 use App\Models\Backoffice\Users\CompaniesAndUsers;
 use App\Models\User;
-use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Str;
@@ -21,12 +20,7 @@ class SubaccountCardController extends Controller
 {
     public function index(Request $request, $uuid)
     {
-        $dates = [
-            '1' => Carbon::now(),
-            '2' => "",
-            '3' => "",
-            '4' => ""
-        ];
+
         $subaccount = DB::connection('card_cloud')
             ->table('subaccounts')
             ->where('UUID', $uuid)
@@ -35,7 +29,6 @@ class SubaccountCardController extends Controller
         if (!$subaccount) {
             return response("No se encontraron tarjetas para la subcuenta especificada.", 404);
         }
-        $dates['2'] = Carbon::now();
 
         $businessUsers = self::businessCardUsers($request->attributes->get('jwt')->businessId);
 
@@ -48,7 +41,6 @@ class SubaccountCardController extends Controller
             ->where('cards.SubAccountId', $subaccount->Id)
             ->get();
 
-        $dates['3'] = Carbon::now();
 
         $cards = $cards->map(function ($card) use ($businessUsers) {
             return [
@@ -80,12 +72,7 @@ class SubaccountCardController extends Controller
             ];
         });
 
-        $dates['4'] = Carbon::now();
-
-        return response()->json([
-            'cards' => $cards,
-            'dates' => $dates
-        ]);
+        return response()->json($cards);
     }
 
     public static function businessCardUsers($businessId)
