@@ -48,7 +48,7 @@ class SubaccountCardController extends Controller
                 'card_external_id' => $card->ExternalId,
                 'card_type' => $card->Type,
                 'brand' => $card->Brand,
-                'bin' => (strlen($card->Pan) >= 16) ? substr($card->Pan, -8) : "",
+                'bin' => (strlen($card->Pan) >= 16) ? "XXXX " . substr($card->Pan, -4) : "",
                 'pan' => $card->Pan,
                 'client_id' => self::getClientId($card->CustomerPrefix, $card->CustomerId),
                 'masked_pan' => (strlen($card->Pan) >= 16) ? "XXXX XXXX XXXX " . substr($card->Pan, -4) : "",
