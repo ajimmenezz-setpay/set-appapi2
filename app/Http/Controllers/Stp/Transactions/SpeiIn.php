@@ -43,6 +43,15 @@ class SpeiIn extends Controller
                 $response[$account->Id]['errors'][] = $e->getMessage() . " " . $e->getLine();
                 continue;
             }
+
+            try{
+                $balance = STPApi::balance(Crypt::decrypt($account->Url), Crypt::decrypt($account->Key), $account->Company, Crypt::decrypt($account->Number));
+                $balance = $this->updateBalance($account, $balance);
+                $response[$account->Id]['balance'] = $balance;
+            } catch (\Exception $e) {
+                $response[$account->Id]['errors'][] = $e->getMessage() . " " . $e->getLine();
+                continue;
+            }
         }
 
         Transactions::fixBalances();
@@ -83,6 +92,32 @@ class SpeiIn extends Controller
             if (!is_null($cardCloud)) {
                 $response[] = $this->processCardCloudMovement($movement, 'card', null, $cardCloud->CardId);
                 continue;
+            }
+        }
+
+        return $response;
+    }
+
+    private function updateBalance($account, $balance){
+        $response = [];
+        if (isset($balance->respuesta)) {
+            if(isset($balance->respuesta->saldo)){
+                StpAccounts::where('Id', $account->Id)->update([
+                    'Balance' => $balance->respuesta->saldo,
+                    'BalanceDate' => Carbon::now('America/Mexico_City')->toDateTimeString()
+                ]);
+                $response['balance'] = $balance->respuesta->saldo;
+            }else{
+                throw new \Exception('Error al obtener el balance. ' . json_encode($balance));
+            }
+
+            if(isset($balance->respuesta->cargosPendientes)){
+                StpAccounts::where('Id', $account->Id)->update([
+                    'PendingCharges' => $balance->respuesta->cargosPendientes
+                ]);
+                $response['pendingCharges'] = $balance->respuesta->cargosPendientes;
+            }else{
+                throw new \Exception('Error al obtener los cargos pendientes. ' . json_encode($balance));
             }
         }
 
