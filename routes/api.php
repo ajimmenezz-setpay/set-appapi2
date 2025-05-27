@@ -5,6 +5,9 @@ use App\Http\Middleware\ValidateEnvironmentAdminProfile;
 use App\Http\Middleware\VerifyJwt;
 use Illuminate\Support\Facades\Route;
 
+Route::post('login', [App\Http\Controllers\Auth\Login::class, 'login']);
+
+
 Route::middleware([VerifyJwt::class])->group(function () {
     Route::group(['prefix' => 'security'], function () {
         Route::group(['prefix' => 'password'], function () {
