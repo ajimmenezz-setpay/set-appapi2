@@ -78,6 +78,4 @@ class Login extends Controller
         }
         return false;
     }
-
-
 }
