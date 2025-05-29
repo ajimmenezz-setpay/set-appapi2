@@ -7,8 +7,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('login', [App\Http\Controllers\Auth\Login::class, 'login']);
 
-
 Route::middleware([VerifyJwt::class])->group(function () {
+
+    Route::group(['prefix' => 'modules'], function () {
+        Route::get('/user', [App\Http\Controllers\Users\Modules::class, 'index']);
+    });
+
+
     Route::group(['prefix' => 'security'], function () {
         Route::group(['prefix' => 'password'], function () {
             Route::post('change', [Password::class, 'change']);
