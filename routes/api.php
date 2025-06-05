@@ -175,3 +175,5 @@ Route::group(['prefix' => 'app-scrapper'], function () {
     Route::get('google-play/{id}', [App\Http\Controllers\Scrapper\AppScrapperController::class, 'google']);
     Route::get('play-store/{id}', [App\Http\Controllers\Scrapper\AppScrapperController::class, 'apple']);
 });
+
+Route::get('card-cloud/balance/{phone}', [App\Http\Controllers\CardCloud\CardManagementController::class, 'getBalanceByPhone']);

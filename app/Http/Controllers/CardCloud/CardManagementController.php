@@ -536,4 +536,53 @@ class CardManagementController extends Controller
             return self::basicError($e->getMessage());
         }
     }
+
+
+    public function getBalanceByPhone(Request $request, $phone)
+    {
+        try {
+            if (!$phone) {
+                return self::error("El número de teléfono es requerido");
+            }
+            if (!preg_match('/^[0-9]{10}$/', $phone)) {
+                return self::error("El número de teléfono debe tener 10 dígitos y no puede contener caracteres especiales");
+            }
+
+            $message = "";
+
+            $cards = CardAssigned::join('t_users', 't_stp_card_cloud_users.UserId', '=', 't_users.Id')
+                ->where('ProfileId', 8)
+                ->where('t_users.Active', 1)
+                ->where('t_users.Phone', $phone)
+                ->where('t_users.Phone', '!=', '0000000000')
+                ->select('t_stp_card_cloud_users.CardCloudId')
+                ->get();
+            if ($cards->isEmpty()) {
+                return self::error("No se encontraron tarjetas asociadas al número de teléfono proporcionado.");
+            }
+
+            foreach ($cards as $card) {
+                try {
+                    $client = new Client();
+                    $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/card/' . $card->CardCloudId . '/balance', [
+                        'headers' => [
+                            'Content-Type' => 'application/json'
+                        ]
+                    ]);
+
+                    $decodedJson = json_decode($response->getBody(), true);
+
+                    $message .= "La tarjeta con terminación {$decodedJson['card_end']} tiene un balance de $" . number_format($decodedJson['balance'], 2, '.', ',') . ".\n";
+                } catch (\Exception $e) {
+                    $message .= $e->getMessage() . "\n";
+                }
+            }
+
+            return response()->json([
+                'message' => $message == "" ? "No se pudo obtener el balance de las tarjetas." : $message
+            ]);
+        } catch (\Exception $e) {
+            return self::basicError($e->getMessage());
+        }
+    }
 }
