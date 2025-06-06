@@ -548,7 +548,7 @@ class CardManagementController extends Controller
                 return self::error("El número de teléfono debe tener 10 dígitos y no puede contener caracteres especiales");
             }
 
-            $message = "";
+            $cardsResponse = [];
 
             $cards = CardAssigned::join('t_users', 't_stp_card_cloud_users.UserId', '=', 't_users.Id')
                 ->where('ProfileId', 8)
@@ -572,15 +572,22 @@ class CardManagementController extends Controller
 
                     $decodedJson = json_decode($response->getBody(), true);
 
-                    $message .= "La tarjeta con terminación {$decodedJson['card_end']} tiene un balance de $" . number_format($decodedJson['balance'], 2, '.', ',') . ".\n";
+                    $cardsResponse[] = [
+                        'client_id' => $decodedJson['client_id'],
+                        'balance' => $decodedJson['balance']
+                    ];
+
+                    // $message .= "La tarjeta con terminación {$decodedJson['card_end']} tiene un balance de $" . number_format($decodedJson['balance'], 2, '.', ',') . ".\n";
                 } catch (\Exception $e) {
-                    $message .= $e->getMessage() . "\n";
+                    // $message .= $e->getMessage() . "\n";
                 }
             }
 
-            return response()->json([
-                'message' => $message == "" ? "No se pudo obtener el balance de las tarjetas." : $message
-            ]);
+            if(empty($cardsResponse)) {
+                return self::error("No se pudo obtener el balance de las tarjetas asociadas al número de teléfono proporcionado.");
+            }
+
+            return response()->json($cardsResponse);
         } catch (\Exception $e) {
             return self::basicError($e->getMessage());
         }
