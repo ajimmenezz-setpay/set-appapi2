@@ -37,6 +37,12 @@ Route::middleware([VerifyJwt::class])->group(function () {
         });
     });
 
+    Route::group(['prefix' => 'card'], function () {
+        Route::get('/{pan_suffix}', [App\Http\Controllers\Card\CardManagementController::class, 'show']);
+        Route::get('/{pan_suffix}/balance', [App\Http\Controllers\Card\CardManagementController::class, 'getBalance']);
+        Route::get('/{pan_suffix}/movements', [App\Http\Controllers\Card\CardManagementController::class, 'movements']);
+    });
+
     Route::group(['prefix' => 'cardCloud'], function () {
         Route::group(['prefix' => 'card'], function () {
             Route::post('/{cardId}/nip', [App\Http\Controllers\CardCloud\CardManagementController::class, 'updateNip']);

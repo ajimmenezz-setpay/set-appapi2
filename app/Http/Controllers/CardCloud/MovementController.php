@@ -13,7 +13,7 @@ class MovementController extends Controller
     /**
      * @OA\Get(
      *      path="/api/cardCloud/movement/{uuid}",
-     *      tags={"Card Cloud"},
+     *      tags={"Card Cloud V2"},
      *      summary="Show movement",
      *      description="Show movement",
      *      security={{"bearerAuth":{}}},

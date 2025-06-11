@@ -15,7 +15,7 @@ class TransferController extends Controller
     /**
      * @OA\Post(
      *      path="/api/cardCloud/card/transfer",
-     *      tags={"Card Cloud"},
+     *      tags={"Card Cloud V2"},
      *      summary="Transfer money between cards",
      *      description="Transfer money between cards",
      *      security={{"bearerAuth":{}}},

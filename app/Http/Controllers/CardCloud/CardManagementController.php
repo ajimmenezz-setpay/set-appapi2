@@ -18,7 +18,7 @@ class CardManagementController extends Controller
     /**
      *  @OA\Post(
      *      path="/api/cardCloud/card/{cardId}/nip",
-     *      tags={"Card Cloud"},
+     *      tags={"Card Cloud V2"},
      *      summary="Update NIP from card",
      *      description="Update NIP from card",
      *      operationId="updateNip",
@@ -118,7 +118,7 @@ class CardManagementController extends Controller
     /**
      * @OA\Get(
      *      path="/api/cardCloud/card/client-id/{clientId}",
-     *      tags={"Card Cloud"},
+     *      tags={"Card Cloud V2"},
      *      summary="Search card by client id",
      *      description="Search card by client id",
      *      operationId="searchByClientId",
@@ -190,7 +190,7 @@ class CardManagementController extends Controller
     /**
      * @OA\Post(
      *      path="/api/cardCloud/card/activate",
-     *      tags={"Card Cloud"},
+     *      tags={"Card Cloud V2"},
      *      summary="Activate additional card for user",
      *      description="Activate additional card for user",
      *      operationId="activateCard",
@@ -319,7 +319,7 @@ class CardManagementController extends Controller
     /**
      * @OA\Post(
      *      path="/api/cardCloud/card/buy_virtual_card",
-     *      tags={"Card Cloud"},
+     *      tags={"Card Cloud V2"},
      *      summary="Buy virtual card",
      *      description="Buy virtual card",
      *      operationId="buyVirtualCard",
@@ -461,7 +461,7 @@ class CardManagementController extends Controller
     /**
      * @OA\Get(
      *      path="/api/cardCloud/card/virtual_card_price",
-     *      tags={"Card Cloud"},
+     *      tags={"Card Cloud V2"},
      *      summary="Get virtual card price",
      *      description="Get virtual card price",
      *      operationId="getVirtualCardPrice",

@@ -151,7 +151,7 @@
         "/api/cardCloud/card/{cardId}/nip": {
             "post": {
                 "tags": [
-                    "Card Cloud"
+                    "Card Cloud V2"
                 ],
                 "summary": "Update NIP from card",
                 "description": "Update NIP from card",
@@ -237,7 +237,7 @@
         "/api/cardCloud/card/client-id/{clientId}": {
             "get": {
                 "tags": [
-                    "Card Cloud"
+                    "Card Cloud V2"
                 ],
                 "summary": "Search card by client id",
                 "description": "Search card by client id",
@@ -311,7 +311,7 @@
         "/api/cardCloud/card/activate": {
             "post": {
                 "tags": [
-                    "Card Cloud"
+                    "Card Cloud V2"
                 ],
                 "summary": "Activate additional card for user",
                 "description": "Activate additional card for user",
@@ -395,7 +395,7 @@
         "/api/cardCloud/card/buy_virtual_card": {
             "post": {
                 "tags": [
-                    "Card Cloud"
+                    "Card Cloud V2"
                 ],
                 "summary": "Buy virtual card",
                 "description": "Buy virtual card",
@@ -572,7 +572,7 @@
         "/api/cardCloud/card/virtual_card_price": {
             "get": {
                 "tags": [
-                    "Card Cloud"
+                    "Card Cloud V2"
                 ],
                 "summary": "Get virtual card price",
                 "description": "Get virtual card price",
@@ -638,7 +638,7 @@
         "/api/cardCloud/card/{cardId}/sensitive": {
             "get": {
                 "tags": [
-                    "Card Cloud"
+                    "Card Cloud V2"
                 ],
                 "summary": "Obtener datos sensibles de la tarjeta",
                 "description": "Obtener datos sensibles de la tarjeta",
@@ -729,7 +729,7 @@
         "/api/cardCloud/card/{cardId}/cvv": {
             "get": {
                 "tags": [
-                    "Card Cloud"
+                    "Card Cloud V2"
                 ],
                 "summary": "Obtener CVV dinámico de la tarjeta",
                 "description": "Obtener CVV dinámico de la tarjeta",
@@ -1325,7 +1325,7 @@
         "/api/cardCloud/movement/{uuid}": {
             "get": {
                 "tags": [
-                    "Card Cloud"
+                    "Card Cloud V2"
                 ],
                 "summary": "Show movement",
                 "description": "Show movement",
@@ -1423,7 +1423,7 @@
         "/api/cardCloud/card/transfer": {
             "post": {
                 "tags": [
-                    "Card Cloud"
+                    "Card Cloud V2"
                 ],
                 "summary": "Transfer money between cards",
                 "description": "Transfer money between cards",
@@ -1555,6 +1555,419 @@
                                 "schema": {
                                     "type": "string",
                                     "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/card/{pan_suffix}": {
+            "get": {
+                "tags": [
+                    "Card Cloud"
+                ],
+                "summary": "Get card details by suffix",
+                "description": "Retrieve card details using the last 8 digits of the card number",
+                "operationId": "getCardDetails",
+                "parameters": [
+                    {
+                        "name": "pan_suffix",
+                        "in": "path",
+                        "description": "Last 8 digits of the card number",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Card details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "card_id": {
+                                            "type": "string",
+                                            "example": "01922a29-3edb-7283-895a-5aebfd93257d"
+                                        },
+                                        "card_external_id": {
+                                            "type": "string",
+                                            "example": "01922a29-4405-8d62-64d2-ceb079990479"
+                                        },
+                                        "card_type": {
+                                            "type": "string",
+                                            "example": "physical"
+                                        },
+                                        "brand": {
+                                            "type": "string",
+                                            "example": "MASTER"
+                                        },
+                                        "bin": {
+                                            "type": "string",
+                                            "example": "00000000"
+                                        },
+                                        "pan": {
+                                            "type": "string",
+                                            "example": "1122334455667788"
+                                        },
+                                        "client_id": {
+                                            "type": "string",
+                                            "example": "XX0000001"
+                                        },
+                                        "masked_pan": {
+                                            "type": "string",
+                                            "example": "XXXX XXXX XXXX 6694"
+                                        },
+                                        "balance": {
+                                            "type": "string",
+                                            "example": "0.00"
+                                        },
+                                        "clabe": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "BLOCKED"
+                                        },
+                                        "substatus": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "NORMAL"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "This card is already to use"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "setups": {
+                                            "properties": {
+                                                "Id": {
+                                                    "type": "integer",
+                                                    "example": 26302
+                                                },
+                                                "CardId": {
+                                                    "type": "integer",
+                                                    "example": 35115
+                                                },
+                                                "Status": {
+                                                    "type": "string",
+                                                    "example": "BLOCKED"
+                                                },
+                                                "StatusReason": {
+                                                    "type": "string",
+                                                    "example": "INITIAL_BLOCKED"
+                                                },
+                                                "Ecommerce": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "International": {
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "Stripe": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "Wallet": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "Withdrawal": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "Contactless": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "PinOffline": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "PinOnUs": {
+                                                    "type": "integer",
+                                                    "example": 0
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid card suffix format",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Invalid card suffix format. It must be 8 digits."
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error retrieving card details: {error_message}"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/card/{pan_suffix}/balance": {
+            "get": {
+                "tags": [
+                    "Card Cloud"
+                ],
+                "summary": "Get card balance by suffix",
+                "description": "Retrieve card balance using the last 8 digits of the card number",
+                "operationId": "getCardBalance",
+                "parameters": [
+                    {
+                        "name": "pan_suffix",
+                        "in": "path",
+                        "description": "Last 8 digits of the card number",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Card balance retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "balance": {
+                                            "type": "string",
+                                            "example": "100.00"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid card suffix format",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Invalid card suffix format. It must be 8 digits."
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error retrieving card details: {error_message}"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/card/{pan_suffix}/movements": {
+            "get": {
+                "tags": [
+                    "Card Cloud"
+                ],
+                "summary": "Get card movements by suffix",
+                "description": "Retrieve card movements using the last 8 digits of the card number",
+                "operationId": "getCardMovements",
+                "parameters": [
+                    {
+                        "name": "pan_suffix",
+                        "in": "path",
+                        "description": "Last 8 digits of the card number",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "from": {
+                                        "description": "From date (Unix timestamp)",
+                                        "type": "string",
+                                        "example": "1234567890"
+                                    },
+                                    "to": {
+                                        "description": "To date (Unix timestamp)",
+                                        "type": "string",
+                                        "example": "1234567890"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Movements retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "movements": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "movement_id": {
+                                                        "description": "Movement UUID",
+                                                        "type": "string",
+                                                        "example": "123456"
+                                                    },
+                                                    "date": {
+                                                        "description": "Movement Date (Unix timestamp)",
+                                                        "type": "string",
+                                                        "example": "1234567890"
+                                                    },
+                                                    "type": {
+                                                        "description": "Movement Type",
+                                                        "type": "string",
+                                                        "example": "deposit"
+                                                    },
+                                                    "amount": {
+                                                        "description": "Movement Amount",
+                                                        "type": "string",
+                                                        "example": "100.00"
+                                                    },
+                                                    "authorization_code": {
+                                                        "description": "Authorization Code",
+                                                        "type": "string",
+                                                        "example": "123456"
+                                                    },
+                                                    "description": {
+                                                        "description": "Movement Description",
+                                                        "type": "string",
+                                                        "example": "Deposit"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "total_records": {
+                                            "description": "Total records",
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "from": {
+                                            "description": "From date (Unix timestamp)",
+                                            "type": "string",
+                                            "example": "1234567890"
+                                        },
+                                        "to": {
+                                            "description": "To date (Unix timestamp)",
+                                            "type": "string",
+                                            "example": "1234567890"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid card suffix format",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Invalid card suffix format. It must be 8 digits."
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error retrieving card movements: {error_message}"
                                 }
                             }
                         }
@@ -5458,8 +5871,8 @@
             "description": "Address"
         },
         {
-            "name": "Card Cloud",
-            "description": "Card Cloud"
+            "name": "Card Cloud V2",
+            "description": "Card Cloud V2"
         },
         {
             "name": "Card Cloud - Contactos",
@@ -5468,6 +5881,10 @@
         {
             "name": "Institutions",
             "description": "Institutions"
+        },
+        {
+            "name": "Card Cloud",
+            "description": "Card Cloud"
         },
         {
             "name": "Reports",
