@@ -135,6 +135,11 @@ Route::middleware([VerifyJwt::class])->group(function () {
             Route::post('/', [App\Http\Controllers\Users\Address::class, 'setAddress']);
             Route::get('/', [App\Http\Controllers\Users\Address::class, 'getAddress']);
         });
+
+        Route::group(['prefix' => 'additional-info'], function () {
+            Route::get('/', [App\Http\Controllers\Users\AdditionalInfo::class, 'getAdditionalInfo']);
+            Route::post('/', [App\Http\Controllers\Users\AdditionalInfo::class, 'setAdditionalInfo']);
+        });
     });
 
     Route::group(['prefix' => 'administration'], function () {

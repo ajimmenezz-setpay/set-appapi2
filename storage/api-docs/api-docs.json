@@ -5149,6 +5149,132 @@
                 }
             }
         },
+        "/api/users/additional-info": {
+            "get": {
+                "tags": [
+                    "Usuarios - Información Adicional"
+                ],
+                "summary": "Obtener información adicional del usuario",
+                "operationId": "getAdditionalInfo",
+                "responses": {
+                    "200": {
+                        "description": "Información adicional del usuario",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "rfc": {
+                                            "type": "string",
+                                            "example": "ABC123456789"
+                                        },
+                                        "curp": {
+                                            "type": "string",
+                                            "example": "ABC123456HDFGJ01"
+                                        },
+                                        "voter_code": {
+                                            "type": "string",
+                                            "example": "12345678901234567890"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error de validación o usuario no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "example": "El usuario no existe"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "example": "Error al procesar la solicitud"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Usuarios - Información Adicional"
+                ],
+                "summary": "Actualizar información adicional del usuario",
+                "operationId": "setAdditionalInfo",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "rfc": {
+                                        "description": "RFC del usuario",
+                                        "type": "string",
+                                        "maxLength": 13
+                                    },
+                                    "curp": {
+                                        "description": "CURP del usuario",
+                                        "type": "string",
+                                        "maxLength": 18
+                                    },
+                                    "voter_code": {
+                                        "description": "Clave de elector",
+                                        "type": "string",
+                                        "maxLength": 30
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Información adicional actualizada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "example": "Información adicional actualizada correctamente."
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error de validación o usuario no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "example": "El usuario no existe"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "example": "Error al procesar la solicitud"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/users/address": {
             "get": {
                 "tags": [
@@ -5925,6 +6051,10 @@
         {
             "name": "Activación de cuenta",
             "description": "Activación de cuenta"
+        },
+        {
+            "name": "Usuarios - Información Adicional",
+            "description": "Usuarios - Información Adicional"
         },
         {
             "name": "Usuarios - Dirección",
