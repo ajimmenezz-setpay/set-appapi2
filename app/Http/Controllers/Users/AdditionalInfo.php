@@ -147,7 +147,7 @@ class AdditionalInfo extends Controller
                 return self::error('El usuario no existe');
             }
 
-            $additionalInfo = Additional::where('UserId', $user->id)->first();
+            $additionalInfo = Additional::where('UserId', $request->attributes->get('jwt')->id)->first();
             if (!$additionalInfo) {
                 $additionalInfo = [
                     'rfc' => null,
