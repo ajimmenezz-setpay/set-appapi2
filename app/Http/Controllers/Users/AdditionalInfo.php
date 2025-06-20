@@ -91,9 +91,9 @@ class AdditionalInfo extends Controller
                 $additionalInfo->UserId = $request->attributes->get('jwt')->id;
             }
 
-            $additionalInfo->RFC = $request->rfc ?? $additionalInfo->RFC;
-            $additionalInfo->CURP = $request->curp ?? $additionalInfo->CURP;
-            $additionalInfo->VoterCode = $request->voter_code ?? $additionalInfo->VoterCode;
+            $additionalInfo->RFC = $request->rfc ?? "";
+            $additionalInfo->CURP = $request->curp ?? "";
+            $additionalInfo->VoterCode = $request->voter_code ?? "";
             $additionalInfo->save();
 
             return response()->json("Información adicional actualizada correctamente.", 200);
