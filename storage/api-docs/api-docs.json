@@ -5084,6 +5084,18 @@
                                         "type": "string",
                                         "example": "1234567890"
                                     },
+                                    "rfc": {
+                                        "type": "string",
+                                        "example": "RFC123456789"
+                                    },
+                                    "curp": {
+                                        "type": "string",
+                                        "example": "CURP123456789"
+                                    },
+                                    "voter_code": {
+                                        "type": "string",
+                                        "example": "12345678901234567890"
+                                    },
                                     "secret_phrase": {
                                         "type": "string",
                                         "example": "Frase secreta"
@@ -5099,6 +5111,42 @@
                                     "moye": {
                                         "type": "string",
                                         "example": "0123"
+                                    },
+                                    "save_address": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "country_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "state_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "example": "Ciudad"
+                                    },
+                                    "postal_code": {
+                                        "type": "string",
+                                        "example": "12345"
+                                    },
+                                    "street": {
+                                        "type": "string",
+                                        "example": "Calle Falsa 123"
+                                    },
+                                    "external_number": {
+                                        "type": "string",
+                                        "example": "456"
+                                    },
+                                    "internal_number": {
+                                        "type": "string",
+                                        "example": "789"
+                                    },
+                                    "reference": {
+                                        "type": "string",
+                                        "example": "Cerca de la plaza principal"
                                     }
                                 },
                                 "type": "object"

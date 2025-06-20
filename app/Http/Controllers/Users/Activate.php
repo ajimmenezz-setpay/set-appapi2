@@ -14,6 +14,7 @@ use App\Models\CardCloud\CardAssigned;
 use App\Models\Security\GoogleAuth;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Users\Additional;
 use Carbon\Carbon;
 use Ramsey\Uuid\Uuid;
 use PragmaRX\Google2FA\Google2FA;
@@ -24,6 +25,7 @@ use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use App\Models\Users\Address as UserAddress;
 
 class Activate extends Controller
 {
@@ -352,10 +354,22 @@ class Activate extends Controller
      *              @OA\Property(property="name", type="string", example="Nombre"),
      *              @OA\Property(property="last_name", type="string", example="Apellido"),
      *              @OA\Property(property="phone", type="string", example="1234567890"),
+     *              @OA\Property(property="rfc", type="string", example="RFC123456789"),
+     *              @OA\Property(property="curp", type="string", example="CURP123456789"),
+     *              @OA\Property(property="voter_code", type="string", example="12345678901234567890"),
      *              @OA\Property(property="secret_phrase", type="string", example="Frase secreta"),
      *              @OA\Property(property="card", type="string", example="12345678"),
      *              @OA\Property(property="nip", type="string", example="1234"),
-     *              @OA\Property(property="moye", type="string", example="0123")
+     *              @OA\Property(property="moye", type="string", example="0123"),
+     *              @OA\Property(property="save_address", type="boolean", example=true),
+     *              @OA\Property(property="country_id", type="integer", example=1),
+     *              @OA\Property(property="state_id", type="integer", example=1),
+     *              @OA\Property(property="city", type="string", example="Ciudad"),
+     *              @OA\Property(property="postal_code", type="string", example="12345"),
+     *              @OA\Property(property="street", type="string", example="Calle Falsa 123"),
+     *              @OA\Property(property="external_number", type="string", example="456"),
+     *              @OA\Property(property="internal_number", type="string", example="789"),
+     *              @OA\Property(property="reference", type="string", example="Cerca de la plaza principal")
      *          )
      *     ),
      *
@@ -434,7 +448,10 @@ class Activate extends Controller
                 $this->validate($request, [
                     'name' => 'required|string',
                     'last_name' => 'required|string',
-                    'phone' => 'required|min:10|max:15|regex:/^[0-9]+$/'
+                    'phone' => 'required|min:10|max:15|regex:/^[0-9]+$/',
+                    'rfc' => 'nullable|string|max:13',
+                    'curp' => 'nullable|string|max:18',
+                    'voter_code' => 'nullable|string|max:30'
                 ], [
                     'name.required' => 'El nombre es requerido',
                     'name.string' => 'El nombre no es válido',
@@ -443,7 +460,10 @@ class Activate extends Controller
                     'phone.required' => 'El teléfono es requerido',
                     'phone.min' => 'El teléfono debe tener al menos 10 dígitos',
                     'phone.max' => 'El teléfono debe tener máximo 15 dígitos',
-                    'phone.regex' => 'El teléfono no es válido'
+                    'phone.regex' => 'El teléfono no es válido',
+                    'rfc.max' => 'El RFC no puede tener más de 13 caracteres',
+                    'curp.max' => 'La CURP no puede tener más de 18 caracteres',
+                    'voter_code.max' => 'El código de elector no puede tener más de 30 caracteres'
                 ]);
             }
 
@@ -493,6 +513,40 @@ class Activate extends Controller
                 GoogleAuth::where('UserId', $user->Id)->delete();
             }
 
+            if ($request->has('save_address')  && $request->save_address == true) {
+                $this->validate($request, [
+                    'country_id' => 'required|integer',
+                    'state_id' => 'required|integer',
+                    'city' => 'required|string|max:255',
+                    'postal_code' => 'required|string|max:10',
+                    'street' => 'required|string|max:255',
+                    'external_number' => 'required|string|max:20',
+                    'internal_number' => 'nullable|string|max:20',
+                    'reference' => 'nullable|string|max:255',
+                ], [
+                    'country_id.required' => 'El campo pais (country_id) es requerido',
+                    'country_id.integer' => 'El campo pais (country_id) debe ser válido',
+                    'state_id.required' => 'El campo estado (state_id) es requerido',
+                    'state_id.integer' => 'El campo estado (state_id) debe ser válido',
+                    'city.required' => 'El campo ciudad (city) es requerido',
+                    'city.string' => 'El campo ciudad (city) debe ser una cadena de texto',
+                    'city.max' => 'El campo ciudad (city) no puede tener más de 255 caracteres',
+                    'postal_code.required' => 'El campo código postal (postal_code) es requerido',
+                    'postal_code.string' => 'El campo código postal (postal_code) debe ser una cadena de texto',
+                    'postal_code.max' => 'El campo código postal (postal_code) no puede tener más de 10 caracteres',
+                    'street.required' => 'El campo calle (street) es requerido',
+                    'street.string' => 'El campo calle (street) debe ser una cadena de texto',
+                    'street.max' => 'El campo calle (street) no puede tener más de 255 caracteres',
+                    'external_number.required' => 'El campo número exterior (external_number) es requerido',
+                    'external_number.string' => 'El campo número exterior (external_number) debe ser una cadena de texto',
+                    'external_number.max' => 'El campo número exterior (external_number) no puede tener más de 20 caracteres',
+                    'internal_number.string' => 'El campo número interior (internal_number) debe ser una cadena de texto',
+                    'internal_number.max' => 'El campo número interior (internal_number) no puede tener más de 20 caracteres',
+                    'reference.string' => 'El campo referencia (reference) debe ser una cadena de texto',
+                    'reference.max' => 'El campo referencia (reference) no puede tener más de 255 caracteres',
+                ]);
+            }
+
             DB::beginTransaction();
 
             User::where('Id', $user->Id)->update([
@@ -505,7 +559,18 @@ class Activate extends Controller
 
             $user = User::where('Id', $user->Id)->first();
 
+            $additionalInfo = Additional::where('UserId', $user->Id)->first();
+            if (!$additionalInfo) {
+                $additionalInfo = new Additional();
+                $additionalInfo->UserId = $user->Id;
+            }
+            $additionalInfo->RFC = $request->rfc ?? $additionalInfo->RFC;
+            $additionalInfo->CURP = $request->curp ?? $additionalInfo->CURP;
+            $additionalInfo->VoterCode = $request->voter_code ?? $additionalInfo->VoterCode;
+            $additionalInfo->save();
+
             $operations[] = 'Los datos del usuario han sido registrados';
+
 
             if (!$this->userHasSecretPhrase($user->Id)) {
                 SecretPhrase::create([
@@ -514,6 +579,25 @@ class Activate extends Controller
                     'SecretPhrase' => $request->secret_phrase
                 ]);
                 $operations[] = 'La frase secreta ha sido registrada';
+            }
+
+            if ($request->save_address == true) {
+                $userAddress = UserAddress::where('UserId', $request->user_id)->first();
+                if (!$userAddress) {
+                    $userAddress = new UserAddress();
+                    $userAddress->UserId = $request->user_id;
+                }
+                $userAddress->CountryId = $request->country_id;
+                $userAddress->StateId = $request->state_id;
+                $userAddress->City = $request->city;
+                $userAddress->PostalCode = $request->postal_code;
+                $userAddress->Street = $request->street;
+                $userAddress->ExternalNumber = $request->external_number;
+                $userAddress->InternalNumber = $request->internal_number ?? null;
+                $userAddress->Reference = $request->reference ?? null;
+                $userAddress->save();
+
+                $operations[] = 'La dirección del usuario ha sido registrada';
             }
 
             if (!$this->hasRegisteredCards($user->Id)) {
