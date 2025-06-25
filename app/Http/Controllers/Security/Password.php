@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Password as ValidatePasssword;
+use Illuminate\Support\Str;
 
 class Password extends Controller
 {
@@ -101,5 +102,13 @@ class Password extends Controller
     public static function hashPassword($password)
     {
         return password_hash(env('APP_PASSWORD_SECURITY') . $password, PASSWORD_DEFAULT);
+    }
+
+    public static function createRandomPassword($length = 8)
+    {
+        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+';
+        $password = substr(str_shuffle(str_repeat($chars, 5)), 0, $length);
+
+        return $password;
     }
 }

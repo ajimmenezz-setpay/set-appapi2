@@ -148,6 +148,342 @@
                 }
             }
         },
+        "/backoffice/company/new": {
+            "post": {
+                "tags": [
+                    "Backoffice"
+                ],
+                "summary": "Create a new company",
+                "operationId": "2d6bc89f2ffcb307b3418052f9196540",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "fiscalName": {
+                                        "type": "string",
+                                        "example": "Empresa S.A. de C.V."
+                                    },
+                                    "rfc": {
+                                        "type": "string",
+                                        "example": "ABC123456789"
+                                    },
+                                    "commercialName": {
+                                        "type": "string",
+                                        "example": "Empresa S.A."
+                                    },
+                                    "stpAccount": {
+                                        "type": "string",
+                                        "example": "550e8400-e29b-41d4-a716-446655440000"
+                                    },
+                                    "isNewUser": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "enableCardCloud": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "enableSpeiCloud": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "userName": {
+                                        "type": "string",
+                                        "example": "Juan"
+                                    },
+                                    "userLastName": {
+                                        "type": "string",
+                                        "example": "Pérez"
+                                    },
+                                    "userEmail": {
+                                        "type": "string",
+                                        "example": "juan.perez@example.com"
+                                    },
+                                    "userPhone": {
+                                        "type": "string",
+                                        "example": "555-1234"
+                                    },
+                                    "assignedUsers": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "550e8400-e29b-41d4-a716-446655440001",
+                                            "550e8400-e29b-41d4-a716-446655440002"
+                                        ]
+                                    },
+                                    "commissions": {
+                                        "properties": {
+                                            "speiOut": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 1.5
+                                            },
+                                            "speiIn": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 1
+                                            },
+                                            "internal": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 0.5
+                                            },
+                                            "feeStp": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 0.2
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Company created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Company created successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "El nombre fiscal es obligatorio (fiscalName)."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized access."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/backoffice/company/update": {
+            "post": {
+                "tags": [
+                    "Backoffice"
+                ],
+                "summary": "Update an existing company",
+                "operationId": "079fce1261e9443d95e301713f674ec8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "id": {
+                                        "type": "string",
+                                        "example": "550e8400-e29b-41d4-a716-446655440000"
+                                    },
+                                    "fiscalName": {
+                                        "type": "string",
+                                        "example": "Empresa S.A. de C.V."
+                                    },
+                                    "rfc": {
+                                        "type": "string",
+                                        "example": "ABC123456789"
+                                    },
+                                    "commercialName": {
+                                        "type": "string",
+                                        "example": "Empresa S.A."
+                                    },
+                                    "stpAccount": {
+                                        "type": "string",
+                                        "example": "550e8400-e29b-41d4-a716-446655440000"
+                                    },
+                                    "isNewUser": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "enableCardCloud": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "enableSpeiCloud": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "userName": {
+                                        "type": "string",
+                                        "example": "Juan"
+                                    },
+                                    "userLastName": {
+                                        "type": "string",
+                                        "example": "Pérez"
+                                    },
+                                    "userEmail": {
+                                        "type": "string",
+                                        "example": "juan.perez@example.com"
+                                    },
+                                    "userPhone": {
+                                        "type": "string",
+                                        "example": "555-1234"
+                                    },
+                                    "assignedUsers": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "550e8400-e29b-41d4-a716-446655440001",
+                                            "550e8400-e29b-41d4-a716-446655440002"
+                                        ]
+                                    },
+                                    "commissions": {
+                                        "properties": {
+                                            "speiOut": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 1.5
+                                            },
+                                            "speiIn": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 1
+                                            },
+                                            "internal": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 0.5
+                                            },
+                                            "feeStp": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 0.2
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Company updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Company updated successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "El nombre fiscal es obligatorio (fiscalName)."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized access."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/cardCloud/card/{cardId}/nip": {
             "post": {
                 "tags": [
@@ -6043,6 +6379,10 @@
         {
             "name": "Address",
             "description": "Address"
+        },
+        {
+            "name": "Backoffice",
+            "description": "Backoffice"
         },
         {
             "name": "Card Cloud V2",

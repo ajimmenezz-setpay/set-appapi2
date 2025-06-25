@@ -111,8 +111,6 @@ Route::middleware([VerifyJwt::class])->group(function () {
                 Route::get('/origin', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizationAccountsController::class, 'origins']);
                 Route::get('/destination', [App\Http\Controllers\SpeiCloud\Authorization\AuthorizationAccountsController::class, 'destinations']);
             });
-
-
         });
     });
 
@@ -146,6 +144,13 @@ Route::middleware([VerifyJwt::class])->group(function () {
         Route::group(['prefix' => 'company'], function () {
             Route::get('/', [App\Http\Controllers\Administration\Company::class, 'index']);
             Route::get('/{id}', [App\Http\Controllers\Administration\Company::class, 'show']);
+        });
+    });
+
+    Route::group(['prefix' => 'backoffice'], function () {
+        Route::group(['prefix' => 'company'], function () {
+            Route::post('/new', [App\Http\Controllers\Backoffice\Company::class, 'create']);
+            Route::post('/update', [App\Http\Controllers\Backoffice\Company::class, 'update']);
         });
     });
 });
