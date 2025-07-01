@@ -465,14 +465,12 @@ class Company extends Controller
                 'active.required' => 'El estado activo es obligatorio (active).'
             ]);
 
-            $active = ($request->active || mb_strtolower($request->active)) == 'true' ? true : false;
-
             DB::beginTransaction();
             CompanyModel::where('Id', $request->company)
-                ->update(['Active' => $active ? 1 : 0, 'UpdatedByUser' => $request->attributes->get('jwt')->id, 'UpdateDate' => now()]);
+                ->update(['Active' => $request->boolean('active') ? 1 : 0, 'UpdatedByUser' => $request->attributes->get('jwt')->id, 'UpdateDate' => now()]);
 
             CompanyProjection::where('Id', $request->company)
-                ->update(['Active' => $active ? 1 : 0, 'UpdatedByUser' => $request->attributes->get('jwt')->id, 'UpdateDate' => now()]);
+                ->update(['Active' => $request->boolean('active') ? 1 : 0, 'UpdatedByUser' => $request->attributes->get('jwt')->id, 'UpdateDate' => now()]);
 
             DB::commit();
 
