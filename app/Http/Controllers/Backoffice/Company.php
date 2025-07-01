@@ -466,6 +466,8 @@ class Company extends Controller
                 'active.boolean' => 'El estado activo debe ser verdadero o falso (active).'
             ]);
 
+            $active = ($request->active || mb_strtolower($request->active)) == 'true' ? true : false;
+
             DB::beginTransaction();
             CompanyModel::where('Id', $request->company)
                 ->update(['Active' => $request->active, 'UpdatedByUser' => $request->attributes->get('jwt')->id, 'UpdateDate' => now()]);
