@@ -462,8 +462,7 @@ class Company extends Controller
                 'active' => 'required|boolean'
             ], [
                 'company.required' => 'El ID de la empresa es obligatorio (company).',
-                'active.required' => 'El estado activo es obligatorio (active).',
-                'active.boolean' => 'El estado activo debe ser verdadero o falso (active).'
+                'active.required' => 'El estado activo es obligatorio (active).'
             ]);
 
             $active = ($request->active || mb_strtolower($request->active)) == 'true' ? true : false;
