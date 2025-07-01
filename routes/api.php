@@ -150,7 +150,7 @@ Route::middleware([VerifyJwt::class])->group(function () {
     Route::group(['prefix' => 'backoffice'], function () {
         Route::group(['prefix' => 'company'], function () {
             Route::post('/new', [App\Http\Controllers\Backoffice\Company::class, 'create']);
-            Route::post('/update', [App\Http\Controllers\Backoffice\Company::class, 'update']);
+            Route::put('/update', [App\Http\Controllers\Backoffice\Company::class, 'update']);
         });
     });
 });
