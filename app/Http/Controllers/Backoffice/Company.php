@@ -459,7 +459,7 @@ class Company extends Controller
         try {
             $request->validate([
                 'company' => 'required|uuid',
-                'active' => 'required|boolean'
+                'active' => 'required'
             ], [
                 'company.required' => 'El ID de la empresa es obligatorio (company).',
                 'active.required' => 'El estado activo es obligatorio (active).'
@@ -469,10 +469,10 @@ class Company extends Controller
 
             DB::beginTransaction();
             CompanyModel::where('Id', $request->company)
-                ->update(['Active' => $request->active, 'UpdatedByUser' => $request->attributes->get('jwt')->id, 'UpdateDate' => now()]);
+                ->update(['Active' => $active ? 1 : 0, 'UpdatedByUser' => $request->attributes->get('jwt')->id, 'UpdateDate' => now()]);
 
             CompanyProjection::where('Id', $request->company)
-                ->update(['Active' => $request->active, 'UpdatedByUser' => $request->attributes->get('jwt')->id, 'UpdateDate' => now()]);
+                ->update(['Active' => $active ? 1 : 0, 'UpdatedByUser' => $request->attributes->get('jwt')->id, 'UpdateDate' => now()]);
 
             DB::commit();
 
