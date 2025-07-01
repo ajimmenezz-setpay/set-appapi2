@@ -453,6 +453,36 @@ class Company extends Controller
     }
 
 
+
+    public function toggle(Request $request)
+    {
+        try {
+            $request->validate([
+                'company' => 'required|uuid',
+                'active' => 'required|boolean'
+            ], [
+                'company.required' => 'El ID de la empresa es obligatorio (company).',
+                'active.required' => 'El estado activo es obligatorio (active).',
+                'active.boolean' => 'El estado activo debe ser verdadero o falso (active).'
+            ]);
+
+            DB::beginTransaction();
+            CompanyModel::where('Id', $request->company)
+                ->update(['Active' => $request->active, 'UpdatedByUser' => $request->attributes->get('jwt')->id, 'UpdateDate' => now()]);
+
+            CompanyProjection::where('Id', $request->company)
+                ->update(['Active' => $request->active, 'UpdatedByUser' => $request->attributes->get('jwt')->id, 'UpdateDate' => now()]);
+
+            DB::commit();
+
+            return response()->json(['message' => 'Empresa actualizada correctamente.'], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response($e->getMessage() . (env('APP_DEBUG') ? ' en la línea ' . $e->getLine() : ''), 400);
+        }
+    }
+
+
     public static function createCompany($request)
     {
         $existingCompany = CompanyModel::where('RFC', $request->rfc)->first();
