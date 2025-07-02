@@ -74,4 +74,72 @@ class MovementController extends Controller
             return response("Error al obtener el movimiento. " . $e->getMessage(), 400);
         }
     }
+
+
+    /**
+     * @OA\Get(
+     *      path="/api/cardCloud/detailed-movements/{id}",
+     *      operationId="movement_authorization_details",
+     *      tags={"Card Cloud V2"},
+     *      summary="Get movement authorization details",
+     *      description="Get movement authorization details",
+     *      @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="Movement ID",
+     *          required=true,
+     *          @OA\Schema(type="string")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *              description="Successful operation",
+     *              @OA\JsonContent(
+     *                  @OA\Property(property="code", type="string", example="123456"),
+     *                  @OA\Property(property="authorization_code", type="string", example="123456"),
+     *                  @OA\Property(property="endpoint", type="string", example="authorizations/"),
+     *                  @OA\Property(property="date", type="integer", example=1727731733),
+     *                  @OA\Property(property="body", type="string", example="{}"),
+     *                  @OA\Property(property="response", type="string", example="{}"),
+     *                  @OA\Property(property="error", type="string", example="{}")
+     *              )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=404,
+     *          description="Movement or Authorization not found",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Movement or Authorization not found")
+     *          )
+     *     ),
+     *
+     *      @OA\Response(
+     *          response=500,
+     *          description="Error getting movement authorization details",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Error getting movement authorization details")
+     *          )
+     *     )
+     *
+     * )
+     *
+     */
+
+    public function detailedMovements(Request $request, $movementId)
+    {
+        try {
+            $client = new Client();
+            $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/movements/' . $movementId, [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                ]
+            ]);
+
+            $decodedJson = json_decode($response->getBody(), true);
+
+            return response()->json($decodedJson);
+        } catch (\Exception $e) {
+            return response("Error al obtener el movimiento. " . $e->getMessage(), 400);
+        }
+    }
 }

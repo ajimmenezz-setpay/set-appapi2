@@ -971,6 +971,1084 @@
                 ]
             }
         },
+        "/api/cardCloud/card/search/{search}": {
+            "get": {
+                "tags": [
+                    "Card Cloud V2"
+                ],
+                "summary": "Search card",
+                "description": "Search card by PAN, Client ID or last 8 digits of PAN",
+                "operationId": "a2db6592697c308ad0ede6232fe126f4",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "path",
+                        "description": "Search term",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Card found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "card_id": {
+                                            "description": "Card UUID",
+                                            "type": "string",
+                                            "example": "f4b3b3b3-4b3b-4b3b-4b3b-4b3b4b3b4b3b"
+                                        },
+                                        "card_external_id": {
+                                            "description": "Card External Id",
+                                            "type": "string",
+                                            "example": "f4b3b3b3-4b3b-4b3b-4b3b-4b3b4b3b4b3b"
+                                        },
+                                        "card_type": {
+                                            "description": "Card type",
+                                            "type": "string",
+                                            "example": "virtual"
+                                        },
+                                        "brand": {
+                                            "description": "Card active function",
+                                            "type": "string",
+                                            "example": "MASTER"
+                                        },
+                                        "client_id": {
+                                            "description": "Client ID",
+                                            "type": "string",
+                                            "example": "SP0000000"
+                                        },
+                                        "masked_pan": {
+                                            "description": "Masked PAN",
+                                            "type": "string",
+                                            "example": "555544******2222"
+                                        },
+                                        "balance": {
+                                            "description": "Card balance",
+                                            "type": "string",
+                                            "example": "0.00"
+                                        },
+                                        "clabe": {
+                                            "description": "CLABE account number",
+                                            "type": "string",
+                                            "example": "0123456789010203"
+                                        },
+                                        "status": {
+                                            "description": "Card status",
+                                            "type": "string",
+                                            "example": "NORMAL"
+                                        },
+                                        "substatus": {
+                                            "description": "Card substatus",
+                                            "properties": {
+                                                "id": {
+                                                    "description": "Substatus ID",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "description": "Substatus name",
+                                                    "type": "string",
+                                                    "example": "NORMAL"
+                                                },
+                                                "description": {
+                                                    "description": "Substatus description",
+                                                    "type": "string",
+                                                    "example": "Card is normal"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "setups": {
+                                            "description": "Card configurations",
+                                            "properties": {
+                                                "Status": {
+                                                    "description": "Card status",
+                                                    "type": "string",
+                                                    "example": "NORMAL"
+                                                },
+                                                "StatusReason": {
+                                                    "description": "Reason for status change",
+                                                    "type": "string",
+                                                    "example": ""
+                                                },
+                                                "Ecommerce": {
+                                                    "description": "Ecommerce setup status",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "International": {
+                                                    "description": "International transactions setup status",
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "Stripe": {
+                                                    "description": "Stripe integration status",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "Wallet": {
+                                                    "description": "Wallet integration status",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "Withdrawal": {
+                                                    "description": "Withdrawal setup status",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "Contactless": {
+                                                    "description": "Contactless transactions setup status",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "enviroment": {
+                                            "description": "Customer Name / Enviroment",
+                                            "type": "string",
+                                            "example": "SET"
+                                        },
+                                        "company": {
+                                            "description": "Company Name",
+                                            "type": "string",
+                                            "example": "SET"
+                                        },
+                                        "profile": {
+                                            "description": "Profile information",
+                                            "properties": {
+                                                "Id": {
+                                                    "description": "Profile ID",
+                                                    "type": "integer",
+                                                    "example": 7
+                                                },
+                                                "ProfileName": {
+                                                    "description": "Profile name",
+                                                    "type": "string",
+                                                    "example": "Perfil Dir SET"
+                                                },
+                                                "MaxDailyAmountTPV": {
+                                                    "description": "Max daily amount for TPV transactions",
+                                                    "type": "string",
+                                                    "example": "$104.64 / $150,000.00"
+                                                },
+                                                "MaxDailyAmountATM": {
+                                                    "description": "Max daily amount for ATM transactions",
+                                                    "type": "string",
+                                                    "example": "$0.00 / $24,100.00"
+                                                },
+                                                "MaxDailyOperationsTPV": {
+                                                    "description": "Max daily operations for TPV transactions",
+                                                    "type": "string",
+                                                    "example": "1 / 30"
+                                                },
+                                                "MaxAmountTPV": {
+                                                    "description": "Max amount for TPV transactions",
+                                                    "type": "string",
+                                                    "example": "250000.00"
+                                                },
+                                                "MaxAmountATM": {
+                                                    "description": "Max amount for ATM transactions",
+                                                    "type": "string",
+                                                    "example": "24100.00"
+                                                },
+                                                "MaxAmountMonthlyTPV": {
+                                                    "description": "Max amount for monthly TPV transactions",
+                                                    "type": "string",
+                                                    "example": "$1,018.14 / $500,000.00"
+                                                },
+                                                "MaxAmountMonthlyATM": {
+                                                    "description": "Max amount for monthly ATM transactions",
+                                                    "type": "string",
+                                                    "example": "$24,069.60 / $250,000.00"
+                                                },
+                                                "MaxOperationsMonthlyTPV": {
+                                                    "description": "Max operations for monthly TPV transactions",
+                                                    "type": "string",
+                                                    "example": "7 / 50000"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "assigned_user": {
+                                            "description": "User assigned to the card",
+                                            "properties": {
+                                                "name": {
+                                                    "description": "User name",
+                                                    "type": "string",
+                                                    "example": "John Doe"
+                                                },
+                                                "email": {
+                                                    "description": "User email",
+                                                    "type": "string",
+                                                    "example": "john@doe.email"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "movements": {
+                                            "description": "List of movements associated with the card",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "movement_id": {
+                                                        "description": "Unique identifier for the movement",
+                                                        "type": "string",
+                                                        "example": "019244d6-120b-71f1-baef-5420fe167046"
+                                                    },
+                                                    "date": {
+                                                        "description": "Timestamp of the movement",
+                                                        "type": "integer",
+                                                        "example": 1727731733
+                                                    },
+                                                    "type": {
+                                                        "description": "Type of the movement",
+                                                        "type": "string",
+                                                        "example": "TRANSFER"
+                                                    },
+                                                    "amount": {
+                                                        "description": "Amount of the transaction",
+                                                        "type": "string",
+                                                        "example": "21496.27"
+                                                    },
+                                                    "balance": {
+                                                        "description": "Balance after the transaction",
+                                                        "type": "string",
+                                                        "example": "12.30"
+                                                    },
+                                                    "authorization_code": {
+                                                        "description": "Authorization code",
+                                                        "type": "string",
+                                                        "example": "287069"
+                                                    },
+                                                    "description": {
+                                                        "description": "Description of the movement",
+                                                        "type": "string",
+                                                        "example": "Transfer from subaccount. Deposito N"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Card not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Error message",
+                                            "type": "string",
+                                            "example": "Card not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Search term must be at least 8 characters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Error message",
+                                            "type": "string",
+                                            "example": "Search term must be at least 8 characters"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cardCloud/card/{cardId}/setup/{setup_name}/{action}": {
+            "post": {
+                "tags": [
+                    "Card Cloud V2"
+                ],
+                "summary": "Set card setup",
+                "description": "Set card setup.",
+                "operationId": "b7e939b7653efda60dfa87176db66342",
+                "parameters": [
+                    {
+                        "name": "cardId",
+                        "in": "path",
+                        "description": "Card ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "setup_name",
+                        "in": "path",
+                        "description": "Setup name (ecommerce, international, stripe, wallet, withdrawal, contactless)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "action",
+                        "in": "path",
+                        "description": "Action (enable, disable)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Card setup updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Message indicating the result of the operation",
+                                            "type": "string",
+                                            "example": "Card setup updated successfully"
+                                        },
+                                        "card": {
+                                            "properties": {
+                                                "card_id": {
+                                                    "description": "Card UUID",
+                                                    "type": "string",
+                                                    "example": "019076da-2212-7245-b8ff-efa0c9e927ba"
+                                                },
+                                                "card_type": {
+                                                    "description": "Type of the card",
+                                                    "type": "string",
+                                                    "example": "physical"
+                                                },
+                                                "active_function": {
+                                                    "description": "Active function of the card",
+                                                    "type": "string",
+                                                    "example": "CREDIT"
+                                                },
+                                                "brand": {
+                                                    "description": "Card brand",
+                                                    "type": "string",
+                                                    "example": "MASTER"
+                                                },
+                                                "masked_pan": {
+                                                    "description": "Masked PAN",
+                                                    "type": "string",
+                                                    "example": "516152XXXXXX9752"
+                                                },
+                                                "balance": {
+                                                    "description": "Card balance",
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 62.82999999999765
+                                                },
+                                                "setup": {
+                                                    "description": "Card setup configuration",
+                                                    "properties": {
+                                                        "status": {
+                                                            "description": "Status of the card",
+                                                            "type": "string",
+                                                            "example": "NORMAL"
+                                                        },
+                                                        "enabled_ecommerce": {
+                                                            "description": "Ecommerce setup enabled status",
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        },
+                                                        "enabled_international": {
+                                                            "description": "International transactions setup enabled status",
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        },
+                                                        "enabled_stripe": {
+                                                            "description": "Stripe setup enabled status",
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        },
+                                                        "enabled_wallet": {
+                                                            "description": "Wallet setup enabled status",
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        },
+                                                        "enabled_withdrawal": {
+                                                            "description": "Withdrawal setup enabled status",
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        },
+                                                        "enabled_contactless": {
+                                                            "description": "Contactless setup enabled status",
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        },
+                                                        "pin_offline": {
+                                                            "description": "Offline PIN enabled status",
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        },
+                                                        "pin_on_us": {
+                                                            "description": "On-us PIN enabled status",
+                                                            "type": "boolean",
+                                                            "example": false
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "person": {
+                                                    "description": "Person associated with the card",
+                                                    "properties": {
+                                                        "person_id": {
+                                                            "description": "Person ID",
+                                                            "type": "integer",
+                                                            "example": 2
+                                                        },
+                                                        "person_external_id": {
+                                                            "description": "External ID of the person",
+                                                            "type": "string",
+                                                            "example": "018fa638-6749-4f46-b773-433faad3af8a"
+                                                        },
+                                                        "person_type": {
+                                                            "description": "Type of person (e.g., legal or individual)",
+                                                            "type": "string",
+                                                            "example": "legal"
+                                                        },
+                                                        "status": {
+                                                            "description": "Status of the person",
+                                                            "type": "string",
+                                                            "example": "active"
+                                                        },
+                                                        "person_account": {
+                                                            "description": "Account information of the person",
+                                                            "properties": {
+                                                                "account_id": {
+                                                                    "description": "Account ID",
+                                                                    "type": "integer",
+                                                                    "example": 1
+                                                                },
+                                                                "external_id": {
+                                                                    "description": "External ID of the account",
+                                                                    "type": "string",
+                                                                    "example": "018fa638-6e9a-0c1a-9542-2f1a8b4a4c13"
+                                                                },
+                                                                "client_id": {
+                                                                    "description": "Client ID associated with the account",
+                                                                    "type": "string",
+                                                                    "example": "018e7c16-6510-f94a-1ae2-37b6ba26c264"
+                                                                },
+                                                                "book_id": {
+                                                                    "description": "Book ID associated with the account",
+                                                                    "type": "string",
+                                                                    "example": "018f5ed6-279e-700d-9cdb-99778820245a"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "legal_person_data": {
+                                                            "description": "Legal information of the person",
+                                                            "properties": {
+                                                                "legal_name": {
+                                                                    "description": "Legal name of the person",
+                                                                    "type": "string",
+                                                                    "example": "SE TRANSACCIONALES"
+                                                                },
+                                                                "trade_name": {
+                                                                    "description": "Trade name of the legal person",
+                                                                    "type": "string",
+                                                                    "example": "SET"
+                                                                },
+                                                                "rfc": {
+                                                                    "description": "RFC of the legal person",
+                                                                    "type": "string",
+                                                                    "example": "STR170601FT1"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "alias_account": {
+                                                    "description": "Alias account information",
+                                                    "properties": {
+                                                        "Id": {
+                                                            "description": "Alias account ID",
+                                                            "type": "integer",
+                                                            "example": 15676
+                                                        },
+                                                        "PersonAccountId": {
+                                                            "description": "Person account ID linked to alias account",
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "CardId": {
+                                                            "description": "Card ID linked to alias account",
+                                                            "type": "integer",
+                                                            "example": 30382
+                                                        },
+                                                        "ExternalId": {
+                                                            "description": "External ID of alias account",
+                                                            "type": "string",
+                                                            "example": " "
+                                                        },
+                                                        "ClientId": {
+                                                            "description": "Client ID of alias account",
+                                                            "type": "string",
+                                                            "example": " "
+                                                        },
+                                                        "BookId": {
+                                                            "description": "Book ID of alias account",
+                                                            "type": "string",
+                                                            "example": " "
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Card not found or you do not have permission to access it",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Error message",
+                                            "type": "string",
+                                            "example": "Card not found or you do not have permission to access it"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error setting card setup",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Error message",
+                                            "type": "string",
+                                            "example": "Error setting card setup"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cardCloud/card/{cardId}/webhooks": {
+            "get": {
+                "tags": [
+                    "Card Cloud V2"
+                ],
+                "summary": "Get registered card webhooks",
+                "description": "Get registered card webhooks",
+                "operationId": "4850b408588ea91f9bf92d2ee6c49641",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "Card UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1456
+                                            },
+                                            "event_type": {
+                                                "type": "string",
+                                                "example": "authorization_created"
+                                            },
+                                            "event_name": {
+                                                "type": "string",
+                                                "example": "global_authorization"
+                                            },
+                                            "authorizer_response": {
+                                                "type": "string",
+                                                "example": "APPROVED"
+                                            },
+                                            "endpoint": {
+                                                "type": "string",
+                                                "example": "CONSULT"
+                                            },
+                                            "establishment": {
+                                                "type": "string",
+                                                "example": "BANCOMER S.A.          CIUDAD DE MEX MEX"
+                                            },
+                                            "amount": {
+                                                "type": "string",
+                                                "example": "13.92"
+                                            },
+                                            "request": {
+                                                "type": "string",
+                                                "example": ""
+                                            },
+                                            "date": {
+                                                "type": "integer",
+                                                "example": 1722156442
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Card not found or no permission",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Card not found or you do not have permission to access it"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error getting webhooks",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error getting webhooks"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cardCloud/card/{cardId}/failed-authorizations": {
+            "get": {
+                "tags": [
+                    "Card Cloud V2"
+                ],
+                "summary": "Get failed authorizations for a card",
+                "description": "Get failed authorizations for a card",
+                "operationId": "bdaddce68d43fd88e310757c654434b8",
+                "parameters": [
+                    {
+                        "name": "cardId",
+                        "in": "path",
+                        "description": "Card ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "uuid": {
+                                                "type": "string",
+                                                "example": "123e4567-e89b-12d3-a456-426614174000"
+                                            },
+                                            "authorization_code": {
+                                                "type": "string",
+                                                "example": "123456"
+                                            },
+                                            "endpoint": {
+                                                "type": "string",
+                                                "example": "CONSULT"
+                                            },
+                                            "event_type": {
+                                                "type": "string",
+                                                "example": "authorization_created"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "BANCOMER S.A.          CIUDAD DE MEX MEX"
+                                            },
+                                            "amount": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 13.92
+                                            },
+                                            "error": {
+                                                "type": "string",
+                                                "example": "Error message"
+                                            },
+                                            "timestamp": {
+                                                "type": "integer",
+                                                "example": 1722156442
+                                            },
+                                            "request": {
+                                                "type": "string",
+                                                "example": "Request body"
+                                            },
+                                            "response": {
+                                                "type": "string",
+                                                "example": "Response body"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Card not found or no permission",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Card not found or you do not have permission to access it"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error getting failed authorizations",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error getting failed authorizations"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cardCloud/card/{cardId}/movements": {
+            "get": {
+                "tags": [
+                    "Card Cloud V2"
+                ],
+                "summary": "Get card movements",
+                "description": "Returns card movements",
+                "operationId": "c999dd881bed1a7003d69e3719763bc0",
+                "parameters": [
+                    {
+                        "name": "cardId",
+                        "in": "path",
+                        "description": "Card ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "from": {
+                                        "description": "From date (Unix timestamp)",
+                                        "type": "string",
+                                        "example": "1234567890"
+                                    },
+                                    "to": {
+                                        "description": "To date (Unix timestamp)",
+                                        "type": "string",
+                                        "example": "1234567890"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Movements retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "movements": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "movement_id": {
+                                                        "description": "Movement UUID",
+                                                        "type": "string",
+                                                        "example": "123456"
+                                                    },
+                                                    "date": {
+                                                        "description": "Movement Date (Unix timestamp)",
+                                                        "type": "string",
+                                                        "example": "1234567890"
+                                                    },
+                                                    "type": {
+                                                        "description": "Movement Type",
+                                                        "type": "string",
+                                                        "example": "deposit"
+                                                    },
+                                                    "amount": {
+                                                        "description": "Movement Amount",
+                                                        "type": "string",
+                                                        "example": "100.00"
+                                                    },
+                                                    "authorization_code": {
+                                                        "description": "Authorization Code",
+                                                        "type": "string",
+                                                        "example": "123456"
+                                                    },
+                                                    "description": {
+                                                        "description": "Movement Description",
+                                                        "type": "string",
+                                                        "example": "Deposit"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "total_records": {
+                                            "description": "Total records",
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "from": {
+                                            "description": "From date (Unix timestamp)",
+                                            "type": "string",
+                                            "example": "1234567890"
+                                        },
+                                        "to": {
+                                            "description": "To date (Unix timestamp)",
+                                            "type": "string",
+                                            "example": "1234567890"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Message",
+                                            "type": "string",
+                                            "example": "Unauthorized | Error while decoding the token"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cardCloud/card/{cardId}/unassign-user": {
+            "delete": {
+                "tags": [
+                    "Card Cloud V2"
+                ],
+                "summary": "Unassign card from user",
+                "description": "Unassign card from user",
+                "operationId": "aa0e42b107801c8cca480698c4c264b1",
+                "parameters": [
+                    {
+                        "name": "cardId",
+                        "in": "path",
+                        "description": "Card ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Card unassigned successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Card unassigned successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Card not found or you dont have permission to access it",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Card not found or you dont have permission to access it"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error unassigning subaccount",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error unassigning subaccount"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/cardCloud/card/{cardId}/sensitive": {
             "get": {
                 "tags": [
@@ -1754,6 +2832,101 @@
                         "bearerAuth": []
                     }
                 ]
+            }
+        },
+        "/api/cardCloud/detailed-movements/{id}": {
+            "get": {
+                "tags": [
+                    "Card Cloud V2"
+                ],
+                "summary": "Get movement authorization details",
+                "description": "Get movement authorization details",
+                "operationId": "movement_authorization_details",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Movement ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "example": "123456"
+                                        },
+                                        "authorization_code": {
+                                            "type": "string",
+                                            "example": "123456"
+                                        },
+                                        "endpoint": {
+                                            "type": "string",
+                                            "example": "authorizations/"
+                                        },
+                                        "date": {
+                                            "type": "integer",
+                                            "example": 1727731733
+                                        },
+                                        "body": {
+                                            "type": "string",
+                                            "example": "{}"
+                                        },
+                                        "response": {
+                                            "type": "string",
+                                            "example": "{}"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "{}"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Movement or Authorization not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Movement or Authorization not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error getting movement authorization details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error getting movement authorization details"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/api/cardCloud/card/transfer": {

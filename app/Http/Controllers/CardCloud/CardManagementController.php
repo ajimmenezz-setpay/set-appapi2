@@ -583,11 +583,667 @@ class CardManagementController extends Controller
                 }
             }
 
-            if(empty($cardsResponse)) {
+            if (empty($cardsResponse)) {
                 return self::error("No se pudo obtener el balance de las tarjetas asociadas al número de teléfono proporcionado.");
             }
 
             return response()->json($cardsResponse);
+        } catch (\Exception $e) {
+            return self::basicError($e->getMessage());
+        }
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/cardCloud/card/search/{search}",
+     *      summary="Search card",
+     *      description="Search card by PAN, Client ID or last 8 digits of PAN",
+     *      tags={"Card Cloud V2"},
+     *      security={{"bearerAuth": {}}},
+     *      @OA\Parameter(
+     *          name="search",
+     *          in="path",
+     *          description="Search term",
+     *          required=true,
+     *          @OA\Schema(type="string")
+     *      ),
+     *
+     *       @OA\Response(
+     *           response=200,
+     *           description="Card found",
+     *           @OA\JsonContent(
+     *               @OA\Property(property="card_id", type="string", example="f4b3b3b3-4b3b-4b3b-4b3b-4b3b4b3b4b3b", description="Card UUID"),
+     *               @OA\Property(property="card_external_id", type="string", example="f4b3b3b3-4b3b-4b3b-4b3b-4b3b4b3b4b3b", description="Card External Id"),
+     *               @OA\Property(property="card_type", type="string", example="virtual", description="Card type"),
+     *               @OA\Property(property="brand", type="string", example="MASTER", description="Card active function"),
+     *               @OA\Property(property="client_id", type="string", example="SP0000000", description="Client ID"),
+     *               @OA\Property(property="masked_pan", type="string", example="555544******2222", description="Masked PAN"),
+     *               @OA\Property(property="balance", type="string", example="0.00", description="Card balance"),
+     *               @OA\Property(property="clabe", type="string", example="0123456789010203", description="CLABE account number"),
+     *               @OA\Property(property="status", type="string", example="NORMAL", description="Card status"),
+     *               @OA\Property(
+     *                  property="substatus",
+     *                  type="object",
+     *                  description="Card substatus",
+     *                  @OA\Property(property="id", type="integer", example=1, description="Substatus ID"),
+     *                  @OA\Property(property="name", type="string", example="NORMAL", description="Substatus name"),
+     *                  @OA\Property(property="description", type="string", example="Card is normal", description="Substatus description")
+     *               ),
+     *               @OA\Property(
+     *                   property="setups",
+     *                   type="object",
+     *                   description="Card configurations",
+     *                   @OA\Property(property="Status", type="string", example="NORMAL", description="Card status"),
+     *                   @OA\Property(property="StatusReason", type="string", example="", description="Reason for status change"),
+     *                   @OA\Property(property="Ecommerce", type="integer", example=1, description="Ecommerce setup status"),
+     *                   @OA\Property(property="International", type="integer", example=0, description="International transactions setup status"),
+     *                   @OA\Property(property="Stripe", type="integer", example=1, description="Stripe integration status"),
+     *                   @OA\Property(property="Wallet", type="integer", example=1, description="Wallet integration status"),
+     *                   @OA\Property(property="Withdrawal", type="integer", example=1, description="Withdrawal setup status"),
+     *                   @OA\Property(property="Contactless", type="integer", example=1, description="Contactless transactions setup status")
+     *               ),
+     *               @OA\Property(property="enviroment", type="string", example="SET", description="Customer Name / Enviroment"),
+     *               @OA\Property(property="company", type="string", example="SET", description="Company Name"),
+     *               @OA\Property(
+     *                  property="profile",
+     *                  type="object",
+     *                  description="Profile information",
+     *                  @OA\Property(property="Id", type="integer", example=7, description="Profile ID"),
+     *                  @OA\Property(property="ProfileName", type="string", example="Perfil Dir SET", description="Profile name"),
+     *                  @OA\Property(property="MaxDailyAmountTPV", type="string", example="$104.64 / $150,000.00", description="Max daily amount for TPV transactions"),
+     *                  @OA\Property(property="MaxDailyAmountATM", type="string", example="$0.00 / $24,100.00", description="Max daily amount for ATM transactions"),
+     *                  @OA\Property(property="MaxDailyOperationsTPV", type="string", example="1 / 30", description="Max daily operations for TPV transactions"),
+     *                  @OA\Property(property="MaxAmountTPV", type="string", example="250000.00", description="Max amount for TPV transactions"),
+     *                  @OA\Property(property="MaxAmountATM", type="string", example="24100.00", description="Max amount for ATM transactions"),
+     *                  @OA\Property(property="MaxAmountMonthlyTPV", type="string", example="$1,018.14 / $500,000.00", description="Max amount for monthly TPV transactions"),
+     *                  @OA\Property(property="MaxAmountMonthlyATM", type="string", example="$24,069.60 / $250,000.00", description="Max amount for monthly ATM transactions"),
+     *                  @OA\Property(property="MaxOperationsMonthlyTPV", type="string", example="7 / 50000", description="Max operations for monthly TPV transactions")
+     *               ),
+     *               @OA\Property(
+     *                  property="assigned_user",
+     *                  type="object",
+     *                  description="User assigned to the card",
+     *                  @OA\Property(property="name", type="string", example="John Doe", description="User name"),
+     *                  @OA\Property(property="email", type="string", example="john@doe.email", description="User email"),
+     *               ),
+     *               @OA\Property(
+     *                   property="movements",
+     *                   type="array",
+     *                   @OA\Items(
+     *                       type="object",
+     *                       @OA\Property(property="movement_id", type="string", example="019244d6-120b-71f1-baef-5420fe167046", description="Unique identifier for the movement"),
+     *                       @OA\Property(property="date", type="integer", example=1727731733, description="Timestamp of the movement"),
+     *                       @OA\Property(property="type", type="string", example="TRANSFER", description="Type of the movement"),
+     *                       @OA\Property(property="amount", type="string", example="21496.27", description="Amount of the transaction"),
+     *                       @OA\Property(property="balance", type="string", example="12.30", description="Balance after the transaction"),
+     *                       @OA\Property(property="authorization_code", type="string", example="287069", description="Authorization code"),
+     *                       @OA\Property(property="description", type="string", example="Transfer from subaccount. Deposito N", description="Description of the movement")
+     *                   ),
+     *                   description="List of movements associated with the card"
+     *               )
+     *           )
+     *       ),
+     *
+     *      @OA\Response(
+     *          response=404,
+     *          description="Card not found",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Card not found", description="Error message")
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=400,
+     *          description="Search term must be at least 8 characters",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Search term must be at least 8 characters", description="Error message")
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Unauthorized")
+     *          )
+     *      )
+     *
+     * )
+     *
+     */
+
+    public function search(Request $request, $search)
+    {
+        try {
+            if (strlen($search) < 8)
+                throw new \Exception('El término de búsqueda debe tener al menos 8 caracteres (Client ID o Últimos 8 dígitos de la tarjeta)', 400);
+
+            $client = new Client();
+            $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/search/' . $search, [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id)
+                ]
+            ]);
+
+            $decodedJson = json_decode($response->getBody(), true);
+
+            unset($decodedJson['bin']);
+            unset($decodedJson['pan']);
+
+
+            return response()->json($decodedJson);
+        } catch (\Exception $e) {
+            return self::basicError($e->getMessage(), $e->getCode() ?? 400);
+        }
+    }
+
+    /**
+     * @OA\Post(
+     *      path="/api/cardCloud/card/{cardId}/setup/{setup_name}/{action}",
+     *      summary="Set card setup",
+     *      description="Set card setup.",
+     *      tags={"Card Cloud V2"},
+     *      security={{"bearerAuth": {}}},
+     *      @OA\Parameter(
+     *          name="cardId",
+     *          in="path",
+     *          description="Card ID",
+     *          required=true,
+     *          @OA\Schema(type="string")
+     *      ),
+     *
+     *      @OA\Parameter(
+     *          name="setup_name",
+     *          in="path",
+     *          description="Setup name (ecommerce, international, stripe, wallet, withdrawal, contactless)",
+     *          required=true,
+     *          @OA\Schema(type="string")
+     *      ),
+     *
+     *      @OA\Parameter(
+     *          name="action",
+     *          in="path",
+     *          description="Action (enable, disable)",
+     *          required=true,
+     *          @OA\Schema(type="string")
+     *      ),
+     *
+     *       @OA\Response(
+     *           response=200,
+     *           description="Card setup updated successfully",
+     *           @OA\JsonContent(
+     *               @OA\Property(property="message", type="string", example="Card setup updated successfully", description="Message indicating the result of the operation"),
+     *               @OA\Property(
+     *                   property="card",
+     *                   type="object",
+     *                   @OA\Property(property="card_id", type="string", example="019076da-2212-7245-b8ff-efa0c9e927ba", description="Card UUID"),
+     *                   @OA\Property(property="card_type", type="string", example="physical", description="Type of the card"),
+     *                   @OA\Property(property="active_function", type="string", example="CREDIT", description="Active function of the card"),
+     *                   @OA\Property(property="brand", type="string", example="MASTER", description="Card brand"),
+     *                   @OA\Property(property="masked_pan", type="string", example="516152XXXXXX9752", description="Masked PAN"),
+     *                   @OA\Property(property="balance", type="number", format="float", example=62.82999999999765, description="Card balance"),
+     *                   @OA\Property(
+     *                       property="setup",
+     *                       type="object",
+     *                       description="Card setup configuration",
+     *                       @OA\Property(property="status", type="string", example="NORMAL", description="Status of the card"),
+     *                       @OA\Property(property="enabled_ecommerce", type="boolean", example=true, description="Ecommerce setup enabled status"),
+     *                       @OA\Property(property="enabled_international", type="boolean", example=true, description="International transactions setup enabled status"),
+     *                       @OA\Property(property="enabled_stripe", type="boolean", example=true, description="Stripe setup enabled status"),
+     *                       @OA\Property(property="enabled_wallet", type="boolean", example=true, description="Wallet setup enabled status"),
+     *                       @OA\Property(property="enabled_withdrawal", type="boolean", example=true, description="Withdrawal setup enabled status"),
+     *                       @OA\Property(property="enabled_contactless", type="boolean", example=true, description="Contactless setup enabled status"),
+     *                       @OA\Property(property="pin_offline", type="boolean", example=true, description="Offline PIN enabled status"),
+     *                       @OA\Property(property="pin_on_us", type="boolean", example=false, description="On-us PIN enabled status")
+     *                   ),
+     *                   @OA\Property(
+     *                       property="person",
+     *                       type="object",
+     *                       description="Person associated with the card",
+     *                       @OA\Property(property="person_id", type="integer", example=2, description="Person ID"),
+     *                       @OA\Property(property="person_external_id", type="string", example="018fa638-6749-4f46-b773-433faad3af8a", description="External ID of the person"),
+     *                       @OA\Property(property="person_type", type="string", example="legal", description="Type of person (e.g., legal or individual)"),
+     *                       @OA\Property(property="status", type="string", example="active", description="Status of the person"),
+     *                       @OA\Property(
+     *                           property="person_account",
+     *                           type="object",
+     *                           description="Account information of the person",
+     *                           @OA\Property(property="account_id", type="integer", example=1, description="Account ID"),
+     *                           @OA\Property(property="external_id", type="string", example="018fa638-6e9a-0c1a-9542-2f1a8b4a4c13", description="External ID of the account"),
+     *                           @OA\Property(property="client_id", type="string", example="018e7c16-6510-f94a-1ae2-37b6ba26c264", description="Client ID associated with the account"),
+     *                           @OA\Property(property="book_id", type="string", example="018f5ed6-279e-700d-9cdb-99778820245a", description="Book ID associated with the account")
+     *                       ),
+     *                       @OA\Property(
+     *                           property="legal_person_data",
+     *                           type="object",
+     *                           description="Legal information of the person",
+     *                           @OA\Property(property="legal_name", type="string", example="SE TRANSACCIONALES", description="Legal name of the person"),
+     *                           @OA\Property(property="trade_name", type="string", example="SET", description="Trade name of the legal person"),
+     *                           @OA\Property(property="rfc", type="string", example="STR170601FT1", description="RFC of the legal person")
+     *                       )
+     *                   ),
+     *                   @OA\Property(
+     *                       property="alias_account",
+     *                       type="object",
+     *                       description="Alias account information",
+     *                       @OA\Property(property="Id", type="integer", example=15676, description="Alias account ID"),
+     *                       @OA\Property(property="PersonAccountId", type="integer", example=1, description="Person account ID linked to alias account"),
+     *                       @OA\Property(property="CardId", type="integer", example=30382, description="Card ID linked to alias account"),
+     *                       @OA\Property(property="ExternalId", type="string", example=" ", description="External ID of alias account"),
+     *                       @OA\Property(property="ClientId", type="string", example=" ", description="Client ID of alias account"),
+     *                       @OA\Property(property="BookId", type="string", example=" ", description="Book ID of alias account")
+     *                   )
+     *               )
+     *           )
+     *       ),
+     *
+     *      @OA\Response(
+     *          response=404,
+     *          description="Card not found or you do not have permission to access it",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Card not found or you do not have permission to access it", description="Error message")
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=400,
+     *          description="Error setting card setup",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Error setting card setup", description="Error message")
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Unauthorized")
+     *          )
+     *      )
+     * )
+     *
+     */
+
+    public function setup(Request $request, $cardId, $setupName, $action)
+    {
+        try {
+            $validSetups = ['ecommerce', 'international', 'stripe', 'wallet', 'withdrawal', 'contactless', 'pin_offline', 'pin_on_us'];
+            if (!in_array($setupName, $validSetups)) {
+                return self::basicError("El setup no es válido");
+            }
+
+            if (!in_array($action, ['enable', 'disable'])) {
+                return self::basicError("La acción no es válida");
+            }
+
+            $client = new Client();
+            $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/setup/' . $setupName . '/' . $action, [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                ]
+            ]);
+
+            $decodedJson = json_decode($response->getBody(), true);
+
+            return response()->json(['message' => $decodedJson['message']]);
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                $statusCode = $e->getResponse()->getStatusCode();
+                $responseBody = $e->getResponse()->getBody()->getContents();
+                $decodedJson = json_decode($responseBody, true);
+                $message = 'Error al actualizar el setup.';
+
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $message .= " " . $decodedJson['message'];
+                }
+                return response($message, $statusCode);
+            } else {
+                return response("Error al actualizar el setup.", 400);
+            }
+        }
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/cardCloud/card/{cardId}/webhooks",
+     *      tags={"Card Cloud V2"},
+     *      summary="Get registered card webhooks",
+     *      description="Get registered card webhooks",
+     *      @OA\Parameter(
+     *          name="uuid",
+     *          in="path",
+     *          description="Card UUID",
+     *          required=true,
+     *          @OA\Schema(type="string")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              type="array",
+     *              @OA\Items(
+     *                  @OA\Property(property="id", type="integer", example=1456),
+     *                  @OA\Property(property="event_type", type="string", example="authorization_created"),
+     *                  @OA\Property(property="event_name", type="string", example="global_authorization"),
+     *                  @OA\Property(property="authorizer_response", type="string", example="APPROVED"),
+     *                  @OA\Property(property="endpoint", type="string", example="CONSULT"),
+     *                  @OA\Property(property="establishment", type="string", example="BANCOMER S.A.          CIUDAD DE MEX MEX"),
+     *                  @OA\Property(property="amount", type="string", example="13.92"),
+     *                  @OA\Property(
+     *                      property="request",
+     *                      type="string",
+     *                      example=""
+     *                  ),
+     *                  @OA\Property(property="date", type="integer", example=1722156442)
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Card not found or no permission",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Card not found or you do not have permission to access it")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Error getting webhooks",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Error getting webhooks")
+     *          )
+     *      )
+     * )
+     */
+
+    public function webhooks(Request $request, $cardId)
+    {
+        try {
+            $client = new Client();
+            $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/webhooks', [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id)
+                ]
+            ]);
+
+            $decodedJson = json_decode($response->getBody(), true);
+
+            return response()->json($decodedJson);
+        } catch (RequestException $e) {
+            echo $e->getMessage() . " - " . $e->getCode() . " - " . $e->getFile() . " - " . $e->getLine();
+            if ($e->hasResponse()) {
+                $statusCode = $e->getResponse()->getStatusCode();
+                $responseBody = $e->getResponse()->getBody()->getContents();
+                $decodedJson = json_decode($responseBody, true);
+                $message = 'Error al actualizar el setup.';
+
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $message .= " " . $decodedJson['message'];
+                }
+                return response($message, $statusCode);
+            }
+        } catch (\Exception $e) {
+            return self::basicError($e->getMessage() . " - " . $e->getCode() . " - " . $e->getFile() . " - " . $e->getLine());
+        }
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/cardCloud/card/{cardId}/failed-authorizations",
+     *      tags={"Card Cloud V2"},
+     *      summary="Get failed authorizations for a card",
+     *      description="Get failed authorizations for a card",
+     *
+     *      @OA\Parameter(
+     *          name="cardId",
+     *          in="path",
+     *          description="Card ID",
+     *          required=true,
+     *          @OA\Schema(type="string")
+     *     ),
+     *
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *              @OA\JsonContent(
+     *              type="array",
+     *              @OA\Items(
+     *                  @OA\Property(property="uuid", type="string", example="123e4567-e89b-12d3-a456-426614174000"),
+     *                   @OA\Property(property="authorization_code", type="string", example="123456"),
+     *                   @OA\Property(property="endpoint", type="string", example="CONSULT"),
+     *                   @OA\Property(property="event_type", type="string", example="authorization_created"),
+     *                   @OA\Property(property="description", type="string", example="BANCOMER S.A.          CIUDAD DE MEX MEX"),
+     *                   @OA\Property(property="amount", type="number", format="float", example=13.92),
+     *                   @OA\Property(property="error", type="string", example="Error message"),
+     *                   @OA\Property(property="timestamp", type="integer", example=1722156442),
+     *                   @OA\Property(property="request", type="string", example="Request body"),
+     *                   @OA\Property(property="response", type="string", example="Response body")
+     *               )
+     *          )
+     *     ),
+     *
+     *      @OA\Response(
+     *          response=404,
+     *          description="Card not found or no permission",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Card not found or you do not have permission to access it")
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=500,
+     *          description="Error getting failed authorizations",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Error getting failed authorizations")
+     *          )
+     *      )
+     *
+     * )
+     */
+
+    public function failedAuthorizations(Request $request, $cardId)
+    {
+        try {
+            $client = new Client();
+            $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/failed_authorization', [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id)
+                ]
+            ]);
+
+            $decodedJson = json_decode($response->getBody(), true);
+
+            return response()->json($decodedJson);
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                $statusCode = $e->getResponse()->getStatusCode();
+                $responseBody = $e->getResponse()->getBody()->getContents();
+                $decodedJson = json_decode($responseBody, true);
+                $message = 'Error al obtener las autorizaciones fallidas.';
+
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $message .= " " . $decodedJson['message'];
+                }
+                return response($message, $statusCode);
+            } else {
+                return response("Error al obtener las autorizaciones fallidas.", 400);
+            }
+        } catch (\Exception $e) {
+            return self::basicError($e->getMessage());
+        }
+    }
+
+    /**
+     *  @OA\Get(
+     *      path="/api/cardCloud/card/{cardId}/movements",
+     *      tags={"Card Cloud V2"},
+     *      summary="Get card movements",
+     *      description="Returns card movements",
+     *      security={{"bearerAuth":{}}},
+     *
+     *      @OA\Parameter(
+     *          name="cardId",
+     *          in="path",
+     *          description="Card ID",
+     *          required=true,
+     *          @OA\Schema(
+     *              type="string"
+     *          )
+     *      ),
+     *
+     *      @OA\RequestBody(
+     *          required=false,
+     *          @OA\JsonContent(
+     *              @OA\Property(property="from", type="string", example="1234567890", description="From date (Unix timestamp)"),
+     *              @OA\Property(property="to", type="string", example="1234567890", description="To date (Unix timestamp)")
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response="200",
+     *          description="Movements retrieved successfully",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="movements", type="array",
+     *                  @OA\Items(
+     *                      @OA\Property(property="movement_id", type="string", example="123456", description="Movement UUID"),
+     *                      @OA\Property(property="date", type="string", example="1234567890", description="Movement Date (Unix timestamp)"),
+     *                      @OA\Property(property="type", type="string", example="deposit", description="Movement Type"),
+     *                      @OA\Property(property="amount", type="string", example="100.00", description="Movement Amount"),
+     *                      @OA\Property(property="authorization_code", type="string", example="123456", description="Authorization Code"),
+     *                      @OA\Property(property="description", type="string", example="Deposit", description="Movement Description")
+     *                  ),
+     *              ),
+     *              @OA\Property(property="total_records", type="integer", example=1, description="Total records"),
+     *              @OA\Property(property="from", type="string", example="1234567890", description="From date (Unix timestamp)"),
+     *              @OA\Property(property="to", type="string", example="1234567890", description="To date (Unix timestamp)")
+     *          )
+     *     ),
+     *
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Unauthorized | Error while decoding the token", description="Message")
+     *          )
+     *      ),
+     *
+     * )
+     *
+     */
+
+    public function movements(Request $request, $cardId)
+    {
+        try {
+            $client = new Client();
+            $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/movements', [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id)
+                ]
+            ]);
+
+            $decodedJson = json_decode($response->getBody(), true);
+
+            return response()->json($decodedJson);
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                $statusCode = $e->getResponse()->getStatusCode();
+                $responseBody = $e->getResponse()->getBody()->getContents();
+                $decodedJson = json_decode($responseBody, true);
+                $message = 'Error al obtener los movimientos de la tarjeta.';
+
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $message .= " " . $decodedJson['message'];
+                }
+                return response($message, $statusCode);
+            } else {
+                return response("Error al obtener los movimientos de la tarjeta.", 400);
+            }
+        } catch (\Exception $e) {
+            return self::basicError($e->getMessage());
+        }
+    }
+
+     /**
+     * @OA\Delete(
+     *      path="/api/cardCloud/card/{cardId}/unassign-user",
+     *      summary="Unassign card from user",
+     *      description="Unassign card from user",
+     *      tags={"Card Cloud V2"},
+     *     security={{"bearerAuth": {}}},
+     *
+     *      @OA\Parameter(
+     *          name="cardId",
+     *          in="path",
+     *          description="Card ID",
+     *          required=true,
+     *          @OA\Schema(type="string")
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Card unassigned successfully",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Card unassigned successfully")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Card not found or you dont have permission to access it",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Card not found or you dont have permission to access it")
+     *         )
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Error unassigning subaccount",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Error unassigning subaccount")
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Unauthorized")
+     *          )
+     *      )
+     * )
+     */
+
+    public function unassignUser(Request $request, $cardId)
+    {
+        try {
+            $client = new Client();
+            $response = $client->request('DELETE', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/user_unassign', [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id)
+                ]
+            ]);
+
+            $decodedJson = json_decode($response->getBody(), true);
+
+            return response()->json(['message' => $decodedJson['message']]);
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                $statusCode = $e->getResponse()->getStatusCode();
+                $responseBody = $e->getResponse()->getBody()->getContents();
+                $decodedJson = json_decode($responseBody, true);
+                $message = 'Error al desasignar el usuario de la tarjeta.';
+
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $message .= " " . $decodedJson['message'];
+                }
+                return response($message, $statusCode);
+            } else {
+                return response("Error al desasignar el usuario de la tarjeta.", 400);
+            }
         } catch (\Exception $e) {
             return self::basicError($e->getMessage());
         }

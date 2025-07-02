@@ -53,6 +53,17 @@ Route::middleware([VerifyJwt::class])->group(function () {
             Route::get('/virtual_card_price', [App\Http\Controllers\CardCloud\CardManagementController::class, 'getVirtualCardPrice']);
             Route::get('/{cardId}/sensitive', [App\Http\Controllers\CardCloud\CardSensitiveController::class, 'sensitive']);
             Route::get('/{cardId}/cvv', [App\Http\Controllers\CardCloud\CardSensitiveController::class, 'dynamicCvv']);
+
+            Route::get('/search/{search}', [App\Http\Controllers\CardCloud\CardManagementController::class, 'search']);
+            Route::post('/{cardId}/setup/{setupName}/{action}', [App\Http\Controllers\CardCloud\CardManagementController::class, 'setup']);
+            Route::get('/{cardId}/webhooks', [App\Http\Controllers\CardCloud\CardManagementController::class, 'webhooks']);
+            Route::get('/{cardId}/failed-authorizations', [App\Http\Controllers\CardCloud\CardManagementController::class, 'failedAuthorizations']);
+            Route::get('/{cardId}/movements', [App\Http\Controllers\CardCloud\CardManagementController::class, 'movements']);
+            Route::delete('/{cardId}/unassign-user', [App\Http\Controllers\CardCloud\CardManagementController::class, 'unassignUser']);
+        });
+
+        Route::group(['prefix' => 'detailed-movements'], function () {
+            Route::get('/{movementId}', [App\Http\Controllers\CardCloud\MovementController::class, 'detailedMovements']);
         });
 
         Route::group(['prefix' => 'movement'], function () {
