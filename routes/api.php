@@ -205,3 +205,11 @@ Route::group(['prefix' => 'app-scrapper'], function () {
 });
 
 Route::get('card-cloud/balance/{phone}', [App\Http\Controllers\CardCloud\CardManagementController::class, 'getBalanceByPhone']);
+
+Route::group(['prefix' => 'dev'], function () {
+    Route::group(['prefix' => 'permissions'], function () {
+        Route::get('/categories', [App\Http\Controllers\Users\Permissions::class, 'categories']);
+        Route::get('/permissions', [App\Http\Controllers\Users\Permissions::class, 'index']);
+        Route::post('/permissions', [App\Http\Controllers\Users\Permissions::class, 'store']);
+    });
+});

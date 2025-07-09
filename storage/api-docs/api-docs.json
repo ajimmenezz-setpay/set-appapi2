@@ -7218,6 +7218,135 @@
                 }
             }
         },
+        "/api/modules/user": {
+            "get": {
+                "tags": [
+                    "Usuarios - Módulos"
+                ],
+                "summary": "Obtener menú y permisos del usuario",
+                "description": "Obtener el menú de módulos y permisos del usuario autenticado",
+                "operationId": "f68347ccb968b7979eda1f540fe39485",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "menu": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "category": {
+                                                        "type": "string",
+                                                        "example": "SPEI Cloud"
+                                                    },
+                                                    "modules": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "icon": {
+                                                                    "type": "string",
+                                                                    "example": "dashboard"
+                                                                },
+                                                                "moduleActions": {
+                                                                    "type": "string",
+                                                                    "example": null,
+                                                                    "nullable": true
+                                                                },
+                                                                "moduleName": {
+                                                                    "type": "string",
+                                                                    "example": "Dashboard"
+                                                                },
+                                                                "modules": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "properties": {
+                                                                            "icon": {
+                                                                                "type": "string",
+                                                                                "example": "contacts"
+                                                                            },
+                                                                            "moduleActions": {
+                                                                                "type": "string",
+                                                                                "example": null,
+                                                                                "nullable": true
+                                                                            },
+                                                                            "moduleName": {
+                                                                                "type": "string",
+                                                                                "example": "SPEI"
+                                                                            },
+                                                                            "path": {
+                                                                                "type": "string",
+                                                                                "example": "/spei-cloud/spei-transfer"
+                                                                            }
+                                                                        },
+                                                                        "type": "object"
+                                                                    },
+                                                                    "nullable": true
+                                                                },
+                                                                "path": {
+                                                                    "type": "string",
+                                                                    "example": "/spei-cloud"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "nullable": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "userActions": {
+                                            "type": "string",
+                                            "example": "MP-VIABO-SPEI-ADMIN"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "User not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/users/secret-phrase": {
             "get": {
                 "tags": [
@@ -7624,6 +7753,10 @@
         {
             "name": "Usuarios - Autenticación",
             "description": "Usuarios - Autenticación"
+        },
+        {
+            "name": "Usuarios - Módulos",
+            "description": "Usuarios - Módulos"
         },
         {
             "name": "Usuarios - Frase secreta",
