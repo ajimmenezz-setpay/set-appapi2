@@ -11,6 +11,8 @@ class Permissions extends Model
 
     protected $fillable = [
         'CategoryId',
+        'ModuleId',
+        'Key',
         'Name',
         'Description',
         'Flag'

@@ -15,12 +15,11 @@ return new class extends Migration
             $table->id('Id');
             $table->bigInteger('CategoryId')->unsigned()->index();
             $table->bigInteger('ModuleId')->unsigned()->index();
+            $table->string('Key', 50)->index();
             $table->string('Name', 100);
             $table->text('Description')->nullable();
             $table->boolean('Flag')->default(1);
             $table->timestamps();
-            $table->foreign('CategoryId')->references('Id')->on('cat_modules_category');
-            $table->foreign('ModuleId')->references('Id')->on('cat_modules');
         });
     }
 

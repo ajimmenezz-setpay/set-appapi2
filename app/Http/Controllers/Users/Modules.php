@@ -185,17 +185,19 @@ class Modules extends Controller
 
     public static function userActions($profileId)
     {
-        $actions = DB::table('cat_modules_actions')
-            ->join('t_modules_actions_and_profiles', 'cat_modules_actions.Id', '=', 't_modules_actions_and_profiles.ModuleActionId')
-            ->where('t_modules_actions_and_profiles.ProfileId', $profileId)
-            ->where('cat_modules_actions.Active', 1)
-            ->select('cat_modules_actions.Key')
-            ->first();
+        $actions = DB::table('cat_permissions')
+            ->join('t_profile_permissions', 'cat_permissions.Id', '=', 't_profile_permissions.PermissionId')
+            ->where('t_profile_permissions.ProfileId', $profileId)
+            ->where('cat_permissions.Flag', 1)
+            ->where('t_profile_permissions.Active', 1)
+            ->select('cat_permissions.Key')
+            ->get();
 
-        if (!$actions) {
-            return "";
-        } else {
-            return $actions->Key;
+        $actions_return = [];
+        foreach ($actions as $action) {
+            $actions_return[] = $action->Key;
         }
+
+        return $actions_return;
     }
 }
