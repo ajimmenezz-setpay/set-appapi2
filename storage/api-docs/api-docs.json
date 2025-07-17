@@ -484,6 +484,370 @@
                 }
             }
         },
+        "/api/cardCloud/card/{cardId}/generate-code": {
+            "post": {
+                "tags": [
+                    "Card Cloud V2"
+                ],
+                "summary": "Generar código de barras para transacción",
+                "description": "Genera un código de barras para realizar una transacción con la tarjeta especificada.",
+                "operationId": "35cd73e5ddfa4d9539c383595f2f2607",
+                "parameters": [
+                    {
+                        "name": "cardId",
+                        "in": "path",
+                        "description": "ID de la tarjeta",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "amount",
+                                    "type"
+                                ],
+                                "properties": {
+                                    "amount": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 100
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "deposit",
+                                            "withdrawal"
+                                        ],
+                                        "example": "deposit"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Código de barras generado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "barcode": {
+                                            "type": "string",
+                                            "example": "2C3427PDE2992000500001752738231"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al generar el código de barras",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al generar el código de barras."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No autorizado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cardCloud/card/{cardId}/barcodes": {
+            "get": {
+                "tags": [
+                    "Card Cloud V2"
+                ],
+                "summary": "Obtener códigos de barras de una tarjeta",
+                "description": "Obtiene los códigos de barras asociados a una tarjeta específica.",
+                "operationId": "a78628acbcaef8f6bb0b8c78df0c10d4",
+                "parameters": [
+                    {
+                        "name": "cardId",
+                        "in": "path",
+                        "description": "ID de la tarjeta",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filtro para los códigos de barras (all, active, expired, canceled, used)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "all",
+                                "active",
+                                "expired",
+                                "canceled",
+                                "used"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Códigos de barras obtenidos exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "barcode": {
+                                                "type": "string",
+                                                "example": "2C3427PDE2992000600001752739472"
+                                            },
+                                            "type": {
+                                                "type": "string",
+                                                "example": "DEPOSIT"
+                                            },
+                                            "amount": {
+                                                "type": "string",
+                                                "example": "600.00"
+                                            },
+                                            "state": {
+                                                "type": "string",
+                                                "example": "active"
+                                            },
+                                            "used": {
+                                                "type": "boolean",
+                                                "example": false
+                                            },
+                                            "canceled": {
+                                                "type": "boolean",
+                                                "example": false
+                                            },
+                                            "expired": {
+                                                "type": "boolean",
+                                                "example": false
+                                            },
+                                            "used_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": null,
+                                                "nullable": true
+                                            },
+                                            "expires_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2025-07-24 08:04:32"
+                                            },
+                                            "canceled_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": null,
+                                                "nullable": true
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No se encontraron códigos de barras",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "No se encontraron códigos de barras para la tarjeta especificada."
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al obtener los códigos de barras",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error al obtener los códigos de barras."
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autorizado",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "No autorizado"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error interno del servidor."
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cardCloud/card/{cardId}/barcode": {
+            "delete": {
+                "tags": [
+                    "Card Cloud V2"
+                ],
+                "summary": "Eliminar código de barras de una tarjeta",
+                "operationId": "944c8b6c00e1f6ba64ea4e7d9732aec4",
+                "parameters": [
+                    {
+                        "name": "cardId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "barcode"
+                                ],
+                                "properties": {
+                                    "barcode": {
+                                        "type": "string",
+                                        "example": "2C3427PDE2992000500001752738231"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Código de barras eliminado exitosamente",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Código de barras cancelado exitosamente"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Código de barras no encontrado",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Código de barras no encontrado."
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al eliminar el código de barras",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error al eliminar el código de barras."
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autorizado",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "No autorizado"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error interno del servidor."
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/cardCloud/card/{cardId}/nip": {
             "post": {
                 "tags": [

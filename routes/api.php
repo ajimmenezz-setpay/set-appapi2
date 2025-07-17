@@ -60,6 +60,10 @@ Route::middleware([VerifyJwt::class])->group(function () {
             Route::get('/{cardId}/failed-authorizations', [App\Http\Controllers\CardCloud\CardManagementController::class, 'failedAuthorizations']);
             Route::get('/{cardId}/movements', [App\Http\Controllers\CardCloud\CardManagementController::class, 'movements']);
             Route::delete('/{cardId}/unassign-user', [App\Http\Controllers\CardCloud\CardManagementController::class, 'unassignUser']);
+
+            Route::post('/{cardId}/generate-code', [App\Http\Controllers\CardCloud\CardBarcodeController::class, 'generateCode']);
+            Route::get('/{cardId}/barcodes', [App\Http\Controllers\CardCloud\CardBarcodeController::class, 'getBarcodes']);
+            Route::delete('/{cardId}/barcode', [App\Http\Controllers\CardCloud\CardBarcodeController::class, 'deleteBarcode']);
         });
 
         Route::group(['prefix' => 'detailed-movements'], function () {
