@@ -128,7 +128,7 @@ class Modules extends Controller
             ->where('cat_modules.Active', 1)
             ->where('cat_modules.SubModuleId', 0)
             ->where('cat_modules.CategoryId', $categoryId)
-            ->select('cat_modules.*')
+            ->select('cat_modules.Icon', 'cat_modules.Name', 'cat_modules.Path', 'cat_modules.Id')
             ->groupBy('cat_modules.Id')
             ->orderBy('cat_modules.Order', 'asc')
             ->get();
