@@ -9,3 +9,7 @@ Route::get('/', function () {
 Route::get('/docs/conector', function () {
     return view('docs.conector');
 });
+
+Route::get('/docs/api', function () {
+    return view('docs.api');
+});
