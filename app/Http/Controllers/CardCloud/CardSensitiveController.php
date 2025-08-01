@@ -71,7 +71,10 @@ class CardSensitiveController extends Controller
     public function sensitive(Request $request, $cardId)
     {
         try {
-            if (CardAssigned::where('CardCloudId', $cardId)->where('UserId', $request->attributes->get('jwt')->id)->count() == 0) {
+
+            if (!($request->attributes->get('jwt')->profileId == 5 && CardAssigned::where('CardCloudId', $cardId)->where('BusinessId', $request->attributes->get('jwt')->businessId)->count() == 0)) {
+                throw new Exception('El usuario no tiene acceso a la tarjeta.');
+            } else if (CardAssigned::where('CardCloudId', $cardId)->where('UserId', $request->attributes->get('jwt')->id)->count() == 0) {
                 throw new Exception('El usuario no tiene acceso a la tarjeta.');
             } else {
 
