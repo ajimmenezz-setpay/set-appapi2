@@ -78,7 +78,22 @@ class CardManagementController extends Controller
             'new_nip.max' => 'El campo new_nip debe tener como máximo 4 caracteres'
         ]);
 
-        if (CardAssigned::where('CardCloudId', $cardId)->where('UserId', $request->attributes->get('jwt')->id)->count() == 0) {
+
+        switch ($request->attributes->get('jwt')->profileId) {
+            case 5:
+                $allowed = true;
+                break;
+            case 7:
+                $cardAssigned = CardAssigned::where('CardCloudId', $cardId)
+                    ->where('UserId', $request->attributes->get('jwt')->id)
+                    ->first();
+                $allowed = $cardAssigned ? true : false;
+                break;
+            default:
+                $allowed = false;
+        }
+
+        if (!$allowed) {
             return response("La tarjeta no está asignada al usuario", 400);
         } else {
             try {
@@ -1168,7 +1183,7 @@ class CardManagementController extends Controller
         }
     }
 
-     /**
+    /**
      * @OA\Delete(
      *      path="/api/cardCloud/card/{cardId}/unassign-user",
      *      summary="Unassign card from user",
