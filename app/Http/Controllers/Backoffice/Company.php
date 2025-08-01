@@ -654,6 +654,9 @@ class Company extends Controller
 
                             $service['subAccountId'] = "$serviceCardCloud->SubAccountId";
                             $service['subAccount'] = json_encode($subaccount);
+                        }else{
+                            $service['subAccountId'] = "$serviceCardCloud->SubAccountId";
+                            $service['subAccount'] = $serviceCardCloud->SubAccount;
                         }
                     } else {
                         $service = [];
