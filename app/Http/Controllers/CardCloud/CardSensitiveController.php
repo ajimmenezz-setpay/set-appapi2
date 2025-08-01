@@ -74,20 +74,19 @@ class CardSensitiveController extends Controller
 
             switch ($request->attributes->get('jwt')->profileId) {
                 case 5:
-                    $cardAssigned = CardAssigned::where('CardCloudId', $cardId)
-                        ->where('BusinessId', $request->attributes->get('jwt')->businessId)
-                        ->first();
+                    $allowed = true;
                     break;
                 case 7:
                     $cardAssigned = CardAssigned::where('CardCloudId', $cardId)
                         ->where('UserId', $request->attributes->get('jwt')->id)
                         ->first();
+                    $allowed = $cardAssigned ? true : false;
                     break;
                 default:
-                    throw new Exception("No tienes permisos para ver los datos sensibles de la tarjeta");
+                    $allowed = false;
             }
 
-            if (!$cardAssigned) {
+            if (!$allowed) {
                 throw new Exception("No tienes permisos para ver los datos sensibles de la tarjeta");
             } else {
 
