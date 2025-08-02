@@ -12,6 +12,7 @@ use App\Models\Backoffice\Companies\CompanyProjection;
 use App\Models\Backoffice\Companies\CompaniesUsers;
 use App\Http\Controllers\Security\GoogleAuth;
 use Ramsey\Uuid\Uuid;
+use Carbon\Carbon;
 
 class CardManagementController extends Controller
 {
@@ -1153,11 +1154,20 @@ class CardManagementController extends Controller
     public function movements(Request $request, $cardId)
     {
         try {
+            $from = isset($request['from']) ? Carbon::createFromTimestamp($request->from) : Carbon::now()->subMonth();
+            $to = isset($request['to']) ? Carbon::createFromTimestamp($request->to) : Carbon::now();
+
+            if ($from > $to) return response()->json(['message' => 'Invalid date range'], 400);
+
             $client = new Client();
             $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/movements', [
                 'headers' => [
                     'Content-Type' => 'application/json',
                     'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id)
+                ],
+                'json' => [
+                    "from" => $from->timestamp,
+                    "to" => $to->timestamp
                 ]
             ]);
 
