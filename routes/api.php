@@ -64,6 +64,9 @@ Route::middleware([VerifyJwt::class])->group(function () {
             Route::post('/{cardId}/generate-code', [App\Http\Controllers\CardCloud\CardBarcodeController::class, 'generateCode']);
             Route::get('/{cardId}/barcodes', [App\Http\Controllers\CardCloud\CardBarcodeController::class, 'getBarcodes']);
             Route::delete('/{cardId}/barcode', [App\Http\Controllers\CardCloud\CardBarcodeController::class, 'deleteBarcode']);
+
+            Route::post('/{cardId}/deposit', [App\Http\Controllers\CardCloud\TransferController::class, 'deposit']);
+            Route::post('/{cardId}/reverse', [App\Http\Controllers\CardCloud\TransferController::class, 'reverse']);
         });
 
         Route::group(['prefix' => 'detailed-movements'], function () {

@@ -139,4 +139,210 @@ class TransferController extends Controller
             return self::basicError($e->getMessage());
         }
     }
+
+    /**
+     * @OA\Post(
+     *     path="/api/cardCloud/card/{cardId}/deposit",
+     *     tags={"Card Cloud V2"},
+     *     summary="Depositar fondos",
+     *     description="Permite depositar fondos en una tarjeta específica desde la subcuenta padre.",
+     *     operationId="depositFunds",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *        name="cardId",
+     *        in="path",
+     *        required=true,
+     *        description="ID de la tarjeta",
+     *        @OA\Schema(type="string")
+     *     ),
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"amount","concept"},
+     *             @OA\Property(property="amount", type="number", format="float", example=100.00),
+     *             @OA\Property(property="concept", type="string", example="Depósito de prueba")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Depósito realizado con éxito",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Depósito realizado con éxito")
+     *         )
+     *     ),
+     *
+     *      @OA\Response(
+     *         response=400,
+     *         description="Error al realizar el depósito",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Error al realizar el depósito.")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error interno del servidor",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Error interno del servidor.")
+     *         )
+     *     )
+     * )
+     */
+
+    public function deposit(Request $request, $cardId)
+    {
+        try {
+            $this->validate($request, [
+                'amount' => 'required|numeric',
+                'concept' => 'required|max:120'
+            ], [
+                'amount.required' => 'El monto a depositar es requerido',
+                'amount.numeric' => 'El monto a depositar debe ser un número',
+                'concept.required' => 'El concepto del depósito es requerido',
+                'concept.max' => 'El concepto del depósito no debe exceder los 120 caracteres'
+            ]);
+
+            $client = new Client();
+            $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/deposit', [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                ],
+                'json' => [
+                    'amount' => $request->amount,
+                    'description' => $request->concept
+                ]
+            ]);
+
+            $decodedJson = json_decode($response->getBody(), true);
+
+            return response()->json($decodedJson);
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                $statusCode = $e->getResponse()->getStatusCode();
+                $responseBody = $e->getResponse()->getBody()->getContents();
+                $decodedJson = json_decode($responseBody, true);
+                $message = 'Error al realizar el depósito.';
+
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $message .= " " . $decodedJson['message'];
+                }
+
+                return response()->json([
+                    'error' => $message
+                ], $statusCode);
+            } else {
+                return response()->json([
+                    'error' => "Error al realizar el depósito."
+                ], 400);
+            }
+        } catch (\Exception $e) {
+            return self::error($e->getMessage());
+        }
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/cardCloud/card/{cardId}/reverse",
+     *     tags={"Card Cloud V2"},
+     *     summary="Reversar fondos",
+     *     description="Permite retornar recursos de una tarjeta hacia la subcuenta padre.",
+     *     operationId="reverseFunds",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *        name="cardId",
+     *        in="path",
+     *        required=true,
+     *        description="ID de la tarjeta",
+     *        @OA\Schema(type="string")
+     *     ),
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"amount","concept"},
+     *             @OA\Property(property="amount", type="number", format="float", example=50.00),
+     *             @OA\Property(property="concept", type="string", example="Reversa de prueba")
+     *         )
+     *     ),
+     *
+     *      @OA\Response(
+     *         response=200,
+     *         description="Reversa realizada con éxito",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Reversa realizada con éxito")
+     *         )
+     *     ),
+     *
+     *      @OA\Response(
+     *         response=400,
+     *         description="Error al realizar la reversa",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Error al realizar la reversa.")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error interno del servidor",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Error interno del servidor.")
+     *         )
+     *     )
+     * )
+     */
+
+    public function reverse(Request $request, $cardId)
+    {
+        try {
+            $this->validate($request, [
+                'amount' => 'required|numeric',
+                'concept' => 'required|max:120'
+            ], [
+                'amount.required' => 'El monto a revertir es requerido',
+                'amount.numeric' => 'El monto a revertir debe ser un número',
+                'concept.required' => 'El concepto de la reversa es requerido',
+                'concept.max' => 'El concepto de la reversa no debe exceder los 120 caracteres'
+            ]);
+
+            $client = new Client();
+            $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/reverse', [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                ],
+                'json' => [
+                    'amount' => $request->amount,
+                    'description' => $request->concept
+                ]
+            ]);
+
+            $decodedJson = json_decode($response->getBody(), true);
+
+            return response()->json($decodedJson);
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                $statusCode = $e->getResponse()->getStatusCode();
+                $responseBody = $e->getResponse()->getBody()->getContents();
+                $decodedJson = json_decode($responseBody, true);
+                $message = 'Error al realizar el reverso.';
+
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $message .= " " . $decodedJson['message'];
+                }
+
+                return response()->json([
+                    'error' => $message
+                ], $statusCode);
+            } else {
+                return response()->json([
+                    'error' => "Error al realizar el reverso."
+                ], 400);
+            }
+        } catch (\Exception $e) {
+            return self::error($e->getMessage());
+        }
+    }
 }
