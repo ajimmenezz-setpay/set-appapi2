@@ -84,7 +84,7 @@ class CardManagementController extends Controller
             case 5:
                 $allowed = true;
                 break;
-            case 7:
+            case 8:
                 $cardAssigned = CardAssigned::where('CardCloudId', $cardId)
                     ->where('UserId', $request->attributes->get('jwt')->id)
                     ->first();
