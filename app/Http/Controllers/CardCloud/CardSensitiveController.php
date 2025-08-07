@@ -130,6 +130,71 @@ class CardSensitiveController extends Controller
         }
     }
 
+
+    public function pin(Request $request, $cardId)
+    {
+        try {
+
+            switch ($request->attributes->get('jwt')->profileId) {
+                case 5:
+                    $allowed = true;
+                    break;
+                case 8:
+                    $cardAssigned = CardAssigned::where('CardCloudId', $cardId)
+                        ->where('UserId', $request->attributes->get('jwt')->id)
+                        ->first();
+                    $allowed = $cardAssigned ? true : false;
+                    break;
+                default:
+                    $allowed = false;
+            }
+
+            if (!$allowed) {
+                throw new Exception("No tienes permisos para ver los datos sensibles de la tarjeta");
+            } else {
+
+                try {
+
+                    $client = new Client();
+                    $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/cards_management/' . $cardId . '/pin', [
+                        'headers' => [
+                            'Content-Type' => 'application/json',
+                            'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                        ]
+                    ]);
+
+                    $decodedJson = json_decode($response->getBody(), true);
+
+                    if (isset($decodedJson['pin'])) {
+                        return response()->json([
+                            'pin' => $decodedJson['pin']
+                        ]);
+                    } else {
+                        return self::basicError('No hemos podido obtener el nip de la tarjeta.');
+                    }
+                } catch (RequestException $e) {
+                    if ($e->hasResponse()) {
+                        $statusCode = $e->getResponse()->getStatusCode();
+                        $responseBody = $e->getResponse()->getBody()->getContents();
+                        $decodedJson = json_decode($responseBody, true);
+                        $message = 'No hemos podido obtener el nip de la tarjeta.';
+
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            $message .= " " . $decodedJson['message'];
+                        }
+                        throw new Exception($message);
+                    } else {
+                        throw new Exception('No hemos podido obtener el nip de la tarjeta.');
+                    }
+                } catch (Exception $e) {
+                    throw new Exception('No hemos podido obtener el nip de la tarjeta.');
+                }
+            }
+        } catch (Exception $e) {
+            return self::basicError($e->getMessage());
+        }
+    }
+
     /**
      *  @OA\Get(
      *      path="/api/cardCloud/card/{cardId}/cvv",

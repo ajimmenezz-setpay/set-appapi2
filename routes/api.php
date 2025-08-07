@@ -53,6 +53,7 @@ Route::middleware([VerifyJwt::class])->group(function () {
             Route::get('/virtual_card_price', [App\Http\Controllers\CardCloud\CardManagementController::class, 'getVirtualCardPrice']);
             Route::get('/{cardId}/sensitive', [App\Http\Controllers\CardCloud\CardSensitiveController::class, 'sensitive']);
             Route::get('/{cardId}/cvv', [App\Http\Controllers\CardCloud\CardSensitiveController::class, 'dynamicCvv']);
+            Route::get('/{cardId}/pin', [App\Http\Controllers\CardCloud\CardSensitiveController::class, 'pin']);
 
             Route::get('/search/{search}', [App\Http\Controllers\CardCloud\CardManagementController::class, 'search']);
             Route::post('/{cardId}/setup/{setupName}/{action}', [App\Http\Controllers\CardCloud\CardManagementController::class, 'setup']);
