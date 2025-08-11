@@ -71,7 +71,6 @@ class CardSensitiveController extends Controller
     public function sensitive(Request $request, $cardId)
     {
         try {
-
             switch ($request->attributes->get('jwt')->profileId) {
                 case 5:
                     $allowed = true;

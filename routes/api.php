@@ -68,6 +68,9 @@ Route::middleware([VerifyJwt::class])->group(function () {
 
             Route::post('/{cardId}/deposit', [App\Http\Controllers\CardCloud\TransferController::class, 'deposit']);
             Route::post('/{cardId}/reverse', [App\Http\Controllers\CardCloud\TransferController::class, 'reverse']);
+
+            Route::post('/{cardId}/block', [App\Http\Controllers\CardCloud\CardManagementController::class, 'blockCard']);
+            Route::post('/{cardId}/unblock', [App\Http\Controllers\CardCloud\CardManagementController::class, 'unblockCard']);
         });
 
         Route::group(['prefix' => 'detailed-movements'], function () {

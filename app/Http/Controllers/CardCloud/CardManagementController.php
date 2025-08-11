@@ -1273,4 +1273,196 @@ class CardManagementController extends Controller
             return self::basicError($e->getMessage());
         }
     }
+
+
+    /**
+     * @OA\Post(
+     *      path="/api/cardCloud/card/{cardId}/block",
+     *      summary="Bloquear tarjeta",
+     *      description="Bloquear una tarjeta",
+     *      tags={"Card Cloud V2"},
+     *      operationId="blockCard",
+     *      security={{"bearerAuth": {}}},
+     *
+     *      @OA\Parameter(
+     *          name="cardId",
+     *          in="path",
+     *          required=true,
+     *          description="ID de la tarjeta",
+     *          @OA\Schema(type="string")
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Tarjeta bloqueada exitosamente",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="La tarjeta ha sido bloqueada.", description="Mensaje de éxito")
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *         response=400,
+     *          description="Error al bloquear la tarjeta",
+     *          @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Error al bloquear la tarjeta.", description="Mensaje de error")
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthorized", description="Mensaje de error")
+     *         )
+     *     )
+     *
+     * )
+     */
+
+    public function blockCard(Request $request, $cardId)
+    {
+        switch ($request->attributes->get('jwt')->profileId) {
+            case 5:
+                $allowed = true;
+                break;
+            case 8:
+                $cardAssigned = CardAssigned::where('CardCloudId', $cardId)
+                    ->where('UserId', $request->attributes->get('jwt')->id)
+                    ->first();
+                $allowed = $cardAssigned ? true : false;
+                break;
+            default:
+                $allowed = false;
+        }
+
+        if (!$allowed) {
+            return response("La tarjeta no está asignada al usuario", 400);
+        } else {
+
+            try {
+                $client = new Client();
+                $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/block', [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id)
+                    ]
+                ]);
+
+                $decodedJson = json_decode($response->getBody(), true);
+
+                return response()->json(['message' => "La tarjeta ha sido bloqueada."]);
+            } catch (RequestException $e) {
+                if ($e->hasResponse()) {
+                    $statusCode = $e->getResponse()->getStatusCode();
+                    $responseBody = $e->getResponse()->getBody()->getContents();
+                    $decodedJson = json_decode($responseBody, true);
+                    $message = 'Error al bloquear la tarjeta.';
+
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        $message .= " " . $decodedJson['message'];
+                    }
+                    return response($message, $statusCode);
+                } else {
+                    return response("Error al bloquear la tarjeta.", 400);
+                }
+            } catch (\Exception $e) {
+                return self::basicError($e->getMessage());
+            }
+        }
+    }
+
+
+    /**
+     * @OA\Post(
+     *      path="/api/cardCloud/card/{cardId}/unblock",
+     *      summary="Desbloquear tarjeta",
+     *      description="Desbloquear una tarjeta",
+     *      tags={"Card Cloud V2"},
+     *      operationId="unblockCard",
+     *      security={{"bearerAuth": {}}},
+     *
+     *     @OA\Parameter(
+     *          name="cardId",
+     *          in="path",
+     *          required=true,
+     *          description="ID de la tarjeta",
+     *          @OA\Schema(type="string")
+     *      ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Tarjeta desbloqueada exitosamente",
+     *        @OA\JsonContent(
+     *            @OA\Property(property="message", type="string", example="La tarjeta ha sido desbloqueada.", description="Mensaje de éxito")
+     *        )
+     *     ),
+     *
+     *      @OA\Response(
+     *        response=400,
+     *        description="Error al desbloquear la tarjeta",
+     *       @OA\JsonContent(
+     *           @OA\Property(property="message", type="string", example="Error al desbloquear la tarjeta.", description="Mensaje de error")
+     *       )
+     *     ),
+     *
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Unauthorized", description="Mensaje de error")
+     *          )
+     *      )
+     *
+     *  )
+     */
+    public function unblockCard(Request $request, $cardId)
+    {
+        switch ($request->attributes->get('jwt')->profileId) {
+            case 5:
+                $allowed = true;
+                break;
+            case 8:
+                $cardAssigned = CardAssigned::where('CardCloudId', $cardId)
+                    ->where('UserId', $request->attributes->get('jwt')->id)
+                    ->first();
+                $allowed = $cardAssigned ? true : false;
+                break;
+            default:
+                $allowed = false;
+        }
+
+        if (!$allowed) {
+            return response("La tarjeta no está asignada al usuario", 400);
+        } else {
+            try {
+                $client = new Client();
+                $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/unblock', [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id)
+                    ]
+                ]);
+
+                $decodedJson = json_decode($response->getBody(), true);
+
+                return response()->json(['message' => "La tarjeta ha sido desbloqueada."]);
+            } catch (RequestException $e) {
+                if ($e->hasResponse()) {
+                    $statusCode = $e->getResponse()->getStatusCode();
+                    $responseBody = $e->getResponse()->getBody()->getContents();
+                    $decodedJson = json_decode($responseBody, true);
+                    $message = 'Error al desbloquear la tarjeta.';
+
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        $message .= " " . $decodedJson['message'];
+                    }
+                    return response($message, $statusCode);
+                } else {
+                    return response("Error al desbloquear la tarjeta.", 400);
+                }
+            } catch (\Exception $e) {
+                return self::basicError($e->getMessage());
+            }
+        }
+    }
 }
