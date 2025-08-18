@@ -176,6 +176,23 @@ class CardManagementController extends Controller
             return response('Invalid card suffix format. It must be 8 digits.', 400);
         }
 
+        if (!$request->attributes->has('jwt')) {
+            return response('Unauthorized', 401);
+        }
+
+        switch ($request->attributes->get('jwt')->profileId) {
+            case 5:
+                $companies = CompanyProjection::where('BusinessId', $request->attributes->get('jwt')->businessId)->get();
+                break;
+            case 7:
+                $companies = CompanyProjection::join('t_backoffice_companies_and_users', 't_backoffice_companies_and_users.CompanyId', '=', 't_backoffice_companies_projection.Id')
+                    ->where('t_backoffice_companies_and_users.UserId', $request->attributes->get('jwt')->id)
+                    ->get();
+                break;
+            default:
+                return self::basicError("No tienes permisos para ver las empresas");
+        }
+
         try {
             $client = new Client();
             $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/b1/card/' . $pan_suffix . '/balance', [

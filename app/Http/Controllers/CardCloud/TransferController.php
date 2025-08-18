@@ -100,27 +100,42 @@ class TransferController extends Controller
                 GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->auth_code);
             }
 
-            if (CardAssigned::where('CardCloudId', $request->source_card)->where('UserId', $request->attributes->get('jwt')->id)->count() == 0) {
-                return self::basicError("La tarjeta de origen no está asignada al usuario");
+            switch ($request->attributes->get('jwt')->profileId) {
+                case 5:
+                    $allowed = true;
+                    break;
+                case 8:
+                    $cardAssigned = CardAssigned::where('CardCloudId', $request->source_card)
+                        ->where('UserId', $request->attributes->get('jwt')->id)
+                        ->first();
+                    $allowed = $cardAssigned ? true : false;
+                    break;
+                default:
+                    $allowed = false;
             }
 
-            $client = new Client();
-            $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card_transfer', [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
-                ],
-                'json' => [
-                    'source_card' => $request->source_card,
-                    'destination_card' => $request->destination_card,
-                    'amount' => $request->amount,
-                    'concept' => $request->concept
-                ]
-            ]);
+            if (!$allowed) {
+                return response("La tarjeta no está asignada al usuario", 400);
+            } else {
 
-            $decodedJson = json_decode($response->getBody(), true);
+                $client = new Client();
+                $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card_transfer', [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                    ],
+                    'json' => [
+                        'source_card' => $request->source_card,
+                        'destination_card' => $request->destination_card,
+                        'amount' => $request->amount,
+                        'concept' => $request->concept
+                    ]
+                ]);
 
-            return response()->json($decodedJson);
+                $decodedJson = json_decode($response->getBody(), true);
+
+                return response()->json($decodedJson);
+            }
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
                 $statusCode = $e->getResponse()->getStatusCode();
