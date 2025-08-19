@@ -7893,6 +7893,14 @@
                                     "code": {
                                         "type": "integer",
                                         "example": 123456
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "Password123!"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "example": "Password123!"
                                     }
                                 },
                                 "type": "object"

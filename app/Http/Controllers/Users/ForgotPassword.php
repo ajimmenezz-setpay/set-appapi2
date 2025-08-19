@@ -3,12 +3,16 @@
 namespace App\Http\Controllers\Users;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Security\Password;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Mail\VerificationAccountCode;
+use App\Models\Users\UsersCode;
+use Illuminate\Support\Facades\Log;
+
 
 class ForgotPassword extends Controller
 {
@@ -83,7 +87,9 @@ class ForgotPassword extends Controller
      *          @OA\JsonContent(
      *              required={"email", "code"},
      *              @OA\Property(property="email", type="string", example="  [email protected]"),
-     *              @OA\Property(property="code", type="integer", example=123456)
+     *              @OA\Property(property="code", type="integer", example=123456),
+     *              @OA\Property(property="password", type="string", example="Password123!"),
+     *              @OA\Property(property="password_confirmation", type="string", example="Password123!")
      *          )
      *      ),
      *
@@ -114,12 +120,22 @@ class ForgotPassword extends Controller
         try {
             $this->validate($request, [
                 'email' => 'required|email',
-                'code' => 'required|numeric'
+                'code' => 'required|numeric',
+                'password' => [
+                    'required',
+                    'min:8',
+                    'confirmed',
+                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/'
+                ]
             ], [
                 'email.required' => 'El email es requerido',
                 'email.email' => 'El email no es válido',
                 'code.required' => 'El código de verificación es requerido',
-                'code.numeric' => 'El código de verificación no es válido'
+                'code.numeric' => 'El código de verificación no es válido',
+                'password.required' => 'La contraseña es requerida',
+                'password.min' => 'La contraseña debe tener al menos 8 caracteres',
+                'password.confirmed' => 'Las contraseñas no coinciden',
+                'password.regex' => 'La contraseña debe contener al menos una letra mayúscula, una letra minúscula y un número'
             ]);
 
             $user = User::where('Email', $request->email)->first();
@@ -136,11 +152,25 @@ class ForgotPassword extends Controller
                 throw new \Exception('El código de verificación no es válido', 400);
             }
 
-            Activate::send_access($user);
+            DB::beginTransaction();
 
-            return response()->json(['message' => 'Se ha enviado un correo electrónico con las nuevas credenciales']);
+            User::where('Id', $user->Id)->update(['Password' => Password::hashPassword($request->password)]);
+            UsersCode::where('UserId', $user->Id)->delete();
+
+            DB::commit();
+
+            return response()->json(['message' => 'La contraseña ha sido actualizada con éxito']);
         } catch (\Exception $e) {
-            return self::basicError($e->getMessage());
+
+            DB::rollBack();
+            Log::error('Error al actualizar la contraseña: ', [
+                'email' => $request->email,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'code' => $e->getCode()
+            ]);
+            return response()->json(['message' => 'Error al actualizar la contraseña, inténtelo de nuevo más tarde'], 500);
         }
     }
 }
