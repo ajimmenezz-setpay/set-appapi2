@@ -57,9 +57,16 @@ class ForgotPassword extends Controller
             $user = User::where('email', $request->email)->first();
             if (!$user) throw new \Exception('El correo electrónico no está registrado');
 
-            $code = rand(100000, 999999);
+            $cutoff = Carbon::now('America/Mexico_City')->subMinutes(15);
 
+            $lastCode = UsersCode::where('UserId', $user->Id)->where('Register', '>=', $cutoff)->first();
+            if ($lastCode) {
+                return self::basicError('Ya se ha enviado un código de verificación recientemente, por favor intente de nuevo más tarde o verifique su correo electrónico.');
+            }
+
+            $code = random_int(100000, 999999);
             DB::table('t_users_codes')->where('UserId', $user->Id)->delete();
+
             DB::table('t_users_codes')->insert([
                 'UserId' => $user->Id,
                 'Code' => $code,
