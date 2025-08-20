@@ -7081,7 +7081,9 @@
                             "schema": {
                                 "required": [
                                     "email",
-                                    "code"
+                                    "code",
+                                    "password",
+                                    "password_confirmation"
                                 ],
                                 "properties": {
                                     "email": {
@@ -7091,6 +7093,14 @@
                                     "code": {
                                         "type": "string",
                                         "example": "123456"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "Password123!"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "example": "Password123!"
                                     }
                                 },
                                 "type": "object"
@@ -7289,8 +7299,7 @@
                             "schema": {
                                 "required": [
                                     "user_id",
-                                    "temporal_code",
-                                    "google_code"
+                                    "temporal_code"
                                 ],
                                 "properties": {
                                     "user_id": {
