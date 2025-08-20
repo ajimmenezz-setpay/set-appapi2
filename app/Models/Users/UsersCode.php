@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class UsersCode extends Model
 {
     protected $table = 't_users_codes';
-    protected $fillable = ['UserId', 'Code', 'Register'];
+    protected $fillable = ['UserId', 'Code', 'Register', 'email'];
 
     public $timestamps = false;
     public $primaryKey = 'Id';

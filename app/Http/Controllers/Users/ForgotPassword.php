@@ -61,7 +61,7 @@ class ForgotPassword extends Controller
 
             $lastCode = UsersCode::where('UserId', $user->Id)->where('Register', '>=', $cutoff)->first();
             if ($lastCode) {
-                return self::basicError('Ya se ha enviado un código de verificación recientemente, por favor intente de nuevo más tarde o verifique su correo electrónico.');
+                return self::basicError('Ya se ha enviado un código de verificación recientemente, por favor intente en 15 minutos.');
             }
 
             $code = random_int(100000, 999999);

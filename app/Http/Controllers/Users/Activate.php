@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Users\Address as UserAddress;
+use App\Models\Users\UsersCode;
 
 class Activate extends Controller
 {
@@ -109,11 +110,19 @@ class Activate extends Controller
             if (!$user || $continueProcess) {
                 $user = $this->createTemporalUser($request->email);
 
-                $code = rand(100000, 999999);
+                $cutoff = Carbon::now('America/Mexico_City')->subMinutes(15);
 
+                $lastCode = UsersCode::where('email', $request->email)->where('Register', '>=', $cutoff)->first();
+                if ($lastCode) {
+                    return self::basicError('Ya se ha enviado un código de verificación recientemente, por favor intente en 15 minutos.');
+                }
+
+                $code = random_int(100000, 999999);
                 DB::table('t_users_codes')->where('UserId', $user->Id)->delete();
+
                 DB::table('t_users_codes')->insert([
                     'UserId' => $user->Id,
+                    'email' => $request->email,
                     'Code' => $code,
                     'Register' => Carbon::now('America/Mexico_City')->format('Y-m-d H:i:s')
                 ]);
@@ -150,9 +159,11 @@ class Activate extends Controller
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(
-     *              required={"email", "code"},
+     *              required={"email", "code", "password", "password_confirmation"},
      *              @OA\Property(property="email", type="string", example="  [email protected]"),
-     *              @OA\Property(property="code", type="string", example="123456")
+     *              @OA\Property(property="code", type="string", example="123456"),
+     *              @OA\Property(property="password", type="string", example="Password123!"),
+     *             @OA\Property(property="password_confirmation", type="string", example="Password123!")
      *          )
      *      ),
      *
@@ -184,12 +195,22 @@ class Activate extends Controller
         try {
             $this->validate($request, [
                 'email' => 'required|email',
-                'code' => 'required|numeric'
+                'code' => 'required|numeric',
+                'password' => [
+                    'required',
+                    'min:8',
+                    'confirmed',
+                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/'
+                ]
             ], [
                 'email.required' => 'El email es requerido',
                 'email.email' => 'El email no es válido',
                 'code.required' => 'El código de verificación es requerido',
-                'code.numeric' => 'El código de verificación no es válido'
+                'code.numeric' => 'El código de verificación no es válido',
+                'password.required' => 'La contraseña es requerida',
+                'password.min' => 'La contraseña debe tener al menos 8 caracteres',
+                'password.confirmed' => 'Las contraseñas no coinciden',
+                'password.regex' => 'La contraseña debe contener al menos una letra mayúscula, una letra minúscula y un número'
             ]);
 
             $user = User::where('Email', $request->email)->first();
@@ -197,7 +218,7 @@ class Activate extends Controller
                 throw new \Exception('El email no está registrado', 404);
             }
 
-            $code = DB::table('t_users_codes')->where('UserId', $user->Id)->orderBy('Register', 'desc')->first();
+            $code = UsersCode::where('UserId', $user->Id)->orderBy('Register', 'desc')->first();
             if (!$code) {
                 throw new \Exception('No se ha solicitado un código de verificación', 400);
             }
@@ -205,6 +226,13 @@ class Activate extends Controller
             if ($code->Code != $request->code) {
                 throw new \Exception('El código de verificación no es válido', 400);
             }
+
+            DB::beginTransaction();
+
+            User::where('Id', $user->Id)->update(['Password' => Password::hashPassword($request->password)]);
+            UsersCode::where('UserId', $user->Id)->delete();
+
+            DB::commit();
 
             return response()->json(['message' => 'El código de verificación es correcto'], 200);
         } catch (\Exception $e) {
@@ -347,7 +375,7 @@ class Activate extends Controller
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(
-     *              required={"user_id", "temporal_code", "google_code"},
+     *              required={"user_id", "temporal_code"},
      *              @OA\Property(property="user_id", type="string", example="123456"),
      *              @OA\Property(property="temporal_code", type="string", example="1234567"),
      *              @OA\Property(property="google_code", type="string", example="1234567"),
@@ -610,34 +638,23 @@ class Activate extends Controller
                     'BusinessId' => $company->BusinessId
                 ]);
 
-                $companyUsers = json_decode($company->Users, true);
-                $newCompanyUsers = [];
-                $c = 0;
-                foreach ($companyUsers as $companyUser) {
-                    if ($companyUser['id'] == $user->Id) {
-                        $companyUser['name'] = $user->Name;
-                        $companyUser['last_name'] = $user->Lastname;
-                        $c = 1;
-                    }
-
-                    $newCompanyUsers[] = $companyUser;
-                }
-
-                if ($c == 0) {
-                    $newCompanyUsers[] = [
-                        'id' => $user->Id,
-                        'companyId' => $company->Id,
-                        'profile' => 8,
-                        'name' => $user->Name,
-                        'lastname' => $user->Lastname,
-                        'email' => $user->Email,
-                        'createDate' => $user->CreateDate
-                    ];
-                }
-
-                CompanyProjection::where('Id', $company->Id)->update([
-                    'Users' => json_encode($newCompanyUsers)
+                $dataArray = json_encode([
+                    'id' => $user->Id,
+                    'companyId' => $company->Id,
+                    'profile' => 8,
+                    'name' => $user->Name,
+                    'lastname' => $user->Lastname,
+                    'email' => $user->Email,
+                    'createDate' => $user->Register
                 ]);
+
+                $projection = CompanyProjection::where('Id', $company->Id)->first();
+                if ($projection) {
+                    $users = json_decode($projection->Users, true);
+                    $users[] = json_decode($dataArray, true);
+                    CompanyProjection::where('Id', $company->Id)
+                        ->update(['Users' => json_encode($users)]);
+                }
 
                 CompaniesAndUsers::create([
                     'CompanyId' => $company->Id,
@@ -676,7 +693,7 @@ class Activate extends Controller
 
             DB::commit();
 
-            self::send_access($user);
+            // self::send_access($user);
 
             return response()->json(['message' => $operations], 200);
         } catch (\Exception $e) {
