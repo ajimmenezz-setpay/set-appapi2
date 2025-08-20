@@ -196,22 +196,28 @@ class Activate extends Controller
             $this->validate($request, [
                 'email' => 'required|email',
                 'code' => 'required|numeric',
-                'password' => [
-                    'required',
-                    'min:8',
-                    'confirmed',
-                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/'
-                ]
             ], [
                 'email.required' => 'El email es requerido',
                 'email.email' => 'El email no es válido',
                 'code.required' => 'El código de verificación es requerido',
-                'code.numeric' => 'El código de verificación no es válido',
-                'password.required' => 'La contraseña es requerida',
-                'password.min' => 'La contraseña debe tener al menos 8 caracteres',
-                'password.confirmed' => 'Las contraseñas no coinciden',
-                'password.regex' => 'La contraseña debe contener al menos una letra mayúscula, una letra minúscula y un número'
+                'code.numeric' => 'El código de verificación no es válido'
             ]);
+
+            if ($request->has('password')) {
+                $this->validate($request, [
+                    'password' => [
+                        'required',
+                        'min:8',
+                        'confirmed',
+                        'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/'
+                    ]
+                ], [
+                    'password.required' => 'La contraseña es requerida',
+                    'password.min' => 'La contraseña debe tener al menos 8 caracteres',
+                    'password.confirmed' => 'Las contraseñas no coinciden',
+                    'password.regex' => 'La contraseña debe contener al menos una letra mayúscula, una letra minúscula y un número'
+                ]);
+            }
 
             $user = User::where('Email', $request->email)->first();
             if (!$user) {
@@ -227,12 +233,14 @@ class Activate extends Controller
                 throw new \Exception('El código de verificación no es válido', 400);
             }
 
-            DB::beginTransaction();
+            if ($request->has('password')) {
+                DB::beginTransaction();
 
-            User::where('Id', $user->Id)->update(['Password' => Password::hashPassword($request->password)]);
-            UsersCode::where('UserId', $user->Id)->delete();
+                User::where('Id', $user->Id)->update(['Password' => Password::hashPassword($request->password)]);
+                UsersCode::where('UserId', $user->Id)->delete();
 
-            DB::commit();
+                DB::commit();
+            }
 
             return response()->json(['message' => 'El código de verificación es correcto'], 200);
         } catch (\Exception $e) {
