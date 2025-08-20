@@ -66,7 +66,7 @@ class FixMissingCompany extends Controller
             $dataArray = json_encode([
                 'id' => $user->Id,
                 'companyId' => $company->Id,
-                'profileId' => $user->ProfileId,
+                'profile' => $user->ProfileId,
                 'name' => $user->Name,
                 'lastname' => $user->Lastname,
                 'email' => $user->Email,
