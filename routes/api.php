@@ -223,4 +223,8 @@ Route::group(['prefix' => 'dev'], function () {
         Route::get('/permissions', [App\Http\Controllers\Users\Permissions::class, 'index']);
         Route::post('/permissions', [App\Http\Controllers\Users\Permissions::class, 'store']);
     });
+
+    Route::group(['prefix' => 'users'], function () {
+        Route::post('/fixMissingCompany', [App\Http\Controllers\Users\FixMissingCompany::class, 'fix']);
+    });
 });

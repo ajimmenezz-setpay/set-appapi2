@@ -22,4 +22,5 @@ class CompaniesUsers extends Model
 
     ];
     public $timestamps = false;
+    protected $primaryKey = null; 
 }
