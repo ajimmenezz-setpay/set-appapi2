@@ -227,4 +227,14 @@ Route::group(['prefix' => 'dev'], function () {
     Route::group(['prefix' => 'users'], function () {
         Route::post('/fixMissingCompany', [App\Http\Controllers\Users\FixMissingCompany::class, 'fix']);
     });
+
+    Route::group(['prefix' => 'backoffice'], function () {
+        Route::prefix('business')->group(function () {
+            Route::group(['prefix' => 'smtp'], function () {
+                Route::get('/', [App\Http\Controllers\Backoffice\SMTPController::class, 'index']);
+                Route::post('/', [App\Http\Controllers\Backoffice\SMTPController::class, 'store']);
+                Route::put('/{id}', [App\Http\Controllers\Backoffice\SMTPController::class, 'update']);
+            });
+        });
+    });
 });

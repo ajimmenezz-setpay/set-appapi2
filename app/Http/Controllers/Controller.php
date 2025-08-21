@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Validator;
 use App\Exceptions\ValidationException;
+use App\Models\Backoffice\BusinessSmtp;
 use Illuminate\Routing\Controller as BaseController;
 
 abstract class Controller extends BaseController
@@ -88,5 +89,32 @@ abstract class Controller extends BaseController
 
         // Retornar null si no coincide el patrón
         return null;
+    }
+
+    public static function setSMTP($businessId)
+    {
+        $smtp = Backoffice\SMTPController::smtpByBusinessId($businessId);
+        if ($smtp) {
+            if ($smtp['last_used_main'] == 1 && !is_null($smtp['host2'])) {
+                config([
+                    'mail.mailers.smtp.host' => $smtp['host2'],
+                    'mail.mailers.smtp.port' => $smtp['port2'],
+                    'mail.mailers.smtp.encryption' => $smtp['encryption2'],
+                    'mail.mailers.smtp.username' => $smtp['username2'],
+                    'mail.mailers.smtp.password' => $smtp['password2'],
+                ]);
+
+                BusinessSmtp::where('BusinessId', $businessId)->update(['LastUsedMain' => 0]);
+            } else {
+                config([
+                    'mail.mailers.smtp.host' => $smtp['host'],
+                    'mail.mailers.smtp.port' => $smtp['port'],
+                    'mail.mailers.smtp.encryption' => $smtp['encryption'],
+                    'mail.mailers.smtp.username' => $smtp['username'],
+                    'mail.mailers.smtp.password' => $smtp['password'],
+                ]);
+                BusinessSmtp::where('BusinessId', $businessId)->update(['LastUsedMain' => 1]);
+            }
+        }
     }
 }

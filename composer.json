@@ -7,6 +7,7 @@
     "require": {
         "php": "^8.2",
         "darkaonline/l5-swagger": "^8.6",
+        "doctrine/dbal": "^4.3",
         "google/apiclient": "*",
         "laravel/framework": "^11.9",
         "laravel/reverb": "^1.5",

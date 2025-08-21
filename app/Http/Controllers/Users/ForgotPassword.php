@@ -73,6 +73,8 @@ class ForgotPassword extends Controller
                 'Register' => Carbon::now('America/Mexico_City')->format('Y-m-d H:i:s')
             ]);
 
+            self::setSMTP($user->BusinessId);
+
             Mail::to($request->email)->send(new VerificationAccountCode($code));
 
             return self::success([

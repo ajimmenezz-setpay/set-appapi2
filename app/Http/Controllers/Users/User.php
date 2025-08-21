@@ -43,6 +43,8 @@ class User extends Controller
                 $companyUser->save();
             }
 
+            self::setSMTP($user->BusinessId);
+
             Mail::to($dataUser['email'])->send(new SendUserCredentials($dataUser['email'], $randomPassword));
         } catch (\Exception $e) {
             throw new \Exception('Error al crear el usuario: ' . $e->getMessage());
