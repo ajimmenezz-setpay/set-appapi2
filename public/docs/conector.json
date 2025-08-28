@@ -7130,6 +7130,456 @@
                 ]
             }
         },
+        "/api/v1/credit": {
+            "get": {
+                "tags": [
+                    "Credit"
+                ],
+                "summary": "Get Account Credits",
+                "operationId": "getAccountCredits",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "description": "Unique identifier for the credit wallet entry",
+                                                "type": "string",
+                                                "format": "uuid",
+                                                "example": "123e4567-e89b-12d3-a456-426614174000"
+                                            },
+                                            "credit_limit": {
+                                                "description": "The total credit limit assigned to the account",
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 5000
+                                            },
+                                            "used_credit": {
+                                                "description": "The amount of credit that has been used",
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 1500
+                                            },
+                                            "available_credit": {
+                                                "description": "The amount of credit that is still available",
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 3500
+                                            },
+                                            "minimum_payment": {
+                                                "description": "The minimum payment required",
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 50
+                                            },
+                                            "interest_rate": {
+                                                "description": "The interest rate applied to the credit",
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 3.5
+                                            },
+                                            "yearly_fee": {
+                                                "description": "The yearly fee for maintaining the credit account",
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 100
+                                            },
+                                            "late_interest_rate": {
+                                                "description": "The interest rate applied to late payments",
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 5
+                                            },
+                                            "credit_start_date": {
+                                                "description": "The date when the credit account was started",
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "2023-01-01"
+                                            },
+                                            "next_fee_date": {
+                                                "description": "The next date when the yearly fee will be charged",
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "2024-01-01"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized access"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to retrieve credit wallet entries. Internal error details."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Credit"
+                ],
+                "summary": "Create Credit Entry",
+                "operationId": "createCreditEntry",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "limit",
+                                    "interest_rate"
+                                ],
+                                "properties": {
+                                    "limit": {
+                                        "description": "The credit limit",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 1000
+                                    },
+                                    "interest_rate": {
+                                        "description": "The interest rate",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 3.5
+                                    },
+                                    "yearly_fee": {
+                                        "description": "The yearly fee",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 100
+                                    },
+                                    "late_interest_rate": {
+                                        "description": "The late interest rate",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 5
+                                    },
+                                    "next_fee_date": {
+                                        "description": "The next fee date",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2024-01-01"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Credit wallet entry created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Credit wallet entry created successfully."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "description": "Unique identifier for the credit wallet entry",
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "123e4567-e89b-12d3-a456-426614174000"
+                                                },
+                                                "credit_limit": {
+                                                    "description": "The total credit limit assigned to the account",
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 5000
+                                                },
+                                                "used_credit": {
+                                                    "description": "The amount of credit that has been used",
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 1500
+                                                },
+                                                "available_credit": {
+                                                    "description": "The amount of credit that is still available",
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 3500
+                                                },
+                                                "minimum_payment": {
+                                                    "description": "The minimum payment required",
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 50
+                                                },
+                                                "interest_rate": {
+                                                    "description": "The interest rate applied to the credit",
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 3.5
+                                                },
+                                                "yearly_fee": {
+                                                    "description": "The yearly fee for maintaining the credit account",
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 100
+                                                },
+                                                "late_interest_rate": {
+                                                    "description": "The interest rate applied to late payments",
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 5
+                                                },
+                                                "credit_start_date": {
+                                                    "description": "The date when the credit account was started",
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2023-01-01"
+                                                },
+                                                "next_fee_date": {
+                                                    "description": "The next date when the yearly fee will be charged",
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2024-01-01"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized access"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to update credit wallet entry."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/credit/{id}": {
+            "put": {
+                "tags": [
+                    "Credit"
+                ],
+                "summary": "Update Credit Entry",
+                "operationId": "updateCreditEntry",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "UUID of the credit wallet entry to update",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "limit",
+                                    "interest_rate"
+                                ],
+                                "properties": {
+                                    "limit": {
+                                        "description": "The credit limit",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 1000
+                                    },
+                                    "interest_rate": {
+                                        "description": "The interest rate",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 15
+                                    },
+                                    "yearly_fee": {
+                                        "description": "The yearly fee",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 100
+                                    },
+                                    "late_interest_rate": {
+                                        "description": "The late interest rate",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 20
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Credit wallet entry updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Credit wallet entry updated successfully."
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": {
+                                                "id": "uuid",
+                                                "limit": 1000,
+                                                "interest_rate": 15,
+                                                "yearly_fee": 100,
+                                                "late_interest_rate": 20
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized access"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Credit wallet entry not found."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to update credit wallet entry."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/admin/v1/dashboard/funding": {
             "get": {
                 "tags": [
@@ -13651,6 +14101,10 @@
         {
             "name": "ADM Card Management",
             "description": "ADM Card Management"
+        },
+        {
+            "name": "Credit",
+            "description": "Credit"
         },
         {
             "name": "Dashboard",

@@ -3199,6 +3199,356 @@
                 ]
             }
         },
+        "/api/cardCloud/sub-account/{companyId}/credits": {
+            "get": {
+                "tags": [
+                    "Card Cloud - Créditos"
+                ],
+                "summary": "Obtiene los créditos de la empresa seleccionada",
+                "operationId": "getSubaccountCredits",
+                "responses": {
+                    "200": {
+                        "description": "Lista de créditos de la empresa seleccionada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "string",
+                                                "example": "0198efc0-e135-73ce-a8ad-539d64d53bf9"
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Alonso Jiménez"
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "example": "ajimmenezz+963@gmail.com"
+                                            },
+                                            "limit": {
+                                                "type": "number",
+                                                "example": 20000
+                                            },
+                                            "used": {
+                                                "type": "number",
+                                                "example": 0
+                                            },
+                                            "details": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "example": "0198efc0-e123-73de-b73b-c09d38fda0f7"
+                                                    },
+                                                    "credit_limit": {
+                                                        "type": "number",
+                                                        "example": 20000
+                                                    },
+                                                    "used_credit": {
+                                                        "type": "number",
+                                                        "example": 0
+                                                    },
+                                                    "available_credit": {
+                                                        "type": "number",
+                                                        "example": 20000
+                                                    },
+                                                    "minimum_payment": {
+                                                        "type": "number",
+                                                        "example": 0
+                                                    },
+                                                    "interest_rate": {
+                                                        "type": "number",
+                                                        "example": 78.05
+                                                    },
+                                                    "yearly_fee": {
+                                                        "type": "number",
+                                                        "example": 0
+                                                    },
+                                                    "late_interest_rate": {
+                                                        "type": "number",
+                                                        "example": 0
+                                                    },
+                                                    "credit_start_date": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": null
+                                                    },
+                                                    "next_fee_date": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": null
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No tiene permisos para consultar estos datos.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No tiene permisos para consultar estos datos."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autorizado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No autorizado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cardCloud/credits/users": {
+            "get": {
+                "tags": [
+                    "Card Cloud - Créditos"
+                ],
+                "summary": "Obtener usuarios existentes sin crédito activo",
+                "operationId": "getNonCreditUsers",
+                "responses": {
+                    "200": {
+                        "description": "Lista de usuarios sin crédito activo",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "Id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "Name": {
+                                                "type": "string",
+                                                "example": "John"
+                                            },
+                                            "Lastname": {
+                                                "type": "string",
+                                                "example": "Doe"
+                                            },
+                                            "Email": {
+                                                "type": "string",
+                                                "example": "john.doe@example.com"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Token de acceso inválido o expirado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Unauthorized: Token de acceso inválido o expirado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Error: No tiene permisos para consultar estos datos.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Error: No tiene permisos para consultar estos datos."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cardCloud/ub-account/{uuid}credits": {
+            "post": {
+                "tags": [
+                    "Card Cloud - Créditos"
+                ],
+                "summary": "Crear un nuevo crédito",
+                "operationId": "createCredit",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "limit": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 1000
+                                    },
+                                    "interest_rate": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 5
+                                    },
+                                    "yearly_fee": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 100
+                                    },
+                                    "late_interest_rate": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 10
+                                    },
+                                    "is_new_user": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "new_user": {
+                                        "properties": {
+                                            "name": {
+                                                "type": "string",
+                                                "example": "John"
+                                            },
+                                            "lastname": {
+                                                "type": "string",
+                                                "example": "Doe"
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "example": "john.doe@example.com"
+                                            },
+                                            "phone": {
+                                                "type": "string",
+                                                "example": "1234567890"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "user_id": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Crédito creado exitosamente.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Crédito creado exitosamente."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error de validación.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Error de validación."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autorizado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No autorizado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Error: No tiene permisos para consultar estos datos.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Error: No tiene permisos para consultar estos datos."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/cardCloud/institution": {
             "get": {
                 "tags": [
@@ -8434,6 +8784,10 @@
         {
             "name": "Card Cloud - Contactos",
             "description": "Card Cloud - Contactos"
+        },
+        {
+            "name": "Card Cloud - Créditos",
+            "description": "Card Cloud - Créditos"
         },
         {
             "name": "Institutions",

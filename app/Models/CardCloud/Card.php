@@ -21,6 +21,8 @@ class Card extends Model
         'CustomerPrefix',
         'CustomerId',
         'Type',
+        'ProductType',
+        'CreditWalletId',
         'ActiveFunction',
         'ExternalId',
         'Brand',

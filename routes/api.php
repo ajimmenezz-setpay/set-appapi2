@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Security\Password;
-use App\Http\Middleware\ValidateEnvironmentAdminProfile;
 use App\Http\Middleware\VerifyJwt;
 use Illuminate\Support\Facades\Route;
 
@@ -95,11 +94,18 @@ Route::middleware([VerifyJwt::class])->group(function () {
 
         Route::group(['prefix' => 'sub-account'], function () {
             Route::get('/{uuid}/cards', [App\Http\Controllers\CardCloud\SubaccountCardController::class, 'index']);
+            Route::get('/{uuid}/credits', [App\Http\Controllers\CardCloud\Credits\SubaccountCreditController::class, 'index']);
+            Route::post('/{uuid}/credits', [App\Http\Controllers\CardCloud\Credits\SubaccountCreditController::class, 'store']);
         });
 
         Route::group(['prefix' => 'cards'], function () {
             Route::post('/assign-user-from-file', [App\Http\Controllers\CardCloud\SubaccountCardController::class, 'assignUserFromFile']);
         });
+
+        Route::group(['prefix' => 'credits'], function () {
+            Route::get('/users', [App\Http\Controllers\CardCloud\Credits\SubaccountCreditController::class, 'getUsers']);
+        });
+
     });
 
     Route::group(['prefix' => 'speiCloud'], function () {

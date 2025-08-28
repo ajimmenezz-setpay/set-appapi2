@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Users\Address as UserAddress;
 use App\Models\Users\UsersCode;
+use App\Http\Controllers\Backoffice\Company;
 
 class Activate extends Controller
 {
@@ -646,33 +647,7 @@ class Activate extends Controller
                     'BusinessId' => $company->BusinessId
                 ]);
 
-                $dataArray = json_encode([
-                    'id' => $user->Id,
-                    'companyId' => $company->Id,
-                    'profile' => 8,
-                    'name' => $user->Name,
-                    'lastname' => $user->Lastname,
-                    'email' => $user->Email,
-                    'createDate' => $user->Register
-                ]);
-
-                $projection = CompanyProjection::where('Id', $company->Id)->first();
-                if ($projection) {
-                    $users = json_decode($projection->Users, true);
-                    $users[] = json_decode($dataArray, true);
-                    CompanyProjection::where('Id', $company->Id)
-                        ->update(['Users' => json_encode($users)]);
-                }
-
-                CompaniesAndUsers::create([
-                    'CompanyId' => $company->Id,
-                    'UserId' => $user->Id,
-                    'ProfileId' => 8,
-                    'Name' => $user->Name,
-                    'Lastname' => $user->Lastname,
-                    'Email' => $user->Email,
-                    'CreateDate' => Carbon::now('America/Mexico_City')->format('Y-m-d H:i:s')
-                ]);
+                Company::addUserToCompany($company->Id, $user->Id);
 
                 $assignedWithoutEmail = CardAssigned::where('CardCloudId', $cardCloudData['card_id'])->where('Email', '')->first();
                 if ($assignedWithoutEmail) {

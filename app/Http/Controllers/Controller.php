@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Validator;
 use App\Exceptions\ValidationException;
+use App\Models\Backoffice\Business;
 use App\Models\Backoffice\BusinessSmtp;
 use Illuminate\Routing\Controller as BaseController;
 
@@ -42,7 +43,7 @@ abstract class Controller extends BaseController
         $validator = Validator::make($request->all(), $rules, $messages);
 
         if ($validator->fails()) {
-            throw new ValidationException($validator->errors()->first());
+            throw new ValidationException($validator->errors()->first(), 400);
         }
     }
 
@@ -116,5 +117,11 @@ abstract class Controller extends BaseController
                 BusinessSmtp::where('BusinessId', $businessId)->update(['LastUsedMain' => 1]);
             }
         }
+    }
+
+    public static function baseUrlByBusinessId($businessId)
+    {
+        $business = Business::where('Id', $businessId)->first();
+        return $business ? "https://" . $business->Domain : null;
     }
 }

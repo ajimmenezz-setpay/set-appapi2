@@ -19,6 +19,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use App\Http\Services\CardCloudApi;
 use App\Models\Backoffice\Users\CompaniesAndUsers;
+use Carbon\Carbon;
 
 class Company extends Controller
 {
@@ -654,7 +655,7 @@ class Company extends Controller
 
                             $service['subAccountId'] = "$serviceCardCloud->SubAccountId";
                             $service['subAccount'] = json_encode($subaccount);
-                        }else{
+                        } else {
                             $service['subAccountId'] = "$serviceCardCloud->SubAccountId";
                             $service['subAccount'] = $serviceCardCloud->SubAccount;
                         }
@@ -821,5 +822,36 @@ class Company extends Controller
             ->select('CompanyId')
             ->where('t_backoffice_companies_service_stp.BankAccountNumber', $account)
             ->first();
+    }
+
+    public static function addUserToCompany($companyId, $user)
+    {
+        $dataArray = json_encode([
+            'id' => $user->Id,
+            'companyId' => $companyId,
+            'profile' => 8,
+            'name' => $user->Name,
+            'lastname' => $user->Lastname,
+            'email' => $user->Email,
+            'createDate' => $user->Register
+        ]);
+
+        $projection = CompanyProjection::where('Id', $companyId)->first();
+        if ($projection) {
+            $users = json_decode($projection->Users, true);
+            $users[] = json_decode($dataArray, true);
+            CompanyProjection::where('Id', $companyId)
+                ->update(['Users' => json_encode($users)]);
+        }
+
+        CompaniesAndUsers::create([
+            'CompanyId' => $companyId,
+            'UserId' => $user->Id,
+            'ProfileId' => $user->ProfileId ?? 8,
+            'Name' => $user->Name,
+            'Lastname' => $user->Lastname,
+            'Email' => $user->Email,
+            'CreateDate' => Carbon::now('America/Mexico_City')->format('Y-m-d H:i:s')
+        ]);
     }
 }
