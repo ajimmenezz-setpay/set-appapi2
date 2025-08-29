@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backoffice;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Users\FixMissingCompany;
 use App\Http\Controllers\Users\User as UsersUser;
 use App\Models\Backoffice\Companies\CompaniesCommissions;
 use App\Models\Backoffice\Companies\CompaniesCommissionsSpei;
@@ -443,6 +444,7 @@ class Company extends Controller
 
             $projection = self::updateProjection($company, $commissions ?? [], $services, $users);
 
+            FixMissingCompany::fixMissingCompanyStatic();
 
             DB::commit();
 
