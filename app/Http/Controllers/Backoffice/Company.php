@@ -436,9 +436,9 @@ class Company extends Controller
                     'phone' => $request->userPhone ?? null,
                     'businessId' => $request->attributes->get('jwt')->businessId
                 ], $request->id);
-                $users = self::assignUsersToCompany($company, [$users['object']['id']]);
+                // $users = self::assignUsersToCompany($company, [$users['object']['id']]);
             } else {
-                $users = self::assignUsersToCompany($company, $request->assignedUsers);
+                // $users = self::assignUsersToCompany($company, $request->assignedUsers);
             }
 
             $projection = self::updateProjection($company, $commissions ?? [], $services, $users);

@@ -105,7 +105,6 @@ Route::middleware([VerifyJwt::class])->group(function () {
         Route::group(['prefix' => 'credits'], function () {
             Route::get('/users', [App\Http\Controllers\CardCloud\Credits\SubaccountCreditController::class, 'getUsers']);
         });
-
     });
 
     Route::group(['prefix' => 'speiCloud'], function () {
@@ -242,5 +241,9 @@ Route::group(['prefix' => 'dev'], function () {
                 Route::put('/{id}', [App\Http\Controllers\Backoffice\SMTPController::class, 'update']);
             });
         });
+    });
+
+    Route::group(['prefix' => 'fixes'], function () {
+        Route::post('/fixMissingCompany', [App\Http\Controllers\Users\FixMissingCompany::class, 'fixMissingCompany']);
     });
 });
