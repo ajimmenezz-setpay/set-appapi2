@@ -436,9 +436,9 @@ class Company extends Controller
                     'phone' => $request->userPhone ?? null,
                     'businessId' => $request->attributes->get('jwt')->businessId
                 ], $request->id);
-                // $users = self::assignUsersToCompany($company, [$users['object']['id']]);
+                $users = self::assignUsersToCompany($company, [$users['object']['id']]);
             } else {
-                // $users = self::assignUsersToCompany($company, $request->assignedUsers);
+                $users = self::assignUsersToCompany($company, $request->assignedUsers);
             }
 
             $projection = self::updateProjection($company, $commissions ?? [], $services, $users);
@@ -764,14 +764,14 @@ class Company extends Controller
             $projectionUsers = json_decode($projection->Users, true);
 
             foreach ($projectionUsers as $user) {
-                if ($user['profile'] != 7 || !$deleteOthers) {
+                if ($user['profile'] != 8 || !$deleteOthers) {
                     $newUsers[] = $user;
                 }
             }
         }
 
         if ($deleteOthers) {
-            CompaniesAndUsers::where('CompanyId', $company->Id)->where('ProfileId', '!=', "7")->delete();
+            CompaniesAndUsers::where('CompanyId', $company->Id)->where('ProfileId', '!=', "8")->delete();
         }
 
         foreach ($users as $user) {
