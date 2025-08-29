@@ -132,6 +132,8 @@ class FixMissingCompany extends Controller
                 }
             }
 
+            $companiesToFix = DB::table('t_backoffice_companies')->where('Active', 1)->get();
+
             foreach ($companiesToFix as $companyId) {
                 $projection = CompanyProjection::where('Id', $companyId)->first();
                 if ($projection) {
