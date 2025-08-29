@@ -135,12 +135,12 @@ class FixMissingCompany extends Controller
             $companiesToFix = DB::table('t_backoffice_companies')->where('Active', 1)->get();
 
             foreach ($companiesToFix as $companyId) {
-                $projection = CompanyProjection::where('Id', $companyId)->first();
+                $projection = CompanyProjection::where('Id', $companyId->Id)->first();
                 if ($projection) {
                     $users = json_decode($projection->Users, true);
 
                     $relatedUsers = DB::table('t_backoffice_companies_and_users')
-                        ->where('CompanyId', $companyId)
+                        ->where('CompanyId', $companyId->Id)
                         ->get();
 
                     foreach ($relatedUsers as $relatedUser) {
@@ -156,7 +156,7 @@ class FixMissingCompany extends Controller
                     }
 
 
-                    CompanyProjection::where('Id', $companyId)
+                    CompanyProjection::where('Id', $companyId->Id)
                         ->update(['Users' => json_encode($users)]);
                 }
             }
