@@ -3619,14 +3619,9 @@
                                             "type": "array",
                                             "items": {
                                                 "properties": {
-                                                    "id": {
+                                                    "movement_id": {
                                                         "type": "string",
                                                         "example": "uuid-5678"
-                                                    },
-                                                    "amount": {
-                                                        "type": "number",
-                                                        "format": "float",
-                                                        "example": 100
                                                     },
                                                     "date": {
                                                         "type": "string",
@@ -3636,6 +3631,28 @@
                                                     "type": {
                                                         "type": "string",
                                                         "example": "payment"
+                                                    },
+                                                    "amount": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 100
+                                                    },
+                                                    "balance": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 900
+                                                    },
+                                                    "authorization_code": {
+                                                        "type": "string",
+                                                        "example": "123456"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Payment for invoice #1234"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "Approved"
                                                     }
                                                 },
                                                 "type": "object"
