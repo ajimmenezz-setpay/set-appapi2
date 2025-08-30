@@ -104,8 +104,10 @@ Route::middleware([VerifyJwt::class])->group(function () {
         });
 
         Route::group(['prefix' => 'credits'], function () {
+            Route::get('/', [App\Http\Controllers\CardCloud\Credits\SubaccountCreditController::class, 'userCredits']);
             Route::get('/users', [App\Http\Controllers\CardCloud\Credits\SubaccountCreditController::class, 'getUsers']);
             Route::get('/{uuid}', [App\Http\Controllers\CardCloud\Credits\SubaccountCreditController::class, 'show']);
+            Route::post('/{uuid}/associate_card', [App\Http\Controllers\CardCloud\Credits\SubaccountCreditController::class, 'associateCard']);
         });
     });
 

@@ -3312,6 +3312,119 @@
                 ]
             }
         },
+        "/api/cardCloud/credits": {
+            "get": {
+                "tags": [
+                    "Card Cloud - Créditos"
+                ],
+                "summary": "Obtener créditos del usuario",
+                "operationId": "getUserCredits",
+                "responses": {
+                    "200": {
+                        "description": "Lista de créditos del usuario",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "string",
+                                                "example": "0198efc0-e135-73ce-a8ad-539d64d53bf9"
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Alonso Jiménez"
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "example": "ajimmenezz+963@gmail.com"
+                                            },
+                                            "limit": {
+                                                "type": "number",
+                                                "example": 20000
+                                            },
+                                            "used": {
+                                                "type": "number",
+                                                "example": 0
+                                            },
+                                            "available": {
+                                                "type": "number",
+                                                "example": 20000
+                                            },
+                                            "minimum_payment": {
+                                                "type": "number",
+                                                "example": 0
+                                            },
+                                            "interest_rate": {
+                                                "type": "number",
+                                                "example": 78.05
+                                            },
+                                            "yearly_fee": {
+                                                "type": "number",
+                                                "example": 0
+                                            },
+                                            "late_interest_rate": {
+                                                "type": "number",
+                                                "example": 0
+                                            },
+                                            "credit_start_date": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": null
+                                            },
+                                            "next_fee_date": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": null
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No tiene permisos para consultar estos datos.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No tiene permisos para consultar estos datos."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autorizado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No autorizado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/cardCloud/credits/users": {
             "get": {
                 "tags": [

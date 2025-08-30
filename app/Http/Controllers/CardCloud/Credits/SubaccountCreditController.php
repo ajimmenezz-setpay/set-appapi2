@@ -105,6 +105,94 @@ class SubaccountCreditController extends Controller
 
     /**
      *  @OA\Get(
+     *      path="/api/cardCloud/credits",
+     *      summary="Obtener créditos del usuario",
+     *      tags={"Card Cloud - Créditos"},
+     *      operationId="getUserCredits",
+     *      security={{"bearerAuth":{}}},
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Lista de créditos del usuario",
+     *          @OA\JsonContent(
+     *              type="array",
+     *              @OA\Items(
+     *                  @OA\Property(property="id", type="string", example="0198efc0-e135-73ce-a8ad-539d64d53bf9"),
+     *                  @OA\Property(property="name", type="string", example="Alonso Jiménez"),
+     *                  @OA\Property(property="email", type="string", example="ajimmenezz+963@gmail.com"),
+     *                  @OA\Property(property="limit", type="number", example=20000),
+     *                  @OA\Property(property="used", type="number", example=0),
+     *                  @OA\Property(property="available", type="number", example=20000),
+     *                  @OA\Property(property="minimum_payment", type="number", example=0),
+     *                  @OA\Property(property="interest_rate", type="number", example=78.05),
+     *                  @OA\Property(property="yearly_fee", type="number", example=0),
+     *                  @OA\Property(property="late_interest_rate", type="number", example=0),
+     *                  @OA\Property(property="credit_start_date", type="string", format="date-time", example=null),
+     *                  @OA\Property(property="next_fee_date", type="string", format="date-time", example=null)
+     *              )
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=403,
+     *          description="No tiene permisos para consultar estos datos.",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="message", type="string", example="No tiene permisos para consultar estos datos.")
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=401,
+     *          description="No autorizado.",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="message", type="string", example="No autorizado.")
+     *          )
+     *      )
+     * )
+     */
+
+    public function userCredits(Request $request)
+    {
+        try {
+            if ($request->attributes->get('jwt')->profileId != 8) {
+                throw new \Exception("No tiene permisos para consultar estos datos.", 403);
+            }
+
+            $credits = Credit::join('t_users', 't_card_cloud_credits.UserId', '=', 't_users.Id')
+                ->where('t_card_cloud_credits.UserId', $request->attributes->get('jwt')->id)
+                ->select('t_card_cloud_credits.*', 't_users.Name', 't_users.Lastname', 't_users.Email')
+                ->get();
+
+            $data = [];
+
+            foreach ($credits as $credit) {
+                try {
+                    $client = new Client();
+                    $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/credit/' . $credit->ExternalId, [
+                        'headers' => [
+                            'Content-Type' => 'application/json',
+                            'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                        ]
+                    ]);
+
+                    $decodedJson = json_decode($response->getBody(), true);
+                } catch (RequestException $re) {
+                    throw new \Exception("Error al obtener los detalles del crédito." . $re->getMessage(), 500);
+                }
+
+                $data[] = $this->creditObject($credit, $decodedJson);
+            }
+
+            return response()->json($data);
+        } catch (\Exception $e) {
+            return response("Error: " . $e->getMessage(), 400);
+        }
+    }
+
+    /**
+     *  @OA\Get(
      *      path="/api/cardCloud/credits/users",
      *      summary="Obtener usuarios existentes sin crédito activo",
      *      tags={"Card Cloud - Créditos"},
@@ -556,4 +644,7 @@ class SubaccountCreditController extends Controller
 
         return $data;
     }
+
+
+    public function associateCard(Request $request, $uuid) {}
 }
