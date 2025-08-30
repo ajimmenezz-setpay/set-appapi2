@@ -3235,52 +3235,35 @@
                                                 "type": "number",
                                                 "example": 0
                                             },
-                                            "details": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "string",
-                                                        "example": "0198efc0-e123-73de-b73b-c09d38fda0f7"
-                                                    },
-                                                    "credit_limit": {
-                                                        "type": "number",
-                                                        "example": 20000
-                                                    },
-                                                    "used_credit": {
-                                                        "type": "number",
-                                                        "example": 0
-                                                    },
-                                                    "available_credit": {
-                                                        "type": "number",
-                                                        "example": 20000
-                                                    },
-                                                    "minimum_payment": {
-                                                        "type": "number",
-                                                        "example": 0
-                                                    },
-                                                    "interest_rate": {
-                                                        "type": "number",
-                                                        "example": 78.05
-                                                    },
-                                                    "yearly_fee": {
-                                                        "type": "number",
-                                                        "example": 0
-                                                    },
-                                                    "late_interest_rate": {
-                                                        "type": "number",
-                                                        "example": 0
-                                                    },
-                                                    "credit_start_date": {
-                                                        "type": "string",
-                                                        "format": "date-time",
-                                                        "example": null
-                                                    },
-                                                    "next_fee_date": {
-                                                        "type": "string",
-                                                        "format": "date-time",
-                                                        "example": null
-                                                    }
-                                                },
-                                                "type": "object"
+                                            "available": {
+                                                "type": "number",
+                                                "example": 20000
+                                            },
+                                            "minimum_payment": {
+                                                "type": "number",
+                                                "example": 0
+                                            },
+                                            "interest_rate": {
+                                                "type": "number",
+                                                "example": 78.05
+                                            },
+                                            "yearly_fee": {
+                                                "type": "number",
+                                                "example": 0
+                                            },
+                                            "late_interest_rate": {
+                                                "type": "number",
+                                                "example": 0
+                                            },
+                                            "credit_start_date": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": null
+                                            },
+                                            "next_fee_date": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": null
                                             }
                                         },
                                         "type": "object"
@@ -3408,7 +3391,7 @@
                 ]
             }
         },
-        "/api/cardCloud/ub-account/{uuid}credits": {
+        "/api/cardCloud/sub-account/{uuid}/credits": {
             "post": {
                 "tags": [
                     "Card Cloud - Créditos"
@@ -3547,6 +3530,149 @@
                         "bearerAuth": []
                     }
                 ]
+            }
+        },
+        "/cardCloud/credits/{uuid}": {
+            "get": {
+                "tags": [
+                    "Card Cloud - Créditos"
+                ],
+                "summary": "Obtener detalles de un crédito",
+                "description": "Devuelve los detalles de un crédito específico",
+                "operationId": "getCreditDetails",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "UUID del crédito",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalles del crédito",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "string",
+                                            "example": "uuid-1234"
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "John Doe"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "example": "john.doe@example.com"
+                                        },
+                                        "limit": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 1000
+                                        },
+                                        "used": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 200
+                                        },
+                                        "available": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 800
+                                        },
+                                        "minimum_payment": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 50
+                                        },
+                                        "interest_rate": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 5
+                                        },
+                                        "yearly_fee": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 100
+                                        },
+                                        "late_interest_rate": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 10
+                                        },
+                                        "credit_start_date": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2023-01-01T00:00:00Z"
+                                        },
+                                        "next_fee_date": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2023-02-01T00:00:00Z"
+                                        },
+                                        "movements": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "example": "uuid-5678"
+                                                    },
+                                                    "amount": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 100
+                                                    },
+                                                    "date": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2023-01-15T00:00:00Z"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "example": "payment"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "cards": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "example": "uuid-91011"
+                                                    },
+                                                    "number": {
+                                                        "type": "string",
+                                                        "example": "**** **** **** 1234"
+                                                    },
+                                                    "expiry_date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2025-12"
+                                                    },
+                                                    "cvv": {
+                                                        "type": "string",
+                                                        "example": "123"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/api/cardCloud/institution": {

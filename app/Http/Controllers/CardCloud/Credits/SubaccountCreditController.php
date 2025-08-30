@@ -15,7 +15,8 @@ use Ramsey\Uuid\Uuid;
 use App\Http\Controllers\Backoffice\Company;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendCredentialsToCreditUser;
-
+use App\Models\Backoffice\Companies\Company as CompaniesCompany;
+use Illuminate\Support\Facades\Log;
 
 class SubaccountCreditController extends Controller
 {
@@ -39,18 +40,13 @@ class SubaccountCreditController extends Controller
      *                  @OA\Property(property="email", type="string", example="ajimmenezz+963@gmail.com"),
      *                  @OA\Property(property="limit", type="number", example=20000),
      *                  @OA\Property(property="used", type="number", example=0),
-     *                  @OA\Property(property="details", type="object",
-     *                      @OA\Property(property="id", type="string", example="0198efc0-e123-73de-b73b-c09d38fda0f7"),
-     *                      @OA\Property(property="credit_limit", type="number", example=20000),
-     *                      @OA\Property(property="used_credit", type="number", example=0),
-     *                      @OA\Property(property="available_credit", type="number", example=20000),
-     *                      @OA\Property(property="minimum_payment", type="number", example=0),
-     *                      @OA\Property(property="interest_rate", type="number", example=78.05),
-     *                      @OA\Property(property="yearly_fee", type="number", example=0),
-     *                      @OA\Property(property="late_interest_rate", type="number", example=0),
-     *                      @OA\Property(property="credit_start_date", type="string", format="date-time", example=null),
-     *                      @OA\Property(property="next_fee_date", type="string", format="date-time", example=null)
-     *                  )
+     *                  @OA\Property(property="available", type="number", example=20000),
+     *                  @OA\Property(property="minimum_payment", type="number", example=0),
+     *                  @OA\Property(property="interest_rate", type="number", example=78.05),
+     *                  @OA\Property(property="yearly_fee", type="number", example=0),
+     *                  @OA\Property(property="late_interest_rate", type="number", example=0),
+     *                  @OA\Property(property="credit_start_date", type="string", format="date-time", example=null),
+     *                  @OA\Property(property="next_fee_date", type="string", format="date-time", example=null)
      *              )
      *          )
      *      ),
@@ -98,14 +94,7 @@ class SubaccountCreditController extends Controller
 
             $data = $credits->map(function ($credit) use ($decodedJson) {
                 $creditDetails = collect($decodedJson)->firstWhere('id', $credit->ExternalId);
-                return [
-                    'id' => $credit->UUID,
-                    'name' => $credit->Name . " " . $credit->Lastname,
-                    'email' => $credit->Email,
-                    'limit' => $creditDetails['credit_limit'],
-                    'used' => $creditDetails['used_credit'],
-                    'details' => $creditDetails
-                ];
+                return self::creditObject($credit, $creditDetails);
             });
 
             return response()->json($data);
@@ -181,7 +170,7 @@ class SubaccountCreditController extends Controller
 
     /**
      * @OA\Post(
-     *      path="/api/cardCloud/ub-account/{uuid}credits",
+     *      path="/api/cardCloud/sub-account/{uuid}/credits",
      *      summary="Crear un nuevo crédito",
      *      tags={"Card Cloud - Créditos"},
      *      operationId="createCredit",
@@ -323,6 +312,17 @@ class SubaccountCreditController extends Controller
                 }
             }
 
+            switch ($request->attributes->get('jwt')->profileId) {
+                case 5:
+                    $company = CompaniesCompany::where('Id', $uuid)->first();
+                    if ($company->BusinessId != $request->attributes->get('jwt')->businessId) {
+                        throw new \Exception("No tiene permisos para crear un crédito en esta empresa.", 403);
+                    }
+                    break;
+                default:
+                    throw new \Exception("No tiene permisos para crear un crédito en esta empresa.", 403);
+            }
+
             Company::addUserToCompany($uuid, $user);
 
             try {
@@ -377,7 +377,148 @@ class SubaccountCreditController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            return response("Error: " . $e->getFile() . " " . $e->getLine() . " " . $e->getMessage(), 400);
+            Log::error("Error en SubaccountCreditController: " . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'request' => $request->all(),
+                'user_data' => $request->attributes->get('jwt')
+            ]);
+            return response("Error: " . $e->getMessage(), 400);
         }
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/cardCloud/credits/{uuid}",
+     *      tags={"Card Cloud - Créditos"},
+     *      summary="Obtener detalles de un crédito",
+     *      description="Devuelve los detalles de un crédito específico",
+     *      operationId="getCreditDetails",
+     *      @OA\Parameter(
+     *          name="uuid",
+     *          in="path",
+     *          required=true,
+     *          description="UUID del crédito",
+     *          @OA\Schema(type="string")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Detalles del crédito",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="id", type="string", example="uuid-1234"),
+     *              @OA\Property(property="name", type="string", example="John Doe"),
+     *              @OA\Property(property="email", type="string", example="john.doe@example.com"),
+     *              @OA\Property(property="limit", type="number", format="float", example=1000.00),
+     *              @OA\Property(property="used", type="number", format="float", example=200.00),
+     *              @OA\Property(property="available", type="number", format="float", example=800.00),
+     *              @OA\Property(property="minimum_payment", type="number", format="float", example=50.00),
+     *              @OA\Property(property="interest_rate", type="number", format="float", example=5.0),
+     *              @OA\Property(property="yearly_fee", type="number", format="float", example=100.00),
+     *              @OA\Property(property="late_interest_rate", type="number", format="float", example=10.0),
+     *              @OA\Property(property="credit_start_date", type="string", format="date-time", example="2023-01-01T00:00:00Z"),
+     *              @OA\Property(property="next_fee_date", type="string", format="date-time", example="2023-02-01T00:00:00Z"),
+     *              @OA\Property(property="movements", type="array",
+     *                  @OA\Items(
+     *                      @OA\Property(property="id", type="string", example="uuid-5678"),
+     *                      @OA\Property(property="amount", type="number", format="float", example=100.00),
+     *                      @OA\Property(property="date", type="string", format="date-time", example="2023-01-15T00:00:00Z"),
+     *                      @OA\Property(property="type", type="string", example="payment")
+     *                  )
+     *              ),
+     *              @OA\Property(property="cards", type="array",
+     *                  @OA\Items(
+     *                      @OA\Property(property="id", type="string", example="uuid-91011"),
+     *                      @OA\Property(property="number", type="string", example="**** **** **** 1234"),
+     *                      @OA\Property(property="expiry_date", type="string", format="date", example="2025-12"),
+     *                      @OA\Property(property="cvv", type="string", example="123")
+     *                  )
+     *              )
+     *          )
+     *      )
+     * )
+     */
+    public function show(Request $request, $uuid)
+    {
+        try {
+
+            $credit = Credit::where('UUID', $uuid)
+                ->join('t_users', 't_card_cloud_credits.UserId', '=', 't_users.Id')
+                ->select('t_card_cloud_credits.*', 't_users.Email', 't_users.Name', 't_users.Lastname', 't_users.Phone')
+                ->first();
+            if (!$credit) {
+                throw new \Exception("Crédito no encontrado.", 404);
+            }
+
+            switch ($request->attributes->get('jwt')->profileId) {
+                case 5:
+                    $company = CompaniesCompany::where('Id', $credit->CompanyId)->first();
+                    if ($company->BusinessId != $request->attributes->get('jwt')->businessId) {
+                        throw new \Exception("No tiene permisos para consultar este crédito 1.", 403);
+                    }
+                    break;
+                case 8:
+                    if ($credit->UserId != $request->attributes->get('jwt')->id) {
+                        throw new \Exception("No tiene permisos para consultar este crédito 2.", 403);
+                    }
+                    break;
+                default:
+                    throw new \Exception("No tiene permisos para consultar este crédito 3.", 403);
+            }
+
+            try {
+                $client = new Client();
+                $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/credit/' . $credit->ExternalId, [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                    ]
+                ]);
+
+                $decodedJson = json_decode($response->getBody(), true);
+            } catch (RequestException $re) {
+                throw new \Exception("Error al obtener los detalles del crédito.", 500);
+            }
+
+            $data = $this->creditObject($credit, $decodedJson, true);
+
+            return response()->json($data);
+        } catch (\Exception $e) {
+            Log::error("Error en SubaccountCreditController: " . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'request' => $request->all(),
+                'user_data' => $request->attributes->get('jwt')
+            ]);
+            return response("Error: " . $e->getMessage(), 400);
+        }
+    }
+
+
+
+    public function creditObject($credit, $details, $full = false)
+    {
+        $data = [
+            'id' => $credit->UUID,
+            'name' => $credit->Name . " " . $credit->Lastname,
+            'email' => $credit->Email,
+            'limit' => $details['credit_limit'],
+            'used' => $details['used_credit'],
+            'available' => $details['available_credit'],
+            'minimum_payment' => $details['minimum_payment'],
+            'interest_rate' => $details['interest_rate'],
+            'yearly_fee' => $details['yearly_fee'],
+            'late_interest_rate' => $details['late_interest_rate'],
+            'credit_start_date' => $details['credit_start_date'],
+            'next_fee_date' => $details['next_fee_date']
+        ];
+
+        if ($full) {
+            $data['movements'] = $details['movements'] ?? [];
+            $data['cards'] = $details['cards'] ?? [];
+        }
+
+        return $data;
     }
 }
