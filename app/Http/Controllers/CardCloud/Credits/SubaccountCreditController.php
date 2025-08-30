@@ -420,18 +420,25 @@ class SubaccountCreditController extends Controller
      *              @OA\Property(property="next_fee_date", type="string", format="date-time", example="2023-02-01T00:00:00Z"),
      *              @OA\Property(property="movements", type="array",
      *                  @OA\Items(
-     *                      @OA\Property(property="id", type="string", example="uuid-5678"),
-     *                      @OA\Property(property="amount", type="number", format="float", example=100.00),
+     *                      @OA\Property(property="movement_id", type="string", example="uuid-5678"),
      *                      @OA\Property(property="date", type="string", format="date-time", example="2023-01-15T00:00:00Z"),
-     *                      @OA\Property(property="type", type="string", example="payment")
+     *                      @OA\Property(property="type", type="string", example="payment"),
+     *                      @OA\Property(property="amount", type="number", format="float", example=100.00),
+     *                      @OA\Property(property="balance", type="number", format="float", example=900.00),
+     *                      @OA\Property(property="authorization_code", type="string", example="123456"),
+     *                      @OA\Property(property="description", type="string", example="Payment for invoice #1234"),
+     *                      @OA\Property(property="status", type="string", example="Approved")
      *                  )
      *              ),
      *              @OA\Property(property="cards", type="array",
      *                  @OA\Items(
-     *                      @OA\Property(property="id", type="string", example="uuid-91011"),
-     *                      @OA\Property(property="number", type="string", example="**** **** **** 1234"),
-     *                      @OA\Property(property="expiry_date", type="string", format="date", example="2025-12"),
-     *                      @OA\Property(property="cvv", type="string", example="123")
+     *                      @OA\Property(property="card_id", type="string", example="uuid-91011"),
+     *                      @OA\Property(property="card_external_id", type="string", example="uuid-91011"),
+     *                      @OA\Property(property="card_type", type="string", example="physical"),
+     *                      @OA\Property(property="brand", type="string", example="MASTER"),
+     *                      @OA\Property(property="client_id", type="string", example="PR0000003"),
+     *                      @OA\Property(property="masked_pan", type="string", example="XXXX XXXX XXXX 5487"),
+     *                      @OA\Property(property="status", type="string", example="BLOCKED"),
      *                  )
      *              )
      *          )
@@ -477,7 +484,7 @@ class SubaccountCreditController extends Controller
 
                 $decodedJson = json_decode($response->getBody(), true);
             } catch (RequestException $re) {
-                throw new \Exception("Error al obtener los detalles del crédito.", 500);
+                throw new \Exception("Error al obtener los detalles del crédito." . $re->getMessage(), 500);
             }
 
             $data = $this->creditObject($credit, $decodedJson, true);
@@ -515,8 +522,36 @@ class SubaccountCreditController extends Controller
         ];
 
         if ($full) {
-            $data['movements'] = $details['movements'] ?? [];
-            $data['cards'] = $details['cards'] ?? [];
+            $data['cards'] = [];
+            $data['movements'] = [];
+            if (isset($details['cards']) && !empty($details['cards'])) {
+                foreach ($details['cards'] as $card) {
+                    $data['cards'][] = [
+                        'card_id' => $card['card_id'],
+                        'card_external_id' => $card['card_external_id'],
+                        'card_type' => $card['card_type'],
+                        'brand' => $card['brand'],
+                        'client_id' => $card['client_id'],
+                        'masked_pan' => $card['masked_pan'],
+                        'status' => $card['status'],
+                    ];
+                }
+            }
+
+            if (isset($details['movements']) && !empty($details['movements'])) {
+                foreach ($details['movements'] as $movement) {
+                    $data['movements'][] = [
+                        'movement_id' => $movement['movement_id'],
+                        'date' => $movement['date'],
+                        'type' => $movement['type'],
+                        'amount' => $movement['amount'],
+                        'balance' => $movement['balance'],
+                        'authorization_code' => $movement['authorization_code'],
+                        'description' => $movement['description'],
+                        'status' => $movement['status'],
+                    ];
+                }
+            }
         }
 
         return $data;

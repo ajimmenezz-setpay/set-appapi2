@@ -3645,22 +3645,33 @@
                                             "type": "array",
                                             "items": {
                                                 "properties": {
-                                                    "id": {
+                                                    "card_id": {
                                                         "type": "string",
                                                         "example": "uuid-91011"
                                                     },
-                                                    "number": {
+                                                    "card_external_id": {
                                                         "type": "string",
-                                                        "example": "**** **** **** 1234"
+                                                        "example": "uuid-91011"
                                                     },
-                                                    "expiry_date": {
+                                                    "card_type": {
                                                         "type": "string",
-                                                        "format": "date",
-                                                        "example": "2025-12"
+                                                        "example": "physical"
                                                     },
-                                                    "cvv": {
+                                                    "brand": {
                                                         "type": "string",
-                                                        "example": "123"
+                                                        "example": "MASTER"
+                                                    },
+                                                    "client_id": {
+                                                        "type": "string",
+                                                        "example": "PR0000003"
+                                                    },
+                                                    "masked_pan": {
+                                                        "type": "string",
+                                                        "example": "XXXX XXXX XXXX 5487"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "BLOCKED"
                                                     }
                                                 },
                                                 "type": "object"
