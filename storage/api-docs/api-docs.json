@@ -3877,6 +3877,54 @@
                 ]
             }
         },
+        "/cardCloud/credits/{uuid}/virtual_card_price": {
+            "get": {
+                "tags": [
+                    "Card Cloud - Créditos"
+                ],
+                "summary": "Obtener el precio de la tarjeta virtual",
+                "description": "Obtiene el precio de la tarjeta virtual asociada al crédito especificado.",
+                "operationId": "getCreditVirtualCardPrice",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "UUID del crédito",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Precio de la tarjeta virtual obtenido exitosamente.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "price": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 10.99
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "El crédito no fue encontrado o no tiene permisos para acceder a él."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/cardCloud/institution": {
             "get": {
                 "tags": [

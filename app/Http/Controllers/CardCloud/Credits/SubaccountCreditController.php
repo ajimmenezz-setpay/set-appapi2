@@ -742,4 +742,59 @@ class SubaccountCreditController extends Controller
             return self::basicError($e->getMessage());
         }
     }
+
+
+    /**
+     * @OA\Get(
+     *      path="/cardCloud/credits/{uuid}/virtual_card_price",
+     *      summary="Obtener el precio de la tarjeta virtual",
+     *      description="Obtiene el precio de la tarjeta virtual asociada al crédito especificado.",
+     *      operationId="getCreditVirtualCardPrice",
+     *      tags={"Card Cloud - Créditos"},
+     *      security={{"bearerAuth": {}}},
+     *
+     *      @OA\Parameter(
+     *          name="uuid",
+     *          in="path",
+     *          required=true,
+     *          description="UUID del crédito",
+     *          @OA\Schema(type="string")
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Precio de la tarjeta virtual obtenido exitosamente.",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="price", type="number", format="float", example=10.99)
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="El crédito no fue encontrado o no tiene permisos para acceder a él."
+     *      )
+     * )
+     */
+
+    public function virtualCardPrice(Request $request, $uuid)
+    {
+        try {
+            $credit = Credit::where('UUID', $uuid)
+                ->join('t_users', 't_card_cloud_credits.UserId', '=', 't_users.Id')
+                ->select('t_card_cloud_credits.*')
+                ->first();
+            if (!$credit) {
+                return response("El crédito no fue encontrado o no tiene permisos para acceder a él.", 404);
+            }
+
+            $subaccount = DB::connection('card_cloud')->table('subaccounts')->where('ExternalId', $credit->CompanyId)->first();
+            if (!$subaccount) {
+                return response("No se ha podido encontrar el costo de la tarjeta virtual. Intente de nuevo más tarde.", 404);
+            }
+
+            return response()->json(['price' => $subaccount->VirtualCardPrice]);
+        } catch (\Exception $e) {
+            return self::basicError($e->getMessage());
+        }
+    }
 }
