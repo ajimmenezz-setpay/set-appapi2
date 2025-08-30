@@ -3813,7 +3813,68 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/cardCloud/credits/{uuid}/activate": {
+            "post": {
+                "tags": [
+                    "Card Cloud - Créditos"
+                ],
+                "summary": "Asociar una tarjeta con un crédito",
+                "description": "Asocia una tarjeta con el UUID de crédito dado",
+                "operationId": "associateCardWithCredit",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "UUID of the credit",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "card": {
+                                        "type": "string",
+                                        "example": "12345678"
+                                    },
+                                    "expiration_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "0830"
+                                    },
+                                    "pin": {
+                                        "type": "string",
+                                        "example": "1234"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tarjeta activada correctamente"
+                    },
+                    "404": {
+                        "description": "El crédito no fue encontrado o no tiene permisos para acceder a él."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/cardCloud/institution": {

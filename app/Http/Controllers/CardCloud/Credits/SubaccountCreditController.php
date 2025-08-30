@@ -13,9 +13,11 @@ use App\Models\CardCloud\Credit;
 use GuzzleHttp\Exception\RequestException;
 use Ramsey\Uuid\Uuid;
 use App\Http\Controllers\Backoffice\Company;
+use App\Http\Controllers\CardCloud\CardManagementController;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendCredentialsToCreditUser;
 use App\Models\Backoffice\Companies\Company as CompaniesCompany;
+use App\Models\CardCloud\CardAssigned;
 use Illuminate\Support\Facades\Log;
 
 class SubaccountCreditController extends Controller
@@ -483,6 +485,7 @@ class SubaccountCreditController extends Controller
      *      summary="Obtener detalles de un crédito",
      *      description="Devuelve los detalles de un crédito específico",
      *      operationId="getCreditDetails",
+     *      security={{"bearerAuth":{}}},
      *      @OA\Parameter(
      *          name="uuid",
      *          in="path",
@@ -645,6 +648,98 @@ class SubaccountCreditController extends Controller
         return $data;
     }
 
+    /**
+     * @OA\Post(
+     *      path="/cardCloud/credits/{uuid}/activate",
+     *      summary="Asociar una tarjeta con un crédito",
+     *      tags={"Card Cloud - Créditos"},
+     *      description="Asocia una tarjeta con el UUID de crédito dado",
+     *      operationId="associateCardWithCredit",
+     *      security={{"bearerAuth":{}}},
+     *
+     *      @OA\Parameter(
+     *          name="uuid",
+     *          in="path",
+     *          required=true,
+     *          description="UUID of the credit"
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              @OA\Property(property="card", type="string", example="12345678"),
+     *              @OA\Property(property="expiration_date", type="string", format="date", example="0830"),
+     *              @OA\Property(property="pin", type="string", example="1234")
+     *          ),
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Tarjeta activada correctamente"
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="El crédito no fue encontrado o no tiene permisos para acceder a él."
+     *      )
+     * )
+     */
+    public function activateCard(Request $request, $uuid)
+    {
+        try {
+            $this->validate($request, [
+                'card' => 'required|min:8|max:8',
+                'expiration_date' => 'required',
+                'pin' => 'required|min:4|max:4'
+            ], [
+                'card.required' => 'Los últimos 8 dígitos de la tarjeta son requeridos',
+                'card.min' => 'Los últimos 8 dígitos de la tarjeta deben tener 8 caracteres',
+                'card.max' => 'Los últimos 8 dígitos de la tarjeta deben tener 8 caracteres',
+                'expiration_date.required' => 'La fecha de expiración es requerida',
+                'pin.required' => 'El PIN es requerido',
+                'pin.min' => 'El PIN debe tener 4 caracteres',
+                'pin.max' => 'El PIN debe tener 4 caracteres'
+            ]);
 
-    public function associateCard(Request $request, $uuid) {}
+            $credit = Credit::where('UUID', $uuid)
+                ->join('t_users', 't_card_cloud_credits.UserId', '=', 't_users.Id')
+                ->select('t_card_cloud_credits.*')
+                ->first();
+            if (!$credit) {
+                return response("El crédito no fue encontrado o no tiene permisos para acceder a él.", 404);
+            }
+
+            $client = new Client();
+            $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/validate_revolving_card', [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                ],
+                'json' => [
+                    'card' => $request->card,
+                    'pin' => $request->pin,
+                    'moye' => $request->expiration_date,
+                    'credit_id' => $credit->ExternalId
+                ]
+            ]);
+
+            $decodedJson = json_decode($response->getBody(), true);
+
+            return response()->json(['message' => 'Tarjeta activada correctamente']);
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                $statusCode = $e->getResponse()->getStatusCode();
+                $responseBody = $e->getResponse()->getBody()->getContents();
+                $decodedJson = json_decode($responseBody, true);
+                $message = 'Error al asociar la tarjeta.';
+
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $message .= " " . $decodedJson['message'];
+                }
+                return response($message, $statusCode);
+            } else {
+                return response("Error al asociar la tarjeta.", 400);
+            }
+        } catch (\Exception $e) {
+            return self::basicError($e->getMessage());
+        }
+    }
 }
