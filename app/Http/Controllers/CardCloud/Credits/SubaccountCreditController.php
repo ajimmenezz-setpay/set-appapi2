@@ -14,6 +14,7 @@ use GuzzleHttp\Exception\RequestException;
 use Ramsey\Uuid\Uuid;
 use App\Http\Controllers\Backoffice\Company;
 use App\Http\Controllers\CardCloud\CardManagementController;
+use App\Http\Controllers\Security\GoogleAuth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendCredentialsToCreditUser;
 use App\Models\Backoffice\Companies\Company as CompaniesCompany;
@@ -793,6 +794,65 @@ class SubaccountCreditController extends Controller
             }
 
             return response()->json(['price' => $subaccount->VirtualCardPrice]);
+        } catch (\Exception $e) {
+            return self::basicError($e->getMessage());
+        }
+    }
+
+
+    public function buyVirtualCard(Request $request, $uuid)
+    {
+        try {
+
+            $this->validate($request, [
+                'months' => 'required|numeric|min:1'
+            ], [
+                'months.required' => 'Los meses de la tarjeta virtual son requeridos',
+                'months.numeric' => 'Los meses de la tarjeta virtual deben ser un número',
+                'months.min' => 'Los meses de la tarjeta virtual deben ser mayor a 0'
+            ]);
+
+            if ($request->has('auth_code')) {
+                $this->validate($request, [
+                    'auth_code' => 'required|min:6|max:6'
+                ], [
+                    'auth_code.required' => 'El código de autenticación es requerido',
+                    'auth_code.min' => 'El código de autenticación debe tener 6 caracteres',
+                    'auth_code.max' => 'El código de autenticación debe tener 6 caracteres'
+                ]);
+                GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->auth_code);
+            }
+
+            $credit = Credit::where('UUID', $uuid)
+                ->join('t_users', 't_card_cloud_credits.UserId', '=', 't_users.Id')
+                ->select('t_card_cloud_credits.*')
+                ->first();
+            if (!$credit) {
+                return response("El crédito no fue encontrado o no tiene permisos para acceder a él.", 404);
+            }
+
+            if ($credit->UserId != $request->attributes->get('jwt')->id) {
+                return response("No tiene permisos para comprar una tarjeta virtual en este crédito.", 403);
+            }
+
+
+            $client = new Client();
+            $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/credit/' . $uuid . '/buy_virtual_card', [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                ],
+                'json' => [
+                    'months' => $request->months,
+                    'company' => $credit->CompanyId
+                ]
+            ]);
+
+            $decodedJson = json_decode($response->getBody(), true);
+
+            return response()->json(['message' => 'Tarjeta virtual activada correctamente.', 'card' => $decodedJson]);
+        } catch (RequestException $e) {
+            return response()->json(['message' => 'Error al activar la tarjeta virtual.'], 500);
         } catch (\Exception $e) {
             return self::basicError($e->getMessage());
         }

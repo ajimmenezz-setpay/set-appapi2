@@ -109,6 +109,7 @@ Route::middleware([VerifyJwt::class])->group(function () {
             Route::get('/{uuid}', [App\Http\Controllers\CardCloud\Credits\SubaccountCreditController::class, 'show']);
             Route::post('/{uuid}/activate', [App\Http\Controllers\CardCloud\Credits\SubaccountCreditController::class, 'activateCard']);
             Route::get('/{uuid}/virtual_card_price', [App\Http\Controllers\CardCloud\Credits\SubaccountCreditController::class, 'virtualCardPrice']);
+            Route::post('/{uuid}/buy_virtual_card', [App\Http\Controllers\CardCloud\Credits\SubaccountCreditController::class, 'buyVirtualCard']);
         });
     });
 
