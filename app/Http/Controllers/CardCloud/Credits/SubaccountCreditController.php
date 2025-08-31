@@ -859,7 +859,11 @@ class SubaccountCreditController extends Controller
                 'request' => $request->all(),
                 'user_data' => $request->attributes->get('jwt')
             ]);
-            return response()->json(['message' => 'Error al activar la tarjeta virtual.'], 500);
+            return response()->json([
+                'message' => 'Error al activar la tarjeta virtual.',
+                'error' => $e->getMessage(),
+                'response' => json_decode($e->getResponse()->getBody(), true)
+            ], 500);
         } catch (\Exception $e) {
             return self::basicError($e->getMessage());
         }
