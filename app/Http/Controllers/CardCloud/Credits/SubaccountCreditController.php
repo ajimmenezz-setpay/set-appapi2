@@ -852,6 +852,13 @@ class SubaccountCreditController extends Controller
 
             return response()->json(['message' => 'Tarjeta virtual activada correctamente.', 'card' => $decodedJson]);
         } catch (RequestException $e) {
+            Log::error("Error al activar la tarjeta virtual: " . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'request' => $request->all(),
+                'user_data' => $request->attributes->get('jwt')
+            ]);
             return response()->json(['message' => 'Error al activar la tarjeta virtual.'], 500);
         } catch (\Exception $e) {
             return self::basicError($e->getMessage());
