@@ -800,6 +800,80 @@ class SubaccountCreditController extends Controller
     }
 
 
+    /**
+     * @OA\Post(
+     *      path="/cardCloud/credits/{uuid}/buy_virtual_card",
+     *      summary="Activar tarjeta virtual",
+     *      description="Permite activar una tarjeta virtual asociada a un crédito específico.",
+     *      operationId="creditActivateVirtualCard",
+     *      tags={"Card Cloud - Créditos"},
+     *      security={{"bearerAuth": {}}},
+     *
+     *      @OA\Parameter(
+     *          name="uuid",
+     *          in="path",
+     *          required=true,
+     *          description="UUID del crédito",
+     *          @OA\Schema(type="string")
+     *      ),
+     *
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="months", type="integer", example=12),
+     *              @OA\Property(property="auth_code", type="string", example="123456")
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Tarjeta virtual comprada exitosamente.",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="message", type="string", example="Tarjeta virtual activada correctamente."),
+     *              @OA\Property(property="card", type="object",
+     *                  @OA\Property(property="card_id", type="string", example="0198fe6d-44bc-718d-9b31-cfaa9713e762"),
+     *                  @OA\Property(property="card_external_id", type="string", example="0198fe6d-4795-9263-257e-02e1bc41e115"),
+     *                  @OA\Property(property="card_type", type="string", example="virtual"),
+     *                  @OA\Property(property="brand", type="string", example="MASTER"),
+     *                  @OA\Property(property="bin", type="string", example=null),
+     *                  @OA\Property(property="pan", type="string", example=null),
+     *                  @OA\Property(property="client_id", type="string", example="SP0156345"),
+     *                  @OA\Property(property="masked_pan", type="string", example="XXXX XXXX XXXX "),
+     *                  @OA\Property(property="balance", type="string", example="0.00"),
+     *                  @OA\Property(property="clabe", type="string", example=null),
+     *                  @OA\Property(property="status", type="string", example="BLOCKED"),
+     *                  @OA\Property(property="substatus", type="object",
+     *                      @OA\Property(property="id", type="integer", example=0),
+     *                      @OA\Property(property="name", type="string", example="NORMAL"),
+     *                      @OA\Property(property="description", type="string", example="This card is already to use")
+     *                  ),
+     *                  @OA\Property(property="setups", type="object",
+     *                      @OA\Property(property="CardId", type="integer", example=140714),
+     *                      @OA\Property(property="Status", type="string", example="BLOCKED"),
+     *                      @OA\Property(property="StatusReason", type="string", example="INITIAL_BLOCKED"),
+     *                      @OA\Property(property="Ecommerce", type="boolean", example=true),
+     *                      @OA\Property(property="International", type="boolean", example=false),
+     *                      @OA\Property(property="Stripe", type="boolean", example=true),
+     *                      @OA\Property(property="Wallet", type="boolean", example=true),
+     *                      @OA\Property(property="Withdrawal", type="boolean", example=false),
+     *                      @OA\Property(property="Contactless", type="boolean", example=false),
+     *                      @OA\Property(property="PinOffline", type="boolean", example=true),
+     *                      @OA\Property(property="PinOnUs", type="boolean", example=false),
+     *                      @OA\Property(property="Id", type="integer", example=126224)
+     *                  )
+     *              )
+     *          )
+     *      ),
+     * 
+     *      @OA\Response(
+     *          response=404,
+     *          description="El crédito no fue encontrado o no tiene permisos para acceder a él."
+     *      )
+     * )
+     */
+
     public function buyVirtualCard(Request $request, $uuid)
     {
         try {

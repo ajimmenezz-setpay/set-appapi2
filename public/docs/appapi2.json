@@ -3925,6 +3925,192 @@
                 ]
             }
         },
+        "/cardCloud/credits/{uuid}/buy_virtual_card": {
+            "post": {
+                "tags": [
+                    "Card Cloud - Créditos"
+                ],
+                "summary": "Activar tarjeta virtual",
+                "description": "Permite activar una tarjeta virtual asociada a un crédito específico.",
+                "operationId": "creditActivateVirtualCard",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "UUID del crédito",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "months": {
+                                        "type": "integer",
+                                        "example": 12
+                                    },
+                                    "auth_code": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tarjeta virtual comprada exitosamente.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tarjeta virtual activada correctamente."
+                                        },
+                                        "card": {
+                                            "properties": {
+                                                "card_id": {
+                                                    "type": "string",
+                                                    "example": "0198fe6d-44bc-718d-9b31-cfaa9713e762"
+                                                },
+                                                "card_external_id": {
+                                                    "type": "string",
+                                                    "example": "0198fe6d-4795-9263-257e-02e1bc41e115"
+                                                },
+                                                "card_type": {
+                                                    "type": "string",
+                                                    "example": "virtual"
+                                                },
+                                                "brand": {
+                                                    "type": "string",
+                                                    "example": "MASTER"
+                                                },
+                                                "bin": {
+                                                    "type": "string",
+                                                    "example": null
+                                                },
+                                                "pan": {
+                                                    "type": "string",
+                                                    "example": null
+                                                },
+                                                "client_id": {
+                                                    "type": "string",
+                                                    "example": "SP0156345"
+                                                },
+                                                "masked_pan": {
+                                                    "type": "string",
+                                                    "example": "XXXX XXXX XXXX "
+                                                },
+                                                "balance": {
+                                                    "type": "string",
+                                                    "example": "0.00"
+                                                },
+                                                "clabe": {
+                                                    "type": "string",
+                                                    "example": null
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "BLOCKED"
+                                                },
+                                                "substatus": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 0
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "NORMAL"
+                                                        },
+                                                        "description": {
+                                                            "type": "string",
+                                                            "example": "This card is already to use"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "setups": {
+                                                    "properties": {
+                                                        "CardId": {
+                                                            "type": "integer",
+                                                            "example": 140714
+                                                        },
+                                                        "Status": {
+                                                            "type": "string",
+                                                            "example": "BLOCKED"
+                                                        },
+                                                        "StatusReason": {
+                                                            "type": "string",
+                                                            "example": "INITIAL_BLOCKED"
+                                                        },
+                                                        "Ecommerce": {
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        },
+                                                        "International": {
+                                                            "type": "boolean",
+                                                            "example": false
+                                                        },
+                                                        "Stripe": {
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        },
+                                                        "Wallet": {
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        },
+                                                        "Withdrawal": {
+                                                            "type": "boolean",
+                                                            "example": false
+                                                        },
+                                                        "Contactless": {
+                                                            "type": "boolean",
+                                                            "example": false
+                                                        },
+                                                        "PinOffline": {
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        },
+                                                        "PinOnUs": {
+                                                            "type": "boolean",
+                                                            "example": false
+                                                        },
+                                                        "Id": {
+                                                            "type": "integer",
+                                                            "example": 126224
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "El crédito no fue encontrado o no tiene permisos para acceder a él."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/cardCloud/institution": {
             "get": {
                 "tags": [
