@@ -837,7 +837,7 @@ class SubaccountCreditController extends Controller
 
 
             $client = new Client();
-            $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/credit/' . $uuid . '/buy_virtual_card', [
+            $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/credit/' . $credit->ExternalId . '/buy_virtual_card', [
                 'headers' => [
                     'Content-Type' => 'application/json',
                     'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
