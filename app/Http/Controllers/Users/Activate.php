@@ -647,7 +647,7 @@ class Activate extends Controller
                     'BusinessId' => $company->BusinessId
                 ]);
 
-                Company::addUserToCompany($company->Id, $user->Id);
+                Company::addUserToCompany($company->Id, $user);
 
                 $assignedWithoutEmail = CardAssigned::where('CardCloudId', $cardCloudData['card_id'])->where('Email', '')->first();
                 if ($assignedWithoutEmail) {
@@ -689,7 +689,9 @@ class Activate extends Controller
                 'trace' => $e->getTraceAsString(),
                 'request' => $request->all()
             ]);
-            return self::basicError($e->getMessage());
+            return self::basicError(
+                $e->getMessage() . ' - ' . $e->getLine() . ' - ' . $e->getFile()
+            );
         }
     }
 
