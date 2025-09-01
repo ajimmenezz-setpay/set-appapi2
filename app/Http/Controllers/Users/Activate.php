@@ -689,9 +689,7 @@ class Activate extends Controller
                 'trace' => $e->getTraceAsString(),
                 'request' => $request->all()
             ]);
-            return self::basicError(
-                $e->getMessage() . ' - ' . $e->getLine() . ' - ' . $e->getFile()
-            );
+            return self::basicError($e->getMessage());
         }
     }
 
