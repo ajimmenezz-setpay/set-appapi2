@@ -8067,6 +8067,99 @@
                 }
             }
         },
+        "/api/admin/v1/dashboard/v2": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get dashboard data",
+                "description": "Returns dashboard data for the specified date range.",
+                "operationId": "getDashboardData",
+                "parameters": [
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "description": "Start date for the data range",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1672531199
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "description": "End date for the data range",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1672617599
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "environment": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Production"
+                                            },
+                                            "fundings": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 1000
+                                            },
+                                            "spends": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 500
+                                            },
+                                            "subaccounts": {
+                                                "type": "array",
+                                                "items": {
+                                                    "properties": {
+                                                        "subaccount": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Subaccount 1"
+                                                        },
+                                                        "fundings": {
+                                                            "type": "number",
+                                                            "format": "float",
+                                                            "example": 500
+                                                        },
+                                                        "spends": {
+                                                            "type": "number",
+                                                            "format": "float",
+                                                            "example": 250
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/admin/v1/profiles/webapp": {
             "get": {
                 "tags": [
