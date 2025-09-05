@@ -1633,6 +1633,10 @@
                                             "MaxOperationsMonthlyTPV": {
                                                 "type": "integer",
                                                 "example": 50000
+                                            },
+                                            "CollateralPercent": {
+                                                "type": "integer",
+                                                "example": 20
                                             }
                                         },
                                         "type": "object"
@@ -1726,6 +1730,10 @@
                                     "max_operations_monthly_tpv": {
                                         "type": "integer",
                                         "example": 50000
+                                    },
+                                    "collateral_percent": {
+                                        "type": "integer",
+                                        "example": 20
                                     }
                                 },
                                 "type": "object"
@@ -1779,6 +1787,10 @@
                                         "MaxOperationsMonthlyTPV": {
                                             "type": "integer",
                                             "example": 50000
+                                        },
+                                        "CollateralPercent": {
+                                            "type": "integer",
+                                            "example": 20
                                         }
                                     },
                                     "type": "object"
@@ -1878,6 +1890,10 @@
                                         "MaxOperationsMonthlyTPV": {
                                             "type": "integer",
                                             "example": 50000
+                                        },
+                                        "CollateralPercent": {
+                                            "type": "integer",
+                                            "example": 20
                                         }
                                     },
                                     "type": "object"
@@ -1997,6 +2013,10 @@
                                     "max_operations_monthly_tpv": {
                                         "type": "integer",
                                         "example": 50000
+                                    },
+                                    "collateral_percent": {
+                                        "type": "integer",
+                                        "example": 20
                                     }
                                 },
                                 "type": "object"
@@ -2050,6 +2070,10 @@
                                         "MaxOperationsMonthlyTPV": {
                                             "type": "integer",
                                             "example": 50000
+                                        },
+                                        "CollateralPercent": {
+                                            "type": "integer",
+                                            "example": 20
                                         }
                                     },
                                     "type": "object"
