@@ -161,14 +161,35 @@ class FixMissingCompany extends Controller
         foreach ($companiesToFix as $companyId) {
             $projection = CompanyProjection::where('Id', $companyId->Id)->first();
             if ($projection) {
+
+                $usersIds = [];
+                $realUsers= [];
+
                 $users = json_decode($projection->Users, true);
+
+                foreach($users as $key => $user) {
+                    if(!in_array($user['id'], $usersIds)) {
+                        $realUsers[] = $users[$key];
+                        $usersIds[] = $user['id'];
+                    }else{
+                        unset($users[$key]);
+                        continue;
+                    }
+                }
+
+                if($projection->Id == "01987c93-2455-72c6-9549-efd83b8f4dc4"){
+                    var_dump($realUsers);
+                }
 
                 $relatedUsers = DB::table('t_backoffice_companies_and_users')
                     ->where('CompanyId', $companyId->Id)
                     ->get();
 
                 foreach ($relatedUsers as $relatedUser) {
-                    $users[] = [
+                    if (in_array($relatedUser->UserId, $usersIds)) {
+                        continue;
+                    }
+                    $realUsers[] = [
                         'id' => $relatedUser->UserId,
                         'companyId' => $relatedUser->CompanyId,
                         'profile' => $relatedUser->ProfileId,
@@ -181,7 +202,7 @@ class FixMissingCompany extends Controller
 
 
                 CompanyProjection::where('Id', $companyId->Id)
-                    ->update(['Users' => json_encode($users)]);
+                    ->update(['Users' => json_encode($realUsers) ]);
             }
         }
 

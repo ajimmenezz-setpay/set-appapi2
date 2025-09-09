@@ -779,6 +779,15 @@ class Activate extends Controller
 
             return $decodedJson;
         } catch (RequestException $e) {
+            Log::error('Error al validar tarjeta en Card Cloud: ', [
+                'card' => $card,
+                'nip' => $nip,
+                'moye' => $moye,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request' => $e->getRequest() ? (string) $e->getRequest()->getBody() : null,
+                'response' => $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+            ]);
             throw new \Exception('Los datos de la tarjeta no son válidos', 400);
         }
     }
