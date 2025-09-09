@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Users\Profile;
 use Illuminate\Http\Request;
 use App\Http\Services\JWTToken;
 
@@ -56,19 +57,25 @@ class Login extends Controller
 
     private function payloadUserData($user)
     {
-        return [
-            'id' => $user->Id,
-            'name' => $user->Name . ' ' . $user->Lastname,
-            'firstName' => $user->Name,
-            'lastName' => $user->Lastname,
-            'profileId' => $user->ProfileId,
-            'profile' => "PROFILE",
-            'email' => $user->Email,
-            'phone' => $user->Phone,
-            'urlInit' => '/spei-cloud/dashboard',
-            'businessId' => $user->BusinessId,
-            'authenticatorFactors' => $this->has2FA($user->Id)
-        ];
+        try {
+            $profile = Profile::getProfile($user);
+
+            return [
+                'id' => $user->Id,
+                'name' => $user->Name . ' ' . $user->Lastname,
+                'firstName' => $user->Name,
+                'lastName' => $user->Lastname,
+                'profileId' => "$user->ProfileId",
+                'profile' => "$profile->Name",
+                'email' => "$user->Email",
+                'phone' => "$user->Phone",
+                'urlInit' => "$profile->UrlInit",
+                'businessId' => "$user->BusinessId",
+                'authenticatorFactors' => $this->has2FA($user->Id)
+            ];
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage(), $e->getCode() ?: 403);
+        }
     }
 
     private function has2FA($userId)

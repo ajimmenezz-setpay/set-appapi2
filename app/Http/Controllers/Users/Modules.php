@@ -95,6 +95,7 @@ class Modules extends Controller
             ];
 
             $categories = self::categories();
+
             foreach ($categories as $category) {
                 $modules = self::modules($category->Id, $user->ProfileId);
                 if (empty($modules)) {
