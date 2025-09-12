@@ -42,7 +42,7 @@ class SubaccountCardController extends Controller
             ->get();
 
 
-        $cards = $cards->map(function ($card) use ($businessUsers) {
+        $cards = $cards->map(function ($card) use ($businessUsers, $request) {
             return [
                 'card_id' => $card->UUID,
                 'card_external_id' => $card->ExternalId,
@@ -52,7 +52,7 @@ class SubaccountCardController extends Controller
                 'pan' => $card->Pan,
                 'client_id' => self::getClientId($card->CustomerPrefix, $card->CustomerId),
                 'masked_pan' => (strlen($card->Pan) >= 16) ? "XXXX XXXX XXXX " . substr($card->Pan, -4) : "",
-                'balance' => self::decrypt($card->Balance),
+                'balance' => $request->attributes->get('jwt')->profileId != 12 ? self::decrypt($card->Balance) : "hidden",
                 'clabe' => $card->ShowSTPAccount == 1 ? $card->STPAccount : null,
                 'status' => $card->Status,
                 'name' => $businessUsers[$card->UUID]['name'] ?? "",

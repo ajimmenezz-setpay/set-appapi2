@@ -83,7 +83,7 @@ class Fundings extends Controller
                 'to.numeric' => 'La fecha de fin debe ser un número en formato UTC',
             ]);
 
-            Validate::userProfile([5, 7, 9, 11], $request->attributes->get('jwt')->profileId);
+            Validate::userProfile([5, 7, 9, 11,12], $request->attributes->get('jwt')->profileId);
 
             $companies = CompaniesByUser::get($request->attributes->get('jwt'));
 
