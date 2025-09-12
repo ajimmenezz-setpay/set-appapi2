@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\Users\Address as UserAddress;
 use App\Models\Users\UsersCode;
 use App\Http\Controllers\Backoffice\Company;
+use App\Mail\SendUserCredentials;
 
 class Activate extends Controller
 {
@@ -674,9 +675,21 @@ class Activate extends Controller
 
             $operations[] = 'El dobble factor de autenticación ha sido activado';
 
+
+            $sendNewPassword = false;
+            if ($user->Password == "NA") {
+                $newPassword = Password::createRandomPassword();
+                User::where('Id', $user->Id)->update([
+                    'Password' => Password::hashPassword($newPassword)
+                ]);
+                $sendNewPassword = true;
+            }
+
             DB::commit();
 
-            // self::send_access($user);
+            if (isset($sendNewPassword) && $sendNewPassword) {
+                Mail::to($user->Email)->send(new SendUserCredentials($user->Email, $newPassword));
+            }
 
             return response()->json(['message' => $operations], 200);
         } catch (\Exception $e) {
@@ -708,7 +721,7 @@ class Activate extends Controller
         $user->Name = 'Usuario';
         $user->Lastname = 'Nuevo';
         $user->Phone = '0000000000';
-        $user->Password = Password::hashPassword('12345678');
+        $user->Password = "NA";
         $user->StpAccountId = substr(Uuid::uuid7(), -7);
         $user->Register = Carbon::now('America/Mexico_City')->format('Y-m-d H:i:s');
         $user->Active = 0;
