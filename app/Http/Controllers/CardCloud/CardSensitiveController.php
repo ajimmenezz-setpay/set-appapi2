@@ -9,6 +9,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use App\Models\CardCloud\CardAssigned;
 use App\Http\Services\CardCloudApi;
+use App\Models\CardCloud\NipView;
+use Illuminate\Support\Facades\Log;
 
 class CardSensitiveController extends Controller
 {
@@ -190,6 +192,72 @@ class CardSensitiveController extends Controller
                 }
             }
         } catch (Exception $e) {
+            return self::basicError($e->getMessage());
+        }
+    }
+
+
+    /**
+     *  @OA\Post(
+     *      path="/api/cardCloud/card/{cardId}/nip_view",
+     *      tags={"Card Cloud V2"},
+     *      summary="Registrar vista de NIP",
+     *      description="Registrar vista de NIP",
+     *      operationId="nipView",
+     *
+     *      @OA\Parameter(
+     *          name="cardId",
+     *          in="path",
+     *          description="ID de la tarjeta",
+     *          required=true,
+     *          @OA\Schema(
+     *             type="string"
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *         response=201,
+     *          description="Vista de NIP registrada exitosamente",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="message", type="string", example="NIP view logged successfully.")
+     *          )
+     *      ),
+     *
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad Request",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Bad Request")
+     *         )
+     *     ),
+     *
+     *    @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Unauthorized")
+     *         )
+     *     )
+     *  )
+     */
+    public function nipView(Request $request, $cardId)
+    {
+        try {
+            NipView::create([
+                'UserId' => $request->attributes->get('jwt')->id,
+                'CardId' => $cardId
+            ]);
+            return response()->json(['message' => 'NIP view logged successfully.'], 201);
+        } catch (Exception $e) {
+            Log::error("Error en nipView: " . $e->getMessage(), [
+                'userId' => $request->attributes->get('jwt')->id,
+                'cardId' => $cardId,
+                'profileId' => $request->attributes->get('jwt')->profileId,
+                'timestamp' => now()
+            ]);
             return self::basicError($e->getMessage());
         }
     }
