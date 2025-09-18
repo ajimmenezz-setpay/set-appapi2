@@ -115,21 +115,19 @@ class Activate extends Controller
                 $cutoff = Carbon::now('America/Mexico_City')->subMinutes(15);
 
                 $lastCode = UsersCode::where('email', $request->email)->where('Register', '>=', $cutoff)->first();
-                if ($lastCode) {
-                    return self::basicError('Ya se ha enviado un código de verificación recientemente, por favor intente en 15 minutos.');
+                if (!$lastCode) {
+                    $code = random_int(100000, 999999);
+                    DB::table('t_users_codes')->where('UserId', $user->Id)->delete();
+
+                    DB::table('t_users_codes')->insert([
+                        'UserId' => $user->Id,
+                        'email' => $request->email,
+                        'Code' => $code,
+                        'Register' => Carbon::now('America/Mexico_City')->format('Y-m-d H:i:s')
+                    ]);
+
+                    Mail::to($request->email)->send(new VerificationAccountCode($code));
                 }
-
-                $code = random_int(100000, 999999);
-                DB::table('t_users_codes')->where('UserId', $user->Id)->delete();
-
-                DB::table('t_users_codes')->insert([
-                    'UserId' => $user->Id,
-                    'email' => $request->email,
-                    'Code' => $code,
-                    'Register' => Carbon::now('America/Mexico_City')->format('Y-m-d H:i:s')
-                ]);
-
-                Mail::to($request->email)->send(new VerificationAccountCode($code));
 
                 $secret = $this->generateSecret($user);
 
@@ -163,9 +161,7 @@ class Activate extends Controller
      *          @OA\JsonContent(
      *              required={"email", "code", "password", "password_confirmation"},
      *              @OA\Property(property="email", type="string", example="  [email protected]"),
-     *              @OA\Property(property="code", type="string", example="123456"),
-     *              @OA\Property(property="password", type="string", example="Password123!"),
-     *             @OA\Property(property="password_confirmation", type="string", example="Password123!")
+     *              @OA\Property(property="code", type="string", example="123456")
      *          )
      *      ),
      *
@@ -385,7 +381,7 @@ class Activate extends Controller
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(
-     *              required={"user_id", "temporal_code"},
+     *              required={"user_id", "temporal_code", "name", "last_name", "phone", "secret_phrase", "card", "nip", "moye", "password", "password_confirmation"},
      *              @OA\Property(property="user_id", type="string", example="123456"),
      *              @OA\Property(property="temporal_code", type="string", example="1234567"),
      *              @OA\Property(property="google_code", type="string", example="1234567"),
@@ -407,7 +403,9 @@ class Activate extends Controller
      *              @OA\Property(property="street", type="string", example="Calle Falsa 123"),
      *              @OA\Property(property="external_number", type="string", example="456"),
      *              @OA\Property(property="internal_number", type="string", example="789"),
-     *              @OA\Property(property="reference", type="string", example="Cerca de la plaza principal")
+     *              @OA\Property(property="reference", type="string", example="Cerca de la plaza principal"),
+     *              @OA\Property(property="password", type="string", example="Password123!"),
+     *              @OA\Property(property="password_confirmation", type="string", example="Password123!")
      *          )
      *     ),
      *
@@ -585,6 +583,22 @@ class Activate extends Controller
                 ]);
             }
 
+            if ($request->has('password')) {
+                $this->validate($request, [
+                    'password' => [
+                        'required',
+                        'min:8',
+                        'confirmed',
+                        'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/'
+                    ]
+                ], [
+                    'password.required' => 'La contraseña es requerida',
+                    'password.min' => 'La contraseña debe tener al menos 8 caracteres',
+                    'password.confirmed' => 'Las contraseñas no coinciden',
+                    'password.regex' => 'La contraseña debe contener al menos una letra mayúscula, una letra minúscula y un número'
+                ]);
+            }
+
             DB::beginTransaction();
 
             User::where('Id', $user->Id)->update([
@@ -674,6 +688,12 @@ class Activate extends Controller
             }
 
             $operations[] = 'El dobble factor de autenticación ha sido activado';
+
+            if ($request->has('password')) {
+                User::where('Id', $user->Id)->update([
+                    'Password' => Password::hashPassword($request->password)
+                ]);
+            }
 
 
             $sendNewPassword = false;

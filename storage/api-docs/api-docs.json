@@ -8076,14 +8076,6 @@
                                     "code": {
                                         "type": "string",
                                         "example": "123456"
-                                    },
-                                    "password": {
-                                        "type": "string",
-                                        "example": "Password123!"
-                                    },
-                                    "password_confirmation": {
-                                        "type": "string",
-                                        "example": "Password123!"
                                     }
                                 },
                                 "type": "object"
@@ -8282,7 +8274,16 @@
                             "schema": {
                                 "required": [
                                     "user_id",
-                                    "temporal_code"
+                                    "temporal_code",
+                                    "name",
+                                    "last_name",
+                                    "phone",
+                                    "secret_phrase",
+                                    "card",
+                                    "nip",
+                                    "moye",
+                                    "password",
+                                    "password_confirmation"
                                 ],
                                 "properties": {
                                     "user_id": {
@@ -8372,6 +8373,14 @@
                                     "reference": {
                                         "type": "string",
                                         "example": "Cerca de la plaza principal"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "Password123!"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "example": "Password123!"
                                     }
                                 },
                                 "type": "object"
