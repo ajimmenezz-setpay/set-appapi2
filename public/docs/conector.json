@@ -7193,8 +7193,8 @@
                                                 "example": "SET"
                                             },
                                             "subaccount_id": {
-                                                "type": "integer",
-                                                "example": 1
+                                                "type": "string",
+                                                "example": "c76deb1a-835b-4b5f-bf6c-272b714cb866"
                                             },
                                             "subaccount_name": {
                                                 "type": "string",
@@ -7291,8 +7291,8 @@
                                         "example": 1
                                     },
                                     "subaccount": {
-                                        "type": "integer",
-                                        "example": 1
+                                        "type": "string",
+                                        "example": "c76deb1a-835b-4b5f-bf6c-272b714cb866"
                                     }
                                 },
                                 "type": "object"
@@ -7329,8 +7329,8 @@
                                             "example": "SET"
                                         },
                                         "subaccount_id": {
-                                            "type": "integer",
-                                            "example": 1
+                                            "type": "string",
+                                            "example": "c76deb1a-835b-4b5f-bf6c-272b714cb866"
                                         },
                                         "subaccount_name": {
                                             "type": "string",
@@ -7475,8 +7475,8 @@
                                             "example": "SET"
                                         },
                                         "subaccount_id": {
-                                            "type": "integer",
-                                            "example": 1
+                                            "type": "string",
+                                            "example": "c76deb1a-835b-4b5f-bf6c-272b714cb866"
                                         },
                                         "subaccount_name": {
                                             "type": "string",
@@ -7589,13 +7589,13 @@
                                         "format": "float",
                                         "example": 150.75
                                     },
-                                    "environment_id": {
+                                    "environment": {
                                         "type": "integer",
                                         "example": 2
                                     },
-                                    "subaccount_id": {
-                                        "type": "integer",
-                                        "example": 3
+                                    "subaccount": {
+                                        "type": "string",
+                                        "example": "c76deb1a-835b-4b5f-bf6c-272b714cb866"
                                     }
                                 },
                                 "type": "object"
@@ -7632,8 +7632,8 @@
                                             "example": "SET"
                                         },
                                         "subaccount_id": {
-                                            "type": "integer",
-                                            "example": 3
+                                            "type": "string",
+                                            "example": "c76deb1a-835b-4b5f-bf6c-272b714cb866"
                                         },
                                         "subaccount_name": {
                                             "type": "string",
@@ -7780,8 +7780,8 @@
                                             "example": "SET"
                                         },
                                         "subaccount_id": {
-                                            "type": "integer",
-                                            "example": 1
+                                            "type": "string",
+                                            "example": "c76deb1a-835b-4b5f-bf6c-272b714cb866"
                                         },
                                         "subaccount_name": {
                                             "type": "string",
@@ -7928,8 +7928,8 @@
                                             "example": "SET"
                                         },
                                         "subaccount_id": {
-                                            "type": "integer",
-                                            "example": 1
+                                            "type": "string",
+                                            "example": "c76deb1a-835b-4b5f-bf6c-272b714cb866"
                                         },
                                         "subaccount_name": {
                                             "type": "string",
