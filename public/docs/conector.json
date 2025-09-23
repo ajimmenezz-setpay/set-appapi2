@@ -7154,6 +7154,879 @@
                 ]
             }
         },
+        "/api/admin/v1/charge_type": {
+            "get": {
+                "tags": [
+                    "Charge Types"
+                ],
+                "summary": "Get all charge types",
+                "description": "Retrieve a list of all charge types.",
+                "operationId": "getChargeTypes",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Charge Type 1"
+                                            },
+                                            "amount": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 10.5
+                                            },
+                                            "environment_id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "environment_name": {
+                                                "type": "string",
+                                                "example": "SET"
+                                            },
+                                            "subaccount_id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "subaccount_name": {
+                                                "type": "string",
+                                                "example": "Subaccount 1"
+                                            },
+                                            "active": {
+                                                "type": "boolean",
+                                                "example": true
+                                            },
+                                            "created_by": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "created_by_name": {
+                                                "type": "string",
+                                                "example": "Admin User"
+                                            },
+                                            "updated_by": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "updated_by_name": {
+                                                "type": "string",
+                                                "example": "Admin User"
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2025-09-18T06:47:32Z"
+                                            },
+                                            "updated_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2025-09-18T06:47:32Z"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "We could not retrieve charge types at this time. Please try again later."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Charge Types"
+                ],
+                "summary": "Create a new charge type",
+                "description": "Create a new charge type with the provided details.",
+                "operationId": "createChargeType",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "amount"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Sample Charge Type"
+                                    },
+                                    "amount": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 99.99
+                                    },
+                                    "environment": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "subaccount": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Charge type created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Sample Charge Type"
+                                        },
+                                        "amount": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 99.99
+                                        },
+                                        "environment_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "environment_name": {
+                                            "type": "string",
+                                            "example": "SET"
+                                        },
+                                        "subaccount_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "subaccount_name": {
+                                            "type": "string",
+                                            "example": "Subaccount 1"
+                                        },
+                                        "active": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "created_by": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "created_by_name": {
+                                            "type": "string",
+                                            "example": "Admin User"
+                                        },
+                                        "updated_by": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "updated_by_name": {
+                                            "type": "string",
+                                            "example": "Admin User"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2025-09-18T06:47:32Z"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2025-09-18T06:47:32Z"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "The name field is required."
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "We could not process your request. Please try again later."
+                                        },
+                                        "errors": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "Internal Server Error"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/charge_type/{id}": {
+            "get": {
+                "tags": [
+                    "Charge Types"
+                ],
+                "summary": "Get a specific charge type by ID",
+                "description": "Retrieve details of a specific charge type using its ID.",
+                "operationId": "getChargeTypeById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the charge type to retrieve",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Charge Type 1"
+                                        },
+                                        "amount": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 10.5
+                                        },
+                                        "environment_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "environment_name": {
+                                            "type": "string",
+                                            "example": "SET"
+                                        },
+                                        "subaccount_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "subaccount_name": {
+                                            "type": "string",
+                                            "example": "Subaccount 1"
+                                        },
+                                        "active": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "created_by": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "created_by_name": {
+                                            "type": "string",
+                                            "example": "Admin User"
+                                        },
+                                        "updated_by": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "updated_by_name": {
+                                            "type": "string",
+                                            "example": "Admin User"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2025-09-18T06:47:32Z"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2025-09-18T06:47:32Z"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Charge type not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Charge type not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "We could not retrieve the charge type at this time. Please try again later."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Charge Types"
+                ],
+                "summary": "Update a charge type",
+                "description": "Update the details of an existing charge type.",
+                "operationId": "updateChargeType",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Updated Charge Type"
+                                    },
+                                    "amount": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 150.75
+                                    },
+                                    "environment_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "subaccount_id": {
+                                        "type": "integer",
+                                        "example": 3
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Charge type updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Updated Charge Type"
+                                        },
+                                        "amount": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 150.75
+                                        },
+                                        "environment_id": {
+                                            "type": "integer",
+                                            "example": 2
+                                        },
+                                        "environment_name": {
+                                            "type": "string",
+                                            "example": "SET"
+                                        },
+                                        "subaccount_id": {
+                                            "type": "integer",
+                                            "example": 3
+                                        },
+                                        "subaccount_name": {
+                                            "type": "string",
+                                            "example": "Subaccount 3"
+                                        },
+                                        "active": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "created_by": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "created_by_name": {
+                                            "type": "string",
+                                            "example": "Admin User"
+                                        },
+                                        "updated_by": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "updated_by_name": {
+                                            "type": "string",
+                                            "example": "Admin User"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2025-09-18T06:47:32Z"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2025-09-18T06:47:32Z"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Charge Type not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Charge Type not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "We could not process your request. Please try again later."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/charge_type/{id}/enable": {
+            "post": {
+                "tags": [
+                    "Charge Types"
+                ],
+                "summary": "Enable a charge type",
+                "description": "Enable a specific charge type by its ID.",
+                "operationId": "enableChargeType",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the charge type to enable",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Charge type enabled successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Charge Type 1"
+                                        },
+                                        "amount": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 10.5
+                                        },
+                                        "environment_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "environment_name": {
+                                            "type": "string",
+                                            "example": "SET"
+                                        },
+                                        "subaccount_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "subaccount_name": {
+                                            "type": "string",
+                                            "example": "Subaccount 1"
+                                        },
+                                        "active": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "created_by": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "created_by_name": {
+                                            "type": "string",
+                                            "example": "Admin User"
+                                        },
+                                        "updated_by": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "updated_by_name": {
+                                            "type": "string",
+                                            "example": "Admin User"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2025-09-18T06:47:32Z"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2025-09-18T06:47:32Z"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Charge Type not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Charge Type not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Charge Type is already enabled",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Charge Type is already enabled"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "We could not process your request. Please try again later."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/charge_type/{id}/disable": {
+            "post": {
+                "tags": [
+                    "Charge Types"
+                ],
+                "summary": "Disable a charge type",
+                "description": "Disable a specific charge type by its ID.",
+                "operationId": "disableChargeType",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the charge type to disable",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Charge Type disabled successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Charge Type 1"
+                                        },
+                                        "amount": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 10.5
+                                        },
+                                        "environment_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "environment_name": {
+                                            "type": "string",
+                                            "example": "SET"
+                                        },
+                                        "subaccount_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "subaccount_name": {
+                                            "type": "string",
+                                            "example": "Subaccount 1"
+                                        },
+                                        "active": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "created_by": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "created_by_name": {
+                                            "type": "string",
+                                            "example": "Admin User"
+                                        },
+                                        "updated_by": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "updated_by_name": {
+                                            "type": "string",
+                                            "example": "Admin User"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2025-09-18T06:47:32Z"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2025-09-18T06:47:32Z"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Charge Type not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Charge Type not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Charge Type is already disabled",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Charge Type is already disabled"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "We could not process your request. Please try again later."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/credit": {
             "get": {
                 "tags": [
@@ -9929,7 +10802,24 @@
                 ],
                 "summary": "Get all subaccounts",
                 "description": "Get all subaccounts",
-                "operationId": "6cec31a7090259499ed43b6752eb8645",
+                "operationId": "getSubaccountsAdmin",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "environment_id": {
+                                        "description": "Environment ID to filter",
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Success",
@@ -14218,6 +15108,10 @@
         {
             "name": "ADM Card Management",
             "description": "ADM Card Management"
+        },
+        {
+            "name": "Charge Types",
+            "description": "Charge Types"
         },
         {
             "name": "Credit",
