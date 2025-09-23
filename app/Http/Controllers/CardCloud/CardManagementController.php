@@ -11,6 +11,8 @@ use GuzzleHttp\Exception\RequestException;
 use App\Models\Backoffice\Companies\CompanyProjection;
 use App\Models\Backoffice\Companies\CompaniesUsers;
 use App\Http\Controllers\Security\GoogleAuth;
+use App\Models\CardCloud\Card;
+use App\Models\CardCloud\CardPan;
 use Ramsey\Uuid\Uuid;
 use Carbon\Carbon;
 
@@ -1464,5 +1466,42 @@ class CardManagementController extends Controller
                 return self::basicError($e->getMessage());
             }
         }
+    }
+
+    public function getInfoByClientId(Request $request, $clientId)
+    {
+        try {
+            $clientId = self::splitClientId($clientId);
+            $card = Card::where('CustomerPrefix', $clientId['prefix'])
+                ->where('CustomerId', $clientId['number'])
+                ->first();
+            if (!$card) {
+                return self::basicError("No se encontró información para el clientId proporcionado");
+            }
+
+            $pan = CardPan::where('CardId', $card->Id)->first();
+            if (!$pan) {
+                return self::basicError("No se encontró información para el clientId proporcionado");
+            }
+
+            return response($pan->Pan);
+        } catch (\Exception $e) {
+            return self::basicError($e->getMessage());
+        }
+    }
+
+    public static function splitClientId($input)
+    {
+        if (preg_match('/^([A-Za-z]+)(\d+)$/', $input, $matches)) {
+            $prefix = $matches[1]; // Primer grupo de captura: letras
+            $number = (int) $matches[2]; // Segundo grupo de captura: números convertido a entero
+            return [
+                'prefix' => $prefix,
+                'number' => $number,
+            ];
+        }
+
+        // Retornar null si no coincide el patrón
+        return null;
     }
 }
