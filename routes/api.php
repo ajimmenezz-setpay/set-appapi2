@@ -231,6 +231,8 @@ Route::get('card-cloud/balance/{phone}', [App\Http\Controllers\CardCloud\CardMan
 
 Route::get('card-cloud/info/{clientId}', [App\Http\Controllers\CardCloud\CardManagementController::class, 'getInfoByClientId']);
 
+Route::get('card-cloud/balanceByCard/{card}', [App\Http\Controllers\CardCloud\CardManagementController::class, 'getBalanceByCardId']);
+
 Route::group(['prefix' => 'dev'], function () {
     Route::group(['prefix' => 'permissions'], function () {
         Route::get('/categories', [App\Http\Controllers\Users\Permissions::class, 'categories']);

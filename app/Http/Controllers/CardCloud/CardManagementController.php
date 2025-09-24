@@ -1490,6 +1490,51 @@ class CardManagementController extends Controller
         }
     }
 
+    public function getBalanceByCardId(Request $request, $card)
+    {
+        try {
+            if (!$card) {
+                return self::error("El número de tarjeta es requerido");
+            }
+            if (!preg_match('/^[0-9]{8}$/', $card)) {
+                return self::error("El número de tarjeta debe tener 8 dígitos y no puede contener caracteres especiales");
+            }
+
+            $cardsResponse = [];
+
+            $card = CardPan::where('card_pan.Pan', 'like', '%' . $card)
+                ->join('cards', 'cards.Id', '=', 'card_pan.CardId')
+                ->select('cards.UUID as CardCloudId')
+                ->first();
+            if (!$card) {
+                return self::error("No se encontraron tarjetas con la terminación proporcionada.");
+            }
+
+            $client = new Client();
+            $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/card/' . $card->CardCloudId . '/balance', [
+                'headers' => [
+                    'Content-Type' => 'application/json'
+                ]
+            ]);
+
+            $decodedJson = json_decode($response->getBody(), true);
+
+            $cardsResponse[] = [
+                'client_id' => $decodedJson['client_id'],
+                'balance' => $decodedJson['balance']
+            ];
+
+
+            if (empty($cardsResponse)) {
+                return self::error("No se pudo obtener el balance de la tarjeta."); 
+            }
+
+            return response()->json($cardsResponse);
+        } catch (\Exception $e) {
+            return self::basicError($e->getMessage());
+        }
+    }
+
     public static function splitClientId($input)
     {
         if (preg_match('/^([A-Za-z]+)(\d+)$/', $input, $matches)) {
