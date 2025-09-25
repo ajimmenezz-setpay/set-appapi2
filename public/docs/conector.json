@@ -4149,6 +4149,163 @@
                 ]
             }
         },
+        "/api/admin/v1/card/{uuid}/charge_types": {
+            "get": {
+                "tags": [
+                    "Card Additional Charges"
+                ],
+                "summary": "Get available charge types for a specific card",
+                "description": "Returns a list of charge types that can be applied to the specified card",
+                "operationId": "getChargeTypesByCard",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "Card UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Late Fee"
+                                            },
+                                            "amount": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 25
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Card not found or you do not have permission to access it"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/card/{uuid}/apply_charge": {
+            "post": {
+                "tags": [
+                    "Card Additional Charges"
+                ],
+                "summary": "Apply a charge to a specific card",
+                "description": "Applies a specified charge type to the card, deducting the amount from the card's balance",
+                "operationId": "applyChargeToCard",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "Card UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "charge_type_id",
+                                    "amount",
+                                    "datetime"
+                                ],
+                                "properties": {
+                                    "charge_type_id": {
+                                        "description": "ID of the charge type to apply",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "amount": {
+                                        "description": "Amount to charge",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 25
+                                    },
+                                    "description": {
+                                        "description": "Optional description for the charge",
+                                        "type": "string",
+                                        "example": "Late fee for overdue payment"
+                                    },
+                                    "datetime": {
+                                        "description": "Date and time when the charge is applied",
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2024-06-15 14:30:00"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Charge applied successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Charge applied successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Card not found or you do not have permission to access it"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/card/{uuid}": {
             "get": {
                 "tags": [
@@ -15088,6 +15245,10 @@
         {
             "name": "ADM Card Movements",
             "description": "ADM Card Movements"
+        },
+        {
+            "name": "Card Additional Charges",
+            "description": "Card Additional Charges"
         },
         {
             "name": "Cards",
