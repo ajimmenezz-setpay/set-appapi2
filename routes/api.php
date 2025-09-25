@@ -97,7 +97,6 @@ Route::middleware([VerifyJwt::class])->group(function () {
             Route::get('/{uuid}/cards', [App\Http\Controllers\CardCloud\SubaccountCardController::class, 'index']);
             Route::get('/{uuid}/credits', [App\Http\Controllers\CardCloud\Credits\SubaccountCreditController::class, 'index']);
             Route::post('/{uuid}/credits', [App\Http\Controllers\CardCloud\Credits\SubaccountCreditController::class, 'store']);
-
         });
 
         Route::group(['prefix' => 'cards'], function () {
@@ -226,6 +225,8 @@ Route::group(['prefix' => 'app-scrapper'], function () {
     Route::get('google-play/{id}', [App\Http\Controllers\Scrapper\AppScrapperController::class, 'google']);
     Route::get('play-store/{id}', [App\Http\Controllers\Scrapper\AppScrapperController::class, 'apple']);
 });
+
+Route::post('voice-ramos-arizpe/control', [App\Http\Controllers\Netelip\VoiceRamosArizpeController::class, 'control']);
 
 Route::get('card-cloud/balance/{phone}', [App\Http\Controllers\CardCloud\CardManagementController::class, 'getBalanceByPhone']);
 
