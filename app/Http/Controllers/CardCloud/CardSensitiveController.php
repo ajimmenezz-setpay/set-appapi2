@@ -11,6 +11,9 @@ use App\Models\CardCloud\CardAssigned;
 use App\Http\Services\CardCloudApi;
 use App\Models\CardCloud\NipView;
 use Illuminate\Support\Facades\Log;
+use App\Models\CardCloud\Card;
+use App\Models\CardCloud\Credit;
+use App\Models\CardCloud\CreditWallet;
 
 class CardSensitiveController extends Controller
 {
@@ -82,6 +85,22 @@ class CardSensitiveController extends Controller
                         ->where('UserId', $request->attributes->get('jwt')->id)
                         ->first();
                     $allowed = $cardAssigned ? true : false;
+
+                    if (!$allowed) {
+                        $cardCloud = Card::where('UUID', $cardId)->first();
+                        if ($cardCloud && $cardCloud->ProductType == "revolving") {
+                            $creditWallet = CreditWallet::where('Id', $cardCloud->CreditWalletId)->first();
+                            if ($creditWallet) {
+                                $creditUserAssociation = Credit::where('ExternalId', $creditWallet->UUID)
+                                    ->where('UserId', $request->attributes->get('jwt')->id)
+                                    ->first();
+                                if ($creditUserAssociation) {
+                                    $allowed = true;
+                                }
+                            }
+                        }
+                    }
+
                     break;
                 default:
                     $allowed = false;
