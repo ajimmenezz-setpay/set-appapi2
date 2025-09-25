@@ -9,6 +9,7 @@ class CreditWallet extends Model
 {
     use HasFactory;
 
+    protected $connection = 'card_cloud';
     protected $table = 'credit_wallets';
     protected $primaryKey = 'Id';
 
