@@ -309,6 +309,14 @@ class SpeiIn extends Controller
                     'Balance' => $companyBalance
                 ]);
 
+            $transactionData = [
+                'movement' => $movement,
+                'businessId' => $company->BusinessId,
+                'comissions' => json_encode($comissions),
+                'destinationBalance' => $companyBalance,
+                'cardCloudAccount' => env('CARD_CLOUD_MAIN_STP_ACCOUNT')
+            ];
+
             $transaction = self::transactionBase($movement, $company->BusinessId, json_encode($comissions), $companyBalance, env('CARD_CLOUD_MAIN_STP_ACCOUNT'));
             $transaction->save();
 
@@ -318,7 +326,8 @@ class SpeiIn extends Controller
                 'id' => $movement->id,
                 'destination' => $movement->cuentaBeneficiario,
                 'amount' => $movement->monto,
-                'status' => 'Registered as company card cloud'
+                'status' => 'Registered as company card cloud',
+                'transaction' => $transactionData
             ];
         } catch (\Exception $e) {
             DB::rollBack();
