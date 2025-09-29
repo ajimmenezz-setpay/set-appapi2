@@ -26,6 +26,7 @@ class SpeiIn extends Controller
         $response = [];
         $accounts = StpAccounts::where('Active', 1)->get();
         $date = isset($request->date) ? $request->date : Carbon::now()->format('Ymd');
+        StpTransaction::where('BusinessId','')->where('TypeId', 2)->where('StatusId', 3)->delete();
         foreach ($accounts as $account) {
             if (!isset($response[$account->Id])) {
                 $response[$account->Id] = [
