@@ -3448,6 +3448,10 @@
                                                 "type": "string",
                                                 "format": "date-time",
                                                 "example": null
+                                            },
+                                            "days_until_due": {
+                                                "type": "integer",
+                                                "example": 1
                                             }
                                         },
                                         "type": "object"
@@ -3611,6 +3615,10 @@
                                     "is_new_user": {
                                         "type": "boolean",
                                         "example": true
+                                    },
+                                    "days_until_due": {
+                                        "type": "integer",
+                                        "example": 1
                                     },
                                     "new_user": {
                                         "properties": {

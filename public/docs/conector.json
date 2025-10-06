@@ -8419,6 +8419,11 @@
                                                 "type": "string",
                                                 "format": "date",
                                                 "example": "2024-01-01"
+                                            },
+                                            "days_until_due": {
+                                                "description": "The number of days until the payment is due",
+                                                "type": "integer",
+                                                "example": 25
                                             }
                                         },
                                         "type": "object"
@@ -8511,6 +8516,12 @@
                                         "type": "string",
                                         "format": "date",
                                         "example": "2024-01-01"
+                                    },
+                                    "credit_start_date": {
+                                        "description": "The credit start date",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2023-01-01"
                                     }
                                 },
                                 "type": "object"
@@ -8590,6 +8601,11 @@
                                                     "type": "string",
                                                     "format": "date",
                                                     "example": "2024-01-01"
+                                                },
+                                                "days_until_due": {
+                                                    "description": "The number of days until the payment is due",
+                                                    "type": "integer",
+                                                    "example": 25
                                                 }
                                             },
                                             "type": "object"
@@ -8641,6 +8657,114 @@
             }
         },
         "/api/v1/credit/{id}": {
+            "get": {
+                "operationId": "c30ffa2aae30450f1206985e4e29894c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "description": "Unique identifier for the credit wallet entry",
+                                            "type": "string",
+                                            "format": "uuid",
+                                            "example": "123e4567-e89b-12d3-a456-426614174000"
+                                        },
+                                        "credit_limit": {
+                                            "description": "The total credit limit assigned to the account",
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 5000
+                                        },
+                                        "used_credit": {
+                                            "description": "The amount of credit that has been used",
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 1500
+                                        },
+                                        "available_credit": {
+                                            "description": "The amount of credit that is still available",
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 3500
+                                        },
+                                        "minimum_payment": {
+                                            "description": "The minimum payment required",
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 50
+                                        },
+                                        "interest_rate": {
+                                            "description": "The interest rate applied to the credit",
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 3.5
+                                        },
+                                        "yearly_fee": {
+                                            "description": "The yearly fee for maintaining the credit account",
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 100
+                                        },
+                                        "late_interest_rate": {
+                                            "description": "The interest rate applied to late payments",
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 5
+                                        },
+                                        "credit_start_date": {
+                                            "description": "The date when the credit account was started",
+                                            "type": "string",
+                                            "format": "date",
+                                            "example": "2023-01-01"
+                                        },
+                                        "next_fee_date": {
+                                            "description": "The next date when the yearly fee will be charged",
+                                            "type": "string",
+                                            "format": "date",
+                                            "example": "2024-01-01"
+                                        },
+                                        "days_until_due": {
+                                            "description": "The number of days until the payment is due",
+                                            "type": "integer",
+                                            "example": 25
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Credit wallet not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Credit wallet entry not found or you don't have permission to access it."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
             "put": {
                 "tags": [
                     "Credit"
@@ -8688,6 +8812,12 @@
                                         "type": "number",
                                         "format": "float",
                                         "example": 20
+                                    },
+                                    "next_fee_date": {
+                                        "description": "The next fee date",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2024-01-01"
                                     }
                                 },
                                 "type": "object"

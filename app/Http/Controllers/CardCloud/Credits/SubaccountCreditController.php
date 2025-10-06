@@ -131,7 +131,8 @@ class SubaccountCreditController extends Controller
      *                  @OA\Property(property="yearly_fee", type="number", example=0),
      *                  @OA\Property(property="late_interest_rate", type="number", example=0),
      *                  @OA\Property(property="credit_start_date", type="string", format="date-time", example=null),
-     *                  @OA\Property(property="next_fee_date", type="string", format="date-time", example=null)
+     *                  @OA\Property(property="next_fee_date", type="string", format="date-time", example=null),
+     *                  @OA\Property(property="days_until_due", type="integer", example=1)
      *              )
      *          )
      *      ),
@@ -276,6 +277,7 @@ class SubaccountCreditController extends Controller
      *              @OA\Property(property="yearly_fee", type="number", format="float", example=100.0),
      *              @OA\Property(property="late_interest_rate", type="number", format="float", example=10.0),
      *              @OA\Property(property="is_new_user", type="boolean", example=true),
+     *              @OA\Property(property="days_until_due", type="integer", example=1),
      *              @OA\Property(property="new_user", type="object",
      *                  @OA\Property(property="name", type="string", example="John"),
      *                  @OA\Property(property="lastname", type="string", example="Doe"),
@@ -332,7 +334,8 @@ class SubaccountCreditController extends Controller
                 'interest_rate' => 'required|numeric|min:0',
                 'yearly_fee' => 'nullable|numeric|min:0',
                 'late_interest_rate' => 'nullable|numeric|min:0',
-                'is_new_user' => 'required|boolean'
+                'is_new_user' => 'required|boolean',
+                'days_until_due' => 'nullable|numeric|min:1'
             ], [
                 'limit.required' => 'El límite de crédito es obligatorio (campo limit)',
                 'limit.numeric' => 'El límite de crédito debe ser un número (campo limit)',
@@ -345,7 +348,10 @@ class SubaccountCreditController extends Controller
                 'yearly_fee.min' => 'La comisión anual debe ser al menos :min (campo yearly_fee).',
                 'late_interest_rate.numeric' => 'La comisión moratoria debe ser un número (campo late_interest_rate).',
                 'late_interest_rate.min' => 'La comisión moratoria debe ser al menos :min (campo late_interest_rate).',
-                'is_new_user.required' => 'Debe definir si el crédito es para un nuevo usuario (campo is_new_user).'
+                'is_new_user.required' => 'Debe definir si el crédito es para un nuevo usuario (campo is_new_user).',
+                'is_new_user.boolean' => 'El campo is_new_user debe ser verdadero o falso (campo is_new_user).',
+                'days_until_due.numeric' => 'Los días para el vencimiento deben ser un número (campo days_until_due).',
+                'days_until_due.min' => 'Los días para el vencimiento deben ser al menos :min (campo days_until_due).'
             ]);
 
             if ($request->is_new_user) {
@@ -428,7 +434,8 @@ class SubaccountCreditController extends Controller
                         "interest_rate" => $request->interest_rate,
                         "yearly_fee" => $request->yearly_fee ?? 0,
                         "late_interest_rate" => $request->late_interest_rate ?? 0,
-                        "credit_start_date" => $request->credit_start_date ?? null
+                        "credit_start_date" => $request->credit_start_date ?? null,
+                        "days_until_due" => $request->days_until_due ?? 1
                     ]
                 ]);
 
