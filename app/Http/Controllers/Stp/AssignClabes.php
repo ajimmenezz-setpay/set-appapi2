@@ -18,7 +18,7 @@ class AssignClabes extends Controller
     public function fixClabesAssignation()
     {
         $companies = $this->fixCompanieStpAccounts();
-        $cards = $this->fixCardStpAccounts();
+        //$cards = $this->fixCardStpAccounts();
 
         return response()->json($companies);
     }
