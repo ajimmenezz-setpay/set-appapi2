@@ -9,6 +9,8 @@ use App\Models\Backoffice\Companies\CompanyProjection;
 use App\Models\Backoffice\Companies\Company;
 use App\Models\Backoffice\Companies\CompanySpeiAccount;
 use App\Models\CardCloud\CardSpeiAccount;
+use App\Models\CardCloud\Credit as CardCloudCredit;
+use App\Models\Credits\CreditWallet;
 use App\Models\Speicloud\StpAccounts;
 use App\Models\Speicloud\StpTransaction;
 use Carbon\Carbon;
@@ -26,7 +28,7 @@ class SpeiIn extends Controller
         $response = [];
         $accounts = StpAccounts::where('Active', 1)->get();
         $date = isset($request->date) ? $request->date : Carbon::now()->format('Ymd');
-        StpTransaction::where('BusinessId','')->where('TypeId', 2)->where('StatusId', 3)->delete();
+        StpTransaction::where('BusinessId', '')->where('TypeId', 2)->where('StatusId', 3)->delete();
         foreach ($accounts as $account) {
             if (!isset($response[$account->Id])) {
                 $response[$account->Id] = [
@@ -45,7 +47,7 @@ class SpeiIn extends Controller
                 continue;
             }
 
-            try{
+            try {
                 $balance = STPApi::balance(Crypt::decrypt($account->Url), Crypt::decrypt($account->Key), $account->Company, Crypt::decrypt($account->Number));
                 $balance = $this->updateBalance($account, $balance);
                 $response[$account->Id]['balance'] = $balance;
@@ -83,6 +85,12 @@ class SpeiIn extends Controller
                 continue;
             }
 
+            $credit = $this->searchByCreditAccount($movement->cuentaBeneficiario);
+            if (!is_null($credit)) {
+                $response[] = $this->processAsCredit($movement, $credit);
+                continue;
+            }
+
             $cardCloudCompany = $this->searchByCardCloudCompanyAccount($movement->cuentaBeneficiario);
             if (!is_null($cardCloudCompany)) {
                 $response[] = $this->processCardCloudMovement($movement, 'company', $cardCloudCompany->CompanyId);
@@ -99,25 +107,26 @@ class SpeiIn extends Controller
         return $response;
     }
 
-    private function updateBalance($account, $balance){
+    private function updateBalance($account, $balance)
+    {
         $response = [];
         if (isset($balance->respuesta)) {
-            if(isset($balance->respuesta->saldo)){
+            if (isset($balance->respuesta->saldo)) {
                 StpAccounts::where('Id', $account->Id)->update([
                     'Balance' => $balance->respuesta->saldo,
                     'BalanceDate' => Carbon::now('America/Mexico_City')->toDateTimeString()
                 ]);
                 $response['balance'] = $balance->respuesta->saldo;
-            }else{
+            } else {
                 throw new \Exception('Error al obtener el balance. ' . json_encode($balance));
             }
 
-            if(isset($balance->respuesta->cargosPendientes)){
+            if (isset($balance->respuesta->cargosPendientes)) {
                 StpAccounts::where('Id', $account->Id)->update([
                     'PendingCharges' => $balance->respuesta->cargosPendientes
                 ]);
                 $response['pendingCharges'] = $balance->respuesta->cargosPendientes;
-            }else{
+            } else {
                 throw new \Exception('Error al obtener los cargos pendientes. ' . json_encode($balance));
             }
         }
@@ -276,6 +285,15 @@ class SpeiIn extends Controller
         return null;
     }
 
+    public function searchByCreditAccount($beneficiaryAccount)
+    {
+        $credit = CreditWallet::where('CLABE', $beneficiaryAccount)->first();
+        if ($credit) {
+            return $credit;
+        }
+        return null;
+    }
+
     public function searchByCardCloud($beneficiaryAccount)
     {
         $card = CardSpeiAccount::where('Clabe', $beneficiaryAccount)->first();
@@ -283,6 +301,36 @@ class SpeiIn extends Controller
             return $card;
         }
         return null;
+    }
+
+    public function processAsCredit($movement, $credit)
+    {
+        try {
+            DB::beginTransaction();
+            $creditLocal = CardCloudCredit::where('ExternalId', $credit->UUID)->first();
+            if (!$creditLocal) {
+                throw new \Exception('No se encontró la cuenta de crédito asociada.', 500);
+            }
+
+            $company = Company::where('Id', $creditLocal->CompanyId)->first();
+            $comissions = $this->calculateCompanyCommission(null, $movement->monto);
+
+            $transaction = self::transactionBase($movement, $company->BusinessId, json_encode($comissions));
+            $transaction->save();
+            $this->processCardCloudCredit($credit->UUID, $movement);
+
+            DB::commit();
+
+            return [
+                'id' => $movement->id,
+                'destination' => $movement->cuentaBeneficiario,
+                'amount' => $movement->monto,
+                'status' => 'Registered as credit'
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw new \Exception('Error al registrar la transacción. ' . $e->getMessage());
+        }
     }
 
     public function processCardCloudMovement($movement, $type, $cardCloudCompany = null, $cardCloudCard = null)
@@ -332,6 +380,28 @@ class SpeiIn extends Controller
             ];
         } catch (\Exception $e) {
             DB::rollBack();
+            throw new \Exception('Error al registrar la transacción. ' . $e->getMessage());
+        }
+    }
+
+    public function processCardCloudCredit($credit, $movement)
+    {
+        try {
+            $client = new Client();
+            $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/credit/' . $credit . '/applyPayment', [
+                'headers' => [
+                    'Content-Type' => 'application/json'
+                ],
+                'json' => [
+                    'description' => 'SPEI Payment - ' . $movement->claveRastreo . ' - ' . $movement->conceptoPago,
+                    'reference' => $movement->id,
+                    'amount' => $movement->monto
+                ]
+            ]);
+
+            return true;
+        } catch (RequestException $e) {
+            Log::error('Error al registrar la transacción. ' . $e->getMessage());
             throw new \Exception('Error al registrar la transacción. ' . $e->getMessage());
         }
     }

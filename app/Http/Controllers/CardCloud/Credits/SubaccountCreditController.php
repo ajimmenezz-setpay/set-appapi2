@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\SendCredentialsToCreditUser;
 use App\Models\Backoffice\Companies\Company as CompaniesCompany;
 use App\Models\CardCloud\CardAssigned;
+use App\Models\Speicloud\StpClabe;
 use Illuminate\Support\Facades\Log;
 
 class SubaccountCreditController extends Controller
@@ -388,7 +389,7 @@ class SubaccountCreditController extends Controller
                     'Name' => $request->new_user['name'],
                     'Lastname' => $request->new_user['lastname'],
                     'Email' => $request->new_user['email'],
-                    'Phone' => $request->new_user['phone'] ?? null,
+                    'Phone' => $request->new_user['phone'] ?? "",
                     'ProfileId' => 8,
                     'Password' => Password::hashPassword($password),
                     'BusinessId' => $request->attributes->get('jwt')->businessId,
@@ -422,6 +423,16 @@ class SubaccountCreditController extends Controller
 
             Company::addUserToCompany($uuid, $user);
 
+            $clabe = null;
+            $nextCLABE = StpClabe::where('BusinessId', $request->attributes->get('jwt')->businessId)
+                ->where('Available', 1)
+                ->first();
+            if ($nextCLABE) {
+                $clabe = $nextCLABE->Number;
+                $nextCLABE->Available = 0;
+                $nextCLABE->save();
+            }
+
             try {
                 $client = new Client();
                 $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/credit', [
@@ -435,7 +446,8 @@ class SubaccountCreditController extends Controller
                         "yearly_fee" => $request->yearly_fee ?? 0,
                         "late_interest_rate" => $request->late_interest_rate ?? 0,
                         "credit_start_date" => $request->credit_start_date ?? null,
-                        "days_until_due" => $request->days_until_due ?? 1
+                        "days_until_due" => $request->days_until_due ?? 1,
+                        "clabe" => $clabe
                     ]
                 ]);
 
@@ -471,8 +483,6 @@ class SubaccountCreditController extends Controller
                     throw new \Exception("Error al crear el crédito.", 500);
                 }
             }
-
-            DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error("Error en SubaccountCreditController: " . $e->getMessage(), [
@@ -873,7 +883,7 @@ class SubaccountCreditController extends Controller
      *              )
      *          )
      *      ),
-     * 
+     *
      *      @OA\Response(
      *          response=404,
      *          description="El crédito no fue encontrado o no tiene permisos para acceder a él."
