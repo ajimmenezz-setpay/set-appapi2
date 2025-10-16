@@ -8244,7 +8244,7 @@
                 ]
             }
         },
-        "/api/admin/v1/charge_type/upload_template": {
+        "/api/admin/v1/charge_type/bulk/upload_template": {
             "post": {
                 "tags": [
                     "Charge Types"
@@ -8335,6 +8335,1068 @@
                                 }
                             }
                         }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/liquidations": {
+            "get": {
+                "tags": [
+                    "Credit Liquidations"
+                ],
+                "summary": "Get credit liquidations by date range",
+                "description": "Returns credit liquidations by date range",
+                "operationId": "getLiquidations",
+                "parameters": [
+                    {
+                        "name": "initial",
+                        "in": "query",
+                        "description": "Initial date (Y-m-d)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "final",
+                        "in": "query",
+                        "description": "Final date (Y-m-d)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "environmentLiquidations": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "environment": {
+                                                        "type": "string",
+                                                        "example": "Environment 1"
+                                                    },
+                                                    "initial_date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2023-01-01"
+                                                    },
+                                                    "final_date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2023-01-31"
+                                                    },
+                                                    "payment_required_date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2023-02-01"
+                                                    },
+                                                    "used": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 100
+                                                    },
+                                                    "paid": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 80
+                                                    },
+                                                    "limit": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 200
+                                                    },
+                                                    "percentage_used": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 50
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "subaccountLiquidations": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "subaccount": {
+                                                        "type": "string",
+                                                        "example": "Subaccount 1"
+                                                    },
+                                                    "initial_date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2023-01-01"
+                                                    },
+                                                    "final_date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2023-01-31"
+                                                    },
+                                                    "payment_required_date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2023-02-01"
+                                                    },
+                                                    "used": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 100
+                                                    },
+                                                    "paid": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 80
+                                                    },
+                                                    "limit": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 200
+                                                    },
+                                                    "percentage_used": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 50
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/liquidations/environment/{id}": {
+            "get": {
+                "tags": [
+                    "Credit Liquidations"
+                ],
+                "summary": "Get environment credit liquidation details",
+                "description": "Returns environment credit liquidation details including card movements",
+                "operationId": "getEnvironmentLiquidation",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Environment liquidation ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "liquidation": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "environment": {
+                                                    "type": "string",
+                                                    "example": "Environment 1"
+                                                },
+                                                "initial_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2023-01-01"
+                                                },
+                                                "final_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2023-01-31"
+                                                },
+                                                "payment_required_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2023-02-01"
+                                                },
+                                                "used": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 100
+                                                },
+                                                "paid": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 80
+                                                },
+                                                "limit": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 200
+                                                },
+                                                "percentage_used": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 50
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "card_movements": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "movement_id": {
+                                                        "type": "string",
+                                                        "example": "uuid-1234-5678"
+                                                    },
+                                                    "date": {
+                                                        "type": "integer",
+                                                        "example": 1672531199
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "example": "PURCHASE"
+                                                    },
+                                                    "amount": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 50
+                                                    },
+                                                    "balance": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 150
+                                                    },
+                                                    "authorization_code": {
+                                                        "type": "string",
+                                                        "example": "123456"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Purchase at Store"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "Approved"
+                                                    },
+                                                    "client_id": {
+                                                        "type": "string",
+                                                        "example": "CU0001234"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "payments": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "environment": {
+                                                        "type": "string",
+                                                        "example": "Environment 1"
+                                                    },
+                                                    "date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2023-02-05"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "example": "PAYMENT"
+                                                    },
+                                                    "amount": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 80
+                                                    },
+                                                    "blob": {
+                                                        "type": "string",
+                                                        "example": "base64-encoded-string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/liquidations/subaccount/{id}": {
+            "get": {
+                "tags": [
+                    "Credit Liquidations"
+                ],
+                "summary": "Get subaccount credit liquidation details",
+                "description": "Returns subaccount credit liquidation details including card movements",
+                "operationId": "getSubaccountLiquidation",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Subaccount ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "liquidation": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "subaccount": {
+                                                    "type": "string",
+                                                    "example": "Subaccount 1"
+                                                },
+                                                "initial_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2023-01-01"
+                                                },
+                                                "final_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2023-01-31"
+                                                },
+                                                "payment_required_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2023-02-01"
+                                                },
+                                                "used": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 100
+                                                },
+                                                "paid": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 80
+                                                },
+                                                "limit": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 200
+                                                },
+                                                "percentage_used": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 50
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "card_movements": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "movement_id": {
+                                                        "type": "string",
+                                                        "example": "uuid-1234-5678"
+                                                    },
+                                                    "date": {
+                                                        "type": "integer",
+                                                        "example": 1672531199
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "example": "PURCHASE"
+                                                    },
+                                                    "amount": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 50
+                                                    },
+                                                    "balance": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 150
+                                                    },
+                                                    "authorization_code": {
+                                                        "type": "string",
+                                                        "example": "123456"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Purchase at Store"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "Approved"
+                                                    },
+                                                    "client_id": {
+                                                        "type": "string",
+                                                        "example": "CU0001234"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "payments": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "subaccount": {
+                                                        "type": "string",
+                                                        "example": "Subaccount 1"
+                                                    },
+                                                    "date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2023-02-05"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "example": "PAYMENT"
+                                                    },
+                                                    "amount": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 80
+                                                    },
+                                                    "blob": {
+                                                        "type": "string",
+                                                        "example": "base64-encoded-string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/liquidations/environment/{id}/card_movements": {
+            "get": {
+                "tags": [
+                    "Credit Liquidations"
+                ],
+                "summary": "Get card movements for an environment liquidation",
+                "description": "Returns card movements associated with a specific environment liquidation",
+                "operationId": "getEnvironmentLiquidationCardMovements",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the environment liquidation",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "movement_id": {
+                                                "type": "string",
+                                                "example": "uuid-1234-5678"
+                                            },
+                                            "date": {
+                                                "type": "integer",
+                                                "example": 1672531199
+                                            },
+                                            "type": {
+                                                "type": "string",
+                                                "example": "PURCHASE"
+                                            },
+                                            "amount": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 50
+                                            },
+                                            "balance": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 150
+                                            },
+                                            "authorization_code": {
+                                                "type": "string",
+                                                "example": "123456"
+                                            },
+                                            "client_id": {
+                                                "type": "string",
+                                                "example": "CU0001234"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "Purchase at Store"
+                                            },
+                                            "status": {
+                                                "type": "string",
+                                                "example": "Approved"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/liquidations/subaccount/{id}/card_movements": {
+            "get": {
+                "tags": [
+                    "Credit Liquidations"
+                ],
+                "summary": "Get card movements for a subaccount liquidation",
+                "description": "Returns card movements associated with a specific subaccount liquidation",
+                "operationId": "getSubaccountLiquidationCardMovements",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the subaccount liquidation",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "movement_id": {
+                                                "type": "string",
+                                                "example": "uuid-1234-5678"
+                                            },
+                                            "date": {
+                                                "type": "integer",
+                                                "example": 1672531199
+                                            },
+                                            "type": {
+                                                "type": "string",
+                                                "example": "PURCHASE"
+                                            },
+                                            "amount": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 50
+                                            },
+                                            "balance": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 150
+                                            },
+                                            "authorization_code": {
+                                                "type": "string",
+                                                "example": "123456"
+                                            },
+                                            "client_id": {
+                                                "type": "string",
+                                                "example": "CU0001234"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "Purchase at Store"
+                                            },
+                                            "status": {
+                                                "type": "string",
+                                                "example": "Approved"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/liquidations/environment/{id}/payments": {
+            "get": {
+                "tags": [
+                    "Credit Liquidations"
+                ],
+                "summary": "Get payments for an environment liquidation",
+                "description": "Returns payments associated with a specific environment liquidation",
+                "operationId": "getEnvironmentLiquidationPayments",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the environment liquidation",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "environment": {
+                                                "type": "string",
+                                                "example": "Environment 1"
+                                            },
+                                            "date": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "2023-01-01"
+                                            },
+                                            "type": {
+                                                "type": "string",
+                                                "example": "PAYMENT"
+                                            },
+                                            "amount": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 100
+                                            },
+                                            "blob": {
+                                                "type": "string",
+                                                "example": "base64-encoded-string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Credit Liquidations"
+                ],
+                "summary": "Register a payment for an environment credit liquidation",
+                "description": "Registers a payment for a specific environment credit liquidation",
+                "operationId": "registerEnvironmentPayment",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "file": {
+                                        "description": "Payment proof file (jpeg, png, jpg, pdf)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "date": {
+                                        "description": "Payment date (Y-m-d)",
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "amount": {
+                                        "description": "Payment amount (positive for payment, negative for reversal)",
+                                        "type": "number",
+                                        "format": "float"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment registered successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Payment registered successfully"
+                                        },
+                                        "movement": {
+                                            "properties": {
+                                                "environment": {
+                                                    "type": "string",
+                                                    "example": "Environment 1"
+                                                },
+                                                "type": {
+                                                    "type": "string",
+                                                    "example": "PAYMENT"
+                                                },
+                                                "date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2023-01-01"
+                                                },
+                                                "amount": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 100
+                                                },
+                                                "blob": {
+                                                    "type": "string",
+                                                    "example": "base64-encoded-string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/liquidations/subaccount/{id}/payments": {
+            "get": {
+                "tags": [
+                    "Credit Liquidations"
+                ],
+                "summary": "Get payments for a subaccount liquidation",
+                "description": "Returns payments associated with a specific subaccount liquidation",
+                "operationId": "getSubaccountLiquidationPayments",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the subaccount liquidation",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "environment": {
+                                                "type": "string",
+                                                "example": "Environment 1"
+                                            },
+                                            "date": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "2023-01-01"
+                                            },
+                                            "type": {
+                                                "type": "string",
+                                                "example": "PAYMENT"
+                                            },
+                                            "amount": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 100
+                                            },
+                                            "blob": {
+                                                "type": "string",
+                                                "example": "base64-encoded-string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Credit Liquidations"
+                ],
+                "summary": "Register a payment for a subaccount credit liquidation",
+                "description": "Registers a payment for a specific subaccount credit liquidation",
+                "operationId": "registerSubaccountPayment",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "file": {
+                                        "description": "Payment proof file (jpeg, png, jpg, pdf)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "date": {
+                                        "description": "Payment date (Y-m-d)",
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "amount": {
+                                        "description": "Payment amount (positive for payment, negative for reversal)",
+                                        "type": "number",
+                                        "format": "float"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment registered successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Payment registered successfully"
+                                        },
+                                        "movement": {
+                                            "properties": {
+                                                "subaccount": {
+                                                    "type": "string",
+                                                    "example": "Subaccount 1"
+                                                },
+                                                "type": {
+                                                    "type": "string",
+                                                    "example": "PAYMENT"
+                                                },
+                                                "date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2023-01-01"
+                                                },
+                                                "amount": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 100
+                                                },
+                                                "blob": {
+                                                    "type": "string",
+                                                    "example": "base64-encoded-string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "500": {
+                        "description": "Internal server error"
                     }
                 },
                 "security": [
@@ -10341,6 +11403,11 @@
                                                 "description": "Fecha de activación de la tarjeta",
                                                 "type": "number",
                                                 "example": "1738300770"
+                                            },
+                                            "authorization_profile": {
+                                                "description": "Perfil de autorización",
+                                                "type": "string",
+                                                "example": "Perfil 1"
                                             }
                                         },
                                         "type": "object"
@@ -15563,6 +16630,10 @@
         {
             "name": "Charge Types",
             "description": "Charge Types"
+        },
+        {
+            "name": "Credit Liquidations",
+            "description": "Credit Liquidations"
         },
         {
             "name": "Credit",
