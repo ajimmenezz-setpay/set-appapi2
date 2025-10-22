@@ -179,7 +179,7 @@ class ForgotPassword extends Controller
                 'line' => $e->getLine(),
                 'code' => $e->getCode()
             ]);
-            return response()->json(['message' => 'Error al actualizar la contraseña, inténtelo de nuevo más tarde'], 500);
+            return response()->json(['message' => 'Error al actualizar la contraseña, '.$e->getMessage()], 500);
         }
     }
 }
