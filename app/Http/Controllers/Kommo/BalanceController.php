@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\Netelip;
+namespace App\Http\Controllers\Kommo;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
-class VoiceRamosArizpeController extends Controller
+class BalanceController extends Controller
 {
-    public function control(Request $request)
+    public function getBalance(Request $request)
     {
         try {
-            $response = Http::post('http://127.0.0.1:3003/api/netelip/api-voice/ramos-arizpe', $request->all());
+            $response = Http::post('http://127.0.0.1:3003/api/kommo/salesbot/consulta-saldo', $request->all());
 
             if ($response->successful()) {
                 return response()->json($response->json());

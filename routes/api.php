@@ -228,6 +228,8 @@ Route::group(['prefix' => 'app-scrapper'], function () {
 
 Route::post('voice-ramos-arizpe/control', [App\Http\Controllers\Netelip\VoiceRamosArizpeController::class, 'control']);
 
+Route::post('balance/kommo', [App\Http\Controllers\Kommo\BalanceController::class, 'getBalance']);
+
 Route::get('card-cloud/balance/{phone}', [App\Http\Controllers\CardCloud\CardManagementController::class, 'getBalanceByPhone']);
 
 Route::get('card-cloud/info/{clientId}', [App\Http\Controllers\CardCloud\CardManagementController::class, 'getInfoByClientId']);
