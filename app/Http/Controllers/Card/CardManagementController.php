@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use App\Http\Services\CardCloudApi;
 use GuzzleHttp\Exception\RequestException;
+use App\Models\Backoffice\Companies\CompanyProjection;
+use Illuminate\Support\Facades\DB;
 
 class CardManagementController extends Controller
 {
@@ -328,5 +330,14 @@ class CardManagementController extends Controller
         } catch (\Exception $e) {
             return response("Error retrieving card movements: " . $e->getMessage(), 500);
         }
+    }
+
+    public static function cardPan($cardId)
+    {
+        $cards = DB::connection('card_cloud')->table('cards')
+            ->join('card_pan', 'cards.Id', '=', 'card_pan.CardId')
+            ->where('UUID', $cardId)->first();
+
+        return $cards ? $cards->Pan : null;
     }
 }

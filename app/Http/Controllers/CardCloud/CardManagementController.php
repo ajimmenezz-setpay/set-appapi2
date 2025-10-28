@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\CardCloud;
 
+use App\Http\Controllers\Card\CardManagementController as CardCardManagementController;
 use App\Http\Controllers\Controller;
 use App\Models\CardCloud\CardAssigned;
 use Illuminate\Http\Request;
@@ -1377,11 +1378,11 @@ class CardManagementController extends Controller
                 Log::info('Card Assigned', ['cardAssigned' => $cardAssigned]);
                 if ($cardAssigned) {
                     $firebaseToken = FirebaseToken::where('UserId', $cardAssigned->UserId)->first();
-                    Log::info('Firebase Token', ['firebaseToken' => $firebaseToken]);
                     if ($firebaseToken) {
+                        $pan = CardCardManagementController::cardPan($cardId);
                         $title = "Tarjeta bloqueada";
-                        $body = "Una de sus tarjetas ha sido apagada.";
-                        $data = ['movementType' => 'CARD_LOCK', 'description' => 'Una de sus tarjetas ha sido bloqueada por usted o por un administrador. Si cree que esto es un error, contacte a soporte.'];
+                        $body = "Su tarjeta con terminación " . substr($pan, -4) . " se ha bloqueado.";
+                        $data = ['movementType' => 'CARD_LOCK', 'description' => 'Su tarjeta con terminación ' . substr($pan, -4) . ' ha sido bloqueada por usted o por un administrador. Si cree que esto es un error, contacte a soporte.'];
                         FirebaseService::sendPushNotification($firebaseToken->Token, $title, $body, $data);
                     }
                 }
@@ -1485,9 +1486,10 @@ class CardManagementController extends Controller
                 if ($cardAssigned) {
                     $firebaseToken = FirebaseToken::where('UserId', $cardAssigned->UserId)->first();
                     if ($firebaseToken) {
+                        $pan = CardCardManagementController::cardPan($cardId);
                         $title = "Tarjeta desbloqueada";
-                        $body = "Una de sus tarjetas se ha encendido.";
-                        $data = ['movementType' => 'CARD_UNLOCK', 'description' => 'Una de sus tarjetas ha sido desbloqueada por usted o por un administrador. Si cree que esto es un error, contacte a soporte.'];
+                        $body = "Su tarjeta con terminación " . substr($pan, -4) . " se ha desbloqueado.";
+                        $data = ['movementType' => 'CARD_UNLOCK', 'description' => 'Su tarjeta con terminación ' . substr($pan, -4) . ' ha sido desbloqueada por usted o por un administrador. Si cree que esto es un error, contacte a soporte.'];
                         FirebaseService::sendPushNotification($firebaseToken->Token, $title, $body, $data);
                     }
                 }

@@ -2,18 +2,23 @@
 
 namespace App\Http\Controllers\CardCloud;
 
-use App\Http\Controllers\Controller;
 use Exception;
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\Notifications\FirebasePushController as FirebaseService;
+use App\Http\Controllers\Card\CardManagementController as CardCardManagementController;
+
+use App\Http\Services\CardCloudApi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+
 use App\Models\CardCloud\CardAssigned;
-use App\Http\Services\CardCloudApi;
 use App\Models\CardCloud\NipView;
-use Illuminate\Support\Facades\Log;
 use App\Models\CardCloud\Card;
 use App\Models\CardCloud\Credit;
 use App\Models\CardCloud\CreditWallet;
+use App\Models\Users\FirebaseToken;
 
 class CardSensitiveController extends Controller
 {
@@ -143,6 +148,18 @@ class CardSensitiveController extends Controller
                     }
                 } catch (Exception $e) {
                     throw new Exception('No hemos podido obtener los datos sensibles de la tarjeta.');
+                } finally {
+                    $cardAssigned = CardAssigned::where('CardCloudId', $cardId)->first();
+                    if ($cardAssigned) {
+                        $firebaseToken = FirebaseToken::where('UserId', $cardAssigned->UserId)->first();
+                        if ($firebaseToken) {
+                            $pan = CardCardManagementController::cardPan($cardId);
+                            $title = "Datos sensibles";
+                            $body = "Se han solicitado los datos sensibles de la tarjeta con terminación " . substr($pan, -4) . ".";
+                            $data = ['movementType' => 'PIN_CHANGE', 'description' => 'Se han solicitado los datos sensibles de la tarjeta con terminación ' . substr($pan, -4) . '. Si usted no realizó esta acción, contacte a soporte.'];
+                            FirebaseService::sendPushNotification($firebaseToken->Token, $title, $body, $data);
+                        }
+                    }
                 }
             }
         } catch (Exception $e) {
