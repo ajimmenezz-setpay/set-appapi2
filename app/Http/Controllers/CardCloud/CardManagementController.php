@@ -1489,7 +1489,7 @@ class CardManagementController extends Controller
                         $pan = CardCardManagementController::cardPan($cardId);
                         $title = "Tarjeta desbloqueada";
                         $body = "Su tarjeta con terminación " . substr($pan, -4) . " se ha desbloqueado.";
-                        $data = ['movementType' => 'CARD_UNLOCK', 'description' => 'Su tarjeta con terminación ' . substr($pan, -4) . ' ha sido desbloqueada por usted o por un administrador. Si cree que esto es un error, contacte a soporte.'];
+                        $data = ['movementType' => 'CARD_LOCK', 'description' => 'Su tarjeta con terminación ' . substr($pan, -4) . ' ha sido desbloqueada por usted o por un administrador. Si cree que esto es un error, contacte a soporte.'];
                         FirebaseService::sendPushNotification($firebaseToken->FirebaseToken, $title, $body, $data);
                     }
                 }
