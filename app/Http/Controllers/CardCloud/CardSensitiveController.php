@@ -159,7 +159,7 @@ class CardSensitiveController extends Controller
                             $title = "Datos sensibles";
                             $body = "Se han solicitado los datos sensibles de la tarjeta con terminación " . substr($pan, -4) . ".";
                             $data = ['movementType' => 'PIN_CHANGE', 'description' => 'Se han solicitado los datos sensibles de la tarjeta con terminación ' . substr($pan, -4) . '. Si usted no realizó esta acción, contacte a soporte.'];
-                            FirebaseService::sendPushNotification($firebaseToken->Token, $title, $body, $data);
+                            FirebaseService::sendPushNotification($firebaseToken->FirebaseToken, $title, $body, $data);
                         }
                     }
                 }
