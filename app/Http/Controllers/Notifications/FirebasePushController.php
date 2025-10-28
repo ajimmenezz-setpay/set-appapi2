@@ -62,9 +62,10 @@ class FirebasePushController extends Controller
             FirebaseToken::updateOrCreate(
                 [
                     'UserId' => $request->attributes->get('jwt')->id,
-                    'FirebaseToken' => $request->input('firebase_token')
                 ],
-                []
+                [
+                    'FirebaseToken' => $request->input('firebase_token')
+                ]
             );
 
             return response()->json(['message' => 'Token del dispositivo asociado correctamente']);
