@@ -5204,6 +5204,91 @@
                 ]
             }
         },
+        "/api/users/firebase-token/asociate": {
+            "post": {
+                "tags": [
+                    "Firebase Push Notifications"
+                ],
+                "summary": "Asociar token de dispositivo Firebase al usuario autenticado",
+                "description": "Asocia el token de dispositivo Firebase al usuario autenticado para recibir notificaciones push.",
+                "operationId": "asociateDeviceToken",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "firebase_token"
+                                ],
+                                "properties": {
+                                    "firebase_token": {
+                                        "type": "string",
+                                        "maxLength": 512,
+                                        "example": "cUTUYpXhTYi397sCPb4MzK:APA91bHcjOxgOLiS5CScaBw4pUf5TMakie-b-aq2wwQ8l0O6-Nqs8aHpq9xL8GeZBh7e5YD35DwxDWpxoEac52ZKU3Vq0DeOVF031XoaBqbPnjsCkEVfEGo"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Token del dispositivo asociado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token del dispositivo asociado correctamente"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al asociar el token del dispositivo",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Error al asociar el token del dispositivo: [detalles del error]"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "No autorizado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/reports/card-cloud/card-status": {
             "get": {
                 "tags": [
@@ -9446,6 +9531,10 @@
         {
             "name": "Card Cloud",
             "description": "Card Cloud"
+        },
+        {
+            "name": "Firebase Push Notifications",
+            "description": "Firebase Push Notifications"
         },
         {
             "name": "Reports",
