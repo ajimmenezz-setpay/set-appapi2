@@ -171,6 +171,10 @@ Route::middleware([VerifyJwt::class])->group(function () {
             Route::get('/', [App\Http\Controllers\Users\AdditionalInfo::class, 'getAdditionalInfo']);
             Route::post('/', [App\Http\Controllers\Users\AdditionalInfo::class, 'setAdditionalInfo']);
         });
+
+        Route::group(['prefix' => 'firebase-token'], function () {
+            Route::post('/asociate', [App\Http\Controllers\Notifications\FirebasePushController::class, 'asociateDeviceToken']);
+        });
     });
 
     Route::group(['prefix' => 'administration'], function () {
@@ -259,5 +263,14 @@ Route::group(['prefix' => 'dev'], function () {
 
     Route::group(['prefix' => 'fixes'], function () {
         Route::post('/fixMissingCompany', [App\Http\Controllers\Users\FixMissingCompany::class, 'fixMissingCompany']);
+    });
+
+    Route::post('/test-push', function () {
+        \App\Http\Controllers\Notifications\FirebasePushController::sendPushNotification(
+            'cUTUYpXhTYi397sCPb4MzK:APA91bHcjOxgOLiS5CScaBw4pUf5TMakie-b-aq2wwQ8l0O6-Nqs8aHpq9xL8GeZBh7e5YD35DwxDWpxoEac52ZKU3Vq0DeOVF031XoaBqbPnjsCkEVfEGo',
+            'Título de prueba',
+            'Este es el cuerpo de la notificación de prueba',
+            ['movementType' => 'WITHDRAWAL', 'description' => 'lorem ipsum dolor sit amet consectetur adipiscing elit ']
+        );
     });
 });
