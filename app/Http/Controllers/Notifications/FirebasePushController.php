@@ -50,6 +50,9 @@ class FirebasePushController extends Controller
             if (!$response->successful()) {
                 Log::error('❌ Error al enviar la notificación push');
                 Log::error('Respuesta: ' . $response->body());
+            }else{
+                Log::info('✅ Notificación push enviada correctamente');
+                Log::info('Respuesta: ' . $response->body());
             }
         } catch (\Exception $e) {
             Log::error('⚠️ Error al enviar la notificación push: ' . $e->getMessage());

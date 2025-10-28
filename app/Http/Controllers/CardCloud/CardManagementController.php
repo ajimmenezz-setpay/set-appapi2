@@ -17,6 +17,7 @@ use App\Models\Users\FirebaseToken;
 use Ramsey\Uuid\Uuid;
 use Carbon\Carbon;
 use App\Http\Controllers\Notifications\FirebasePushController as FirebaseService;
+use Illuminate\Support\Facades\Log;
 
 class CardManagementController extends Controller
 {
@@ -1373,8 +1374,10 @@ class CardManagementController extends Controller
                 return self::basicError($e->getMessage());
             } finally {
                 $cardAssigned = CardAssigned::where('CardCloudId', $cardId)->first();
+                Log::info('Card Assigned', ['cardAssigned' => $cardAssigned]);
                 if ($cardAssigned) {
                     $firebaseToken = FirebaseToken::where('UserId', $cardAssigned->UserId)->first();
+                    Log::info('Firebase Token', ['firebaseToken' => $firebaseToken]);
                     if ($firebaseToken) {
                         $title = "Tarjeta bloqueada";
                         $body = "Una de sus tarjetas ha sido apagada.";
