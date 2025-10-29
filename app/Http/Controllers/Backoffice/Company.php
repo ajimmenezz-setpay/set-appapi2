@@ -487,10 +487,10 @@ class Company extends Controller
 
     public static function createCompany($request)
     {
-        $existingCompany = CompanyModel::where('RFC', $request->rfc)->first();
-        if ($existingCompany) {
-            throw new \Exception('Ya existe una empresa con el RFC proporcionado.', 400);
-        }
+        // $existingCompany = CompanyModel::where('RFC', $request->rfc)->first();
+        // if ($existingCompany) {
+        //     throw new \Exception('Ya existe una empresa con el RFC proporcionado.', 400);
+        // }
 
         return CompanyModel::create([
             'Id' => Uuid::uuid7(),
