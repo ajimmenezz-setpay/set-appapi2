@@ -8364,13 +8364,12 @@
                         }
                     },
                     {
-                        "name": "final",
+                        "name": "unpaid",
                         "in": "query",
-                        "description": "Final date (Y-m-d)",
-                        "required": true,
+                        "description": "Filter to get only unpaid liquidations",
+                        "required": false,
                         "schema": {
-                            "type": "string",
-                            "format": "date"
+                            "type": "boolean"
                         }
                     }
                 ],
@@ -8655,6 +8654,42 @@
                                                 },
                                                 "type": "object"
                                             }
+                                        },
+                                        "previous_liquidation": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "environment": {
+                                                    "type": "string",
+                                                    "example": "Environment 1"
+                                                },
+                                                "payment_required_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2023-01-01"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "next_liquidation": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "environment": {
+                                                    "type": "string",
+                                                    "example": "Environment 1"
+                                                },
+                                                "payment_required_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2023-01-01"
+                                                }
+                                            },
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
