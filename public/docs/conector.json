@@ -4149,6 +4149,195 @@
                 ]
             }
         },
+        "/admin/v1/card/{uuid}/notes": {
+            "get": {
+                "summary": "Get all notes for a card",
+                "operationId": "155904cca4ead823221fc9cbdf4b54af",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Notes retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "parent_id": {
+                                                "type": "integer"
+                                            },
+                                            "user": {
+                                                "type": "string"
+                                            },
+                                            "title": {
+                                                "type": "string"
+                                            },
+                                            "content": {
+                                                "type": "string"
+                                            },
+                                            "attachments": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string",
+                                                    "format": "base64"
+                                                }
+                                            },
+                                            "note_date": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "child_notes": {
+                                                "type": "array",
+                                                "items": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "parent_id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "user": {
+                                                            "type": "string"
+                                                        },
+                                                        "title": {
+                                                            "type": "string"
+                                                        },
+                                                        "content": {
+                                                            "type": "string"
+                                                        },
+                                                        "attachments": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string",
+                                                                "format": "base64"
+                                                            }
+                                                        },
+                                                        "note_date": {
+                                                            "type": "string",
+                                                            "format": "date-time"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create a new note for a card",
+                "operationId": "f92dd583378f7a95a671afff7960a63b",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "maxLength": 200
+                                    },
+                                    "content": {
+                                        "type": "string"
+                                    },
+                                    "attachments": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    },
+                                    "parent_id": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Note created successfully"
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/admin/v1/card/notes/{noteId}": {
+            "delete": {
+                "summary": "Delete a note by its ID",
+                "operationId": "f453088777fc7dfc4ac88e3f174a0b69",
+                "parameters": [
+                    {
+                        "name": "noteId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Note deleted successfully"
+                    },
+                    "400": {
+                        "description": "Cannot delete note with child notes"
+                    },
+                    "404": {
+                        "description": "Note not found"
+                    },
+                    "403": {
+                        "description": "Unauthorized to delete this note"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/api/admin/v1/card/{uuid}/charge_types": {
             "get": {
                 "tags": [

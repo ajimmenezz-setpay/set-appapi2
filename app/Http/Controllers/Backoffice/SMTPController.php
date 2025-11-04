@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backoffice;
 
 use App\Http\Controllers\Controller;
+use App\Models\Backoffice\Business;
 use App\Models\Business\SMTP;
 use Illuminate\Http\Request;
 
@@ -30,6 +31,8 @@ class SMTPController extends Controller
         }
 
         return [
+            'business_id' => $smtp->BusinessId,
+            'business_name' => Business::where('Id', $smtp->BusinessId)->value('Name'),
             'host' => self::decrypt($smtp->SmtpHost),
             'port' => self::decrypt($smtp->SmtpPort),
             'username' => self::decrypt($smtp->SmtpUser),
