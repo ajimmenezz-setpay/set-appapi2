@@ -4305,10 +4305,10 @@
                 }
             }
         },
-        "/admin/v1/card/notes/{noteId}": {
+        "/admin/v1/card/{uuid}/notes/{noteId}": {
             "delete": {
                 "summary": "Delete a note by its ID",
-                "operationId": "f453088777fc7dfc4ac88e3f174a0b69",
+                "operationId": "835783599c236b75307649983813e712",
                 "parameters": [
                     {
                         "name": "noteId",
@@ -5066,6 +5066,72 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/api/admin/v1/cards/{uuid}/nip-changes": {
+            "get": {
+                "tags": [
+                    "Cards"
+                ],
+                "summary": "Get NIP changes for a card",
+                "description": "Returns a list of NIP changes for the specified card UUID.",
+                "operationId": "getNipChanges",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "The UUID of the card.",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 123
+                                            },
+                                            "change_nip_date": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2023-10-01T12:34:56Z"
+                                            },
+                                            "next_movement_type": {
+                                                "type": "string",
+                                                "example": "purchase"
+                                            },
+                                            "next_movement_date": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2023-10-02T14:20:00Z"
+                                            },
+                                            "next_movement_concept": {
+                                                "type": "string",
+                                                "example": "Hubsite SANT"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Card not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
                     }
                 }
             }
