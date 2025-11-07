@@ -1329,6 +1329,9 @@ class CardManagementController extends Controller
     {
         switch ($request->attributes->get('jwt')->profileId) {
             case 5:
+            case 10:
+            case 11:
+            case 12:
                 $allowed = true;
                 break;
             case 8:
@@ -1438,6 +1441,9 @@ class CardManagementController extends Controller
     {
         switch ($request->attributes->get('jwt')->profileId) {
             case 5:
+            case 10:
+            case 11:
+            case 12:
                 $allowed = true;
                 break;
             case 8:
