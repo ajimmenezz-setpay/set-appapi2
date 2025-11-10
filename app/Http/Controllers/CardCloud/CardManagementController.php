@@ -1508,7 +1508,9 @@ class CardManagementController extends Controller
         try {
             $clientId = self::splitClientId($clientId);
             $card = Card::where('CustomerPrefix', $clientId['prefix'])
+                ->join('card_pan', 'card_pan.CardId', '=', 'cards.Id')
                 ->where('CustomerId', $clientId['number'])
+                ->select('cards.Id', 'card_pan.Pan')
                 ->first();
             if (!$card) {
                 return self::basicError("No se encontró información para el clientId proporcionado");
@@ -1519,7 +1521,7 @@ class CardManagementController extends Controller
                 return self::basicError("No se encontró información para el clientId proporcionado");
             }
 
-            return response(substr($pan->Pan, -8));
+            return response($pan->Pan, -8);
         } catch (\Exception $e) {
             return self::basicError($e->getMessage());
         }
