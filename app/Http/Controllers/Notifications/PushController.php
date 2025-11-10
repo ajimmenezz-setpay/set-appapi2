@@ -41,16 +41,13 @@ class PushController extends Controller
 
 
             if ($cardAssigned) {
-                Log::info('Sending push notification', ['userId' => $cardAssigned->UserId]);
                 $firebaseToken = FirebaseToken::where('UserId', $cardAssigned->UserId)->first();
                 if ($firebaseToken) {
-                    Log::info('Firebase token found', ['firebaseToken' => $firebaseToken->FirebaseToken]);
                     $pan = CardCardManagementController::cardPan($cardId);
-                    $title = "Tarjeta bloqueada";
-                    $body = "Su tarjeta con terminación " . substr($pan, -4) . " se ha bloqueado.";
-                    $data = ['movementType' => 'CARD_LOCK', 'description' => 'Su tarjeta con terminación ' . substr($pan, -4) . ' ha sido bloqueada por usted o por un administrador. Si cree que esto es un error, contacte a soporte.'];
+                    $title = $request->input('title');
+                    $body = $request->input('body');
+                    $data = ['movementType' => $request->input('movement_type'), 'description' => $request->input('description')];
                     FirebaseService::sendPushNotification($firebaseToken->FirebaseToken, $title, $body, $data);
-                    Log::info('Push notification sent successfully');
                 }
             }
 

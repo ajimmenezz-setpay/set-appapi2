@@ -150,9 +150,7 @@ class CardSensitiveController extends Controller
                     throw new Exception('No hemos podido obtener los datos sensibles de la tarjeta.');
                 } finally {
                     $cardAssigned = CardAssigned::where('CardCloudId', $cardId)->first();
-                    // Log::info('Card Assigned for sensitive data notification', ['cardAssigned' => $cardAssigned]);
                     if ($cardAssigned) {
-                        // Log::info('Sending push notification for sensitive data access', ['userId' => $cardAssigned->UserId]);
                         $firebaseToken = FirebaseToken::where('UserId', $cardAssigned->UserId)->first();
                         if ($firebaseToken) {
                             $pan = CardCardManagementController::cardPan($cardId);

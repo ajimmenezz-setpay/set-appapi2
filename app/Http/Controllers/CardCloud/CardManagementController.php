@@ -1378,7 +1378,6 @@ class CardManagementController extends Controller
                 return self::basicError($e->getMessage());
             } finally {
                 $cardAssigned = CardAssigned::where('CardCloudId', $cardId)->first();
-                Log::info('Card Assigned', ['cardAssigned' => $cardAssigned]);
                 if ($cardAssigned) {
                     $firebaseToken = FirebaseToken::where('UserId', $cardAssigned->UserId)->first();
                     if ($firebaseToken) {
