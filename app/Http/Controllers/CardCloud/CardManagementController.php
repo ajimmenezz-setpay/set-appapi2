@@ -1521,7 +1521,7 @@ class CardManagementController extends Controller
                 return self::basicError("No se encontró información para el clientId proporcionado");
             }
 
-            return response($pan->Pan, -8);
+            return response($pan->Pan);
         } catch (\Exception $e) {
             return self::basicError($e->getMessage());
         }
