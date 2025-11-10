@@ -16,14 +16,14 @@ class PushController extends Controller
     {
         try {
             $this->validate($request, [
-                'card_id' => 'required|integer',
+                'card_id' => 'required|string',
                 'title' => 'required|string',
                 'body' => 'required|string',
                 'movement_type' => 'required|string',
                 'description' => 'string',
             ], [
                 'card_id.required' => 'El campo card_id es obligatorio.',
-                'card_id.integer' => 'El campo card_id debe ser un número entero.',
+                'card_id.string' => 'El campo card_id debe ser una cadena de texto.',
                 'title.required' => 'El campo title es obligatorio.',
                 'title.string' => 'El campo title debe ser una cadena de texto.',
                 'body.required' => 'El campo body es obligatorio.',
