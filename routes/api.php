@@ -274,3 +274,5 @@ Route::group(['prefix' => 'dev'], function () {
         );
     });
 });
+
+Route::post('npush', [App\Http\Controllers\Notifications\PushController::class, 'sendPushNotification']);
