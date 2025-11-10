@@ -1383,8 +1383,8 @@ class CardManagementController extends Controller
                     if ($firebaseToken) {
                         $pan = CardCardManagementController::cardPan($cardId);
                         $title = "Tarjeta bloqueada";
-                        $body = "Su tarjeta con terminación " . substr($pan, -4) . " se ha bloqueado.";
-                        $data = ['movementType' => 'CARD_LOCK', 'description' => 'Su tarjeta con terminación ' . substr($pan, -4) . ' ha sido bloqueada por usted o por un administrador. Si cree que esto es un error, contacte a soporte.'];
+                        $body = "Su tarjeta con terminación " . substr($cardAssigned->MaskedPan, -4) . " se ha bloqueado.";
+                        $data = ['movementType' => 'CARD_LOCK', 'description' => 'Su tarjeta con terminación ' . substr($cardAssigned->MaskedPan, -4) . ' ha sido bloqueada por usted o por un administrador. Si cree que esto es un error, contacte a soporte.'];
                         FirebaseService::sendPushNotification($firebaseToken->FirebaseToken, $title, $body, $data);
                     }
                 }
