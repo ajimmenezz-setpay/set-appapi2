@@ -273,6 +273,8 @@ Route::group(['prefix' => 'dev'], function () {
             ['movementType' => 'WITHDRAWAL', 'description' => 'lorem ipsum dolor sit amet consectetur adipiscing elit ']
         );
     });
+
+    Route::get('/push-notifications/pending', [App\Http\Controllers\Notifications\PushController::class, 'sendPendingPushNotifications']);
 });
 
 Route::post('npush', [App\Http\Controllers\Notifications\PushController::class, 'sendPushNotification']);

@@ -91,14 +91,21 @@ class FirebasePushController extends Controller
             $response = Http::post('http://127.0.0.1:3003/api/fcm/notifications/send', $message);
 
             if (!$response->successful()) {
-                Log::error('❌ Error al enviar la notificación push');
-                Log::error('Respuesta: ' . $response->body());
+                return [
+                    'status' => 'failure',
+                    'error' => 'Error al enviar la notificación: ' . $response->body()
+                ];
             } else {
-                Log::info('✅ Notificación push enviada correctamente');
-                Log::info('Respuesta: ' . $response->body());
+                return [
+                    'status' => 'success',
+                    'response' => $response->json()
+                ];
             }
         } catch (\Exception $e) {
-            Log::error('⚠️ Error al enviar la notificación push: ' . $e->getMessage());
+            return [
+                'status' => 'failure',
+                'error' => 'Excepción al enviar la notificación: ' . $e->getMessage()
+            ];
         }
     }
 }

@@ -8,7 +8,7 @@ use App\Models\CardCloud\CardAssigned;
 use App\Models\Users\FirebaseToken;
 use App\Http\Controllers\Card\CardManagementController as CardCardManagementController;
 use App\Http\Controllers\Notifications\FirebasePushController as FirebaseService;
-use Illuminate\Support\Facades\Log;
+use App\Models\Notifications\Push as PushModel;
 
 class PushController extends Controller
 {
@@ -37,27 +37,62 @@ class PushController extends Controller
             $cardId = $request->input('card_id');
 
             $cardAssigned = CardAssigned::where('CardCloudId', $cardId)->first();
-            Log::info('Card Assigned for push notification', ['cardAssigned' => $cardAssigned]);
 
-
-            if ($cardAssigned) {
+            if ($cardAssigned){
                 $firebaseToken = FirebaseToken::where('UserId', $cardAssigned->UserId)->first();
                 if ($firebaseToken) {
-                    $pan = CardCardManagementController::cardPan($cardId);
-                    $title = $request->input('title');
-                    $body = $request->input('body');
-                    $data = ['movementType' => $request->input('movement_type'), 'description' => $request->input('description')];
-                    FirebaseService::sendPushNotification($firebaseToken->FirebaseToken, $title, $body, $data);
+                    PushModel::create([
+                        'UserId' => $cardAssigned->UserId,
+                        'Token' => $firebaseToken->FirebaseToken,
+                        'CardCloudId' => $cardId,
+                        'Title' => $request->input('title'),
+                        'Body' => $request->input('body'),
+                        'Type' => $request->input('movement_type'),
+                        'Description' => $request->input('description'),
+                        'IsSent' => false,
+                        'IsFailed' => false,
+                    ]);
                 }
             }
 
             return response()->json([
-                'message' => 'Notificación push enviada correctamente'
+                'message' => 'Notificación push guardada para enviar'
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()
             ], 200);
         }
+    }
+
+    public function sendPendingPushNotifications()
+    {
+        $pendingNotifications = PushModel::where('IsSent', false)->limit(200)->get();
+
+        foreach ($pendingNotifications as $notification) {
+
+            $sending = FirebaseService::sendPushNotification(
+                $notification->Token,
+                $notification->Title,
+                $notification->Body,
+                [
+                    'movement_type' => $notification->Type,
+                    'description' => $notification->Description
+                ]
+            );
+
+            if ($sending['status'] === 'success') {
+                $notification->IsSent = true;
+                $notification->save();
+            } else {
+                $notification->IsFailed = true;
+                $notification->FailureReason = $sending['error'];
+                $notification->save();
+            }
+        }
+
+        return response()->json([
+            'message' => 'Notificaciones push pendientes enviadas'
+        ], 200);
     }
 }
