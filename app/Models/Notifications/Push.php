@@ -21,6 +21,12 @@ class Push extends Model
         'Type',
         'Description',
         'IsSent',
-        'IsFailed'
+        'SentAt',
+        'IsFailed',
+        'FailedAt',
+        'RetryCount',
+        'LastRetryAt',
+        'IsRead',
+        'ReadAt'
     ];
 }

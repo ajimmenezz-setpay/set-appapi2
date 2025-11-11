@@ -38,7 +38,7 @@ class PushController extends Controller
 
             $cardAssigned = CardAssigned::where('CardCloudId', $cardId)->first();
 
-            if ($cardAssigned){
+            if ($cardAssigned) {
                 $firebaseToken = FirebaseToken::where('UserId', $cardAssigned->UserId)->first();
                 if ($firebaseToken) {
                     PushModel::create([
@@ -67,32 +67,43 @@ class PushController extends Controller
 
     public function sendPendingPushNotifications()
     {
-        $pendingNotifications = PushModel::where('IsSent', false)->limit(200)->get();
+        try {
+            $pendingNotifications = PushModel::where('IsSent', false)->where('RetryCount', '<', 3)->limit(200)->get();
 
-        foreach ($pendingNotifications as $notification) {
+            foreach ($pendingNotifications as $notification) {
 
-            $sending = FirebaseService::sendPushNotification(
-                $notification->Token,
-                $notification->Title,
-                $notification->Body,
-                [
-                    'movementType' => $notification->Type,
-                    'description' => $notification->Description
-                ]
-            );
+                $sending = FirebaseService::sendPushNotification(
+                    $notification->Token,
+                    $notification->Title,
+                    $notification->Body,
+                    [
+                        'movementType' => $notification->Type,
+                        'description' => $notification->Description
+                    ]
+                );
 
-            if ($sending['status'] === 'success') {
-                $notification->IsSent = true;
-                $notification->save();
-            } else {
-                $notification->IsFailed = true;
-                $notification->FailureReason = $sending['error'];
-                $notification->save();
+                if ($sending['status'] === 'success') {
+                    $notification->IsSent = true;
+                    $notification->SentAt = now();
+                    $notification->IsFailed = false;
+                    $notification->FailureReason = null;
+                    $notification->save();
+                } else {
+                    $notification->IsFailed = true;
+                    $notification->FailureReason = $sending['error'];
+                    $notification->RetryCount += 1;
+                    $notification->LastRetryAt = now();
+                    $notification->save();
+                }
             }
-        }
 
-        return response()->json([
-            'message' => 'Notificaciones push pendientes enviadas'
-        ], 200);
+            return response()->json([
+                'message' => 'Notificaciones push pendientes enviadas'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 200);
+        }
     }
 }

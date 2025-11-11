@@ -21,7 +21,13 @@ return new class extends Migration
             $table->string('Type', 50)->index();
             $table->string('Description', 500)->nullable();
             $table->boolean('IsSent')->default(false)->index();
+            $table->timestamp('SentAt')->nullable()->index();
             $table->boolean('IsFailed')->default(false)->index();
+            $table->timestamp('FailedAt')->nullable()->index();
+            $table->integer('RetryCount')->default(0)->index();
+            $table->timestamp('LastRetryAt')->nullable()->index();
+            $table->boolean('IsRead')->default(false)->index();
+            $table->timestamp('ReadAt')->nullable()->index();
             $table->longText('FailureReason')->nullable();
             $table->timestamps();
         });
