@@ -13319,10 +13319,20 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "string"
-                                    }
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "white"
+                                        },
+                                        "commerce_ids": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "COM1234"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
@@ -15059,10 +15069,20 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "string"
-                                    }
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "white"
+                                        },
+                                        "mccs": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "5411"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
@@ -15256,10 +15276,20 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "string"
-                                    }
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "white"
+                                        },
+                                        "postal_codes": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "12345"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
@@ -15453,10 +15483,20 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "string"
-                                    }
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "white"
+                                        },
+                                        "terminal_ids": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "TERM1234"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
