@@ -76,7 +76,7 @@ class PushController extends Controller
                 $notification->Title,
                 $notification->Body,
                 [
-                    'movement_type' => $notification->Type,
+                    'movementType' => $notification->Type,
                     'description' => $notification->Description
                 ]
             );
