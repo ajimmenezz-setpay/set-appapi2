@@ -95,6 +95,15 @@ class CardManagementController extends Controller
                     ->where('UserId', $request->attributes->get('jwt')->id)
                     ->first();
                 $allowed = $cardAssigned ? true : false;
+
+                $allowChange = DB::connection('card_cloud')->table('cards')
+                    ->join('subaccount_blocks', 'cards.SubAccountId', '=', 'subaccount_blocks.SubaccountId')
+                    ->where('UUID', $cardId)
+                    ->where('subaccount_blocks.NipChanges', 1)
+                    ->first();
+                if ($allowChange) {
+                    return response("Esta función no esta disponible para tu empresa. Contacta al CAE SETPAY o a tu administrador", 400);
+                }
                 break;
             default:
                 $allowed = false;
@@ -429,9 +438,17 @@ class CardManagementController extends Controller
                 GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->auth_code);
             }
 
-
             if (CardAssigned::where('CardCloudId', $request->source_card)->where('UserId', $request->attributes->get('jwt')->id)->count() == 0) {
                 return self::basicError("La tarjeta de origen no está asignada al usuario");
+            }
+
+            $allowChange = DB::connection('card_cloud')->table('cards')
+                ->join('subaccount_blocks', 'cards.SubAccountId', '=', 'subaccount_blocks.SubaccountId')
+                ->where('UUID', $request->source_card)
+                ->where('subaccount_blocks.BuyVirtualCard', 1)
+                ->first();
+            if ($allowChange) {
+                return response("Esta función no esta disponible para tu empresa. Contacta al CAE SETPAY o a tu administrador", 400);
             }
 
             $client = new Client();
