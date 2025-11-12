@@ -1637,6 +1637,10 @@
                                             "CollateralPercent": {
                                                 "type": "integer",
                                                 "example": 20
+                                            },
+                                            "MaxContactlessAmount": {
+                                                "type": "string",
+                                                "example": "1000.00"
                                             }
                                         },
                                         "type": "object"
@@ -1734,6 +1738,10 @@
                                     "collateral_percent": {
                                         "type": "integer",
                                         "example": 20
+                                    },
+                                    "max_contactless_amount": {
+                                        "type": "string",
+                                        "example": "1000.00"
                                     }
                                 },
                                 "type": "object"
@@ -1791,6 +1799,10 @@
                                         "CollateralPercent": {
                                             "type": "integer",
                                             "example": 20
+                                        },
+                                        "MaxContactlessAmount": {
+                                            "type": "string",
+                                            "example": "1000.00"
                                         }
                                     },
                                     "type": "object"
@@ -1894,6 +1906,10 @@
                                         "CollateralPercent": {
                                             "type": "integer",
                                             "example": 20
+                                        },
+                                        "MaxContactlessAmount": {
+                                            "type": "string",
+                                            "example": "1000.00"
                                         }
                                     },
                                     "type": "object"
@@ -2017,6 +2033,10 @@
                                     "collateral_percent": {
                                         "type": "integer",
                                         "example": 20
+                                    },
+                                    "max_contactless_amount": {
+                                        "type": "string",
+                                        "example": "1000.00"
                                     }
                                 },
                                 "type": "object"
@@ -2074,6 +2094,10 @@
                                         "CollateralPercent": {
                                             "type": "integer",
                                             "example": 20
+                                        },
+                                        "MaxContactlessAmount": {
+                                            "type": "string",
+                                            "example": "1000.00"
                                         }
                                     },
                                     "type": "object"
