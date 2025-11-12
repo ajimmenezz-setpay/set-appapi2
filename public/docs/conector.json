@@ -15171,6 +15171,13 @@
                                         "items": {
                                             "type": "string"
                                         }
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "white",
+                                            "black"
+                                        ]
                                     }
                                 },
                                 "type": "object"
@@ -15378,6 +15385,13 @@
                                         "items": {
                                             "type": "string"
                                         }
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "white",
+                                            "black"
+                                        ]
                                     }
                                 },
                                 "type": "object"
@@ -15587,6 +15601,13 @@
                                         "items": {
                                             "type": "string"
                                         }
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "white",
+                                            "black"
+                                        ]
                                     }
                                 },
                                 "type": "object"
