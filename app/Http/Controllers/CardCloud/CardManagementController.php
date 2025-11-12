@@ -19,6 +19,7 @@ use Ramsey\Uuid\Uuid;
 use Carbon\Carbon;
 use App\Http\Controllers\Notifications\FirebasePushController as FirebaseService;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class CardManagementController extends Controller
 {
