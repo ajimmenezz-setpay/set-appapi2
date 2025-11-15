@@ -204,7 +204,7 @@ class SubaccountCardController extends Controller
                         'BusinessId' => $request->attributes->get('jwt')->businessId,
                         'CardCloudId' => $card->UUID,
                         'CardCloudNumber' => "",
-                        'UserId' => $request->attributes->get('jwt')->id,
+                        'UserId' => $user->Id,
                         'Name' => $name,
                         'Lastname' => $lastname,
                         'Phone' => $phone,
