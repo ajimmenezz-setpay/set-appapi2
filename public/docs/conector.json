@@ -2241,6 +2241,208 @@
                 ]
             }
         },
+        "/api/admin/v1/authorization_profile/environments": {
+            "get": {
+                "tags": [
+                    "ADM Authorization Card Profile"
+                ],
+                "summary": "Get all environments",
+                "description": "Returns all environments for authorization profiles",
+                "operationId": "getAuthorizationProfileEnvironments",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "Id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Environment 1"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error getting authorization profile environments"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/authorization_profile/{profile}/environments": {
+            "get": {
+                "tags": [
+                    "ADM Authorization Card Profile"
+                ],
+                "summary": "Get environments by authorization profile",
+                "description": "Returns environments associated with an authorization profile",
+                "operationId": "getAuthorizationProfileEnvironmentsByProfile",
+                "parameters": [
+                    {
+                        "name": "profile",
+                        "in": "path",
+                        "description": "Authorization profile id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "environments": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error getting authorization profile environments"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "ADM Authorization Card Profile"
+                ],
+                "summary": "Update environments for an authorization profile",
+                "description": "Update environments associated with an authorization profile",
+                "operationId": "updateAuthorizationProfileEnvironments",
+                "parameters": [
+                    {
+                        "name": "profile",
+                        "in": "path",
+                        "description": "Authorization profile id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "environments"
+                                ],
+                                "properties": {
+                                    "environments": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer",
+                                            "example": 1
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Authorization profile environments updated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error updating authorization profile environments"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/b1/subaccount/{uuid}/cards": {
             "get": {
                 "tags": [
