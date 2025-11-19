@@ -16185,15 +16185,37 @@
                                             "environments": {
                                                 "type": "array",
                                                 "items": {
-                                                    "type": "string",
-                                                    "example": "Environment 1"
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "environment": {
+                                                            "type": "string",
+                                                            "example": "Environment 1"
+                                                        }
+                                                    },
+                                                    "type": "object"
                                                 }
                                             },
                                             "subaccounts": {
                                                 "type": "array",
                                                 "items": {
-                                                    "type": "string",
-                                                    "example": "Subaccount 1"
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "subaccount": {
+                                                            "type": "string",
+                                                            "example": "Subaccount 1"
+                                                        },
+                                                        "environment": {
+                                                            "type": "string",
+                                                            "example": "Environment 1"
+                                                        }
+                                                    },
+                                                    "type": "object"
                                                 }
                                             }
                                         },
@@ -16293,15 +16315,37 @@
                                         "environments": {
                                             "type": "array",
                                             "items": {
-                                                "type": "string",
-                                                "example": "Environment 1"
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "environment": {
+                                                        "type": "string",
+                                                        "example": "Environment 1"
+                                                    }
+                                                },
+                                                "type": "object"
                                             }
                                         },
                                         "subaccounts": {
                                             "type": "array",
                                             "items": {
-                                                "type": "string",
-                                                "example": "Subaccount 1"
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "subaccount": {
+                                                        "type": "string",
+                                                        "example": "Subaccount 1"
+                                                    },
+                                                    "environment": {
+                                                        "type": "string",
+                                                        "example": "Environment 1"
+                                                    }
+                                                },
+                                                "type": "object"
                                             }
                                         }
                                     },
@@ -16464,15 +16508,37 @@
                                         "environments": {
                                             "type": "array",
                                             "items": {
-                                                "type": "string",
-                                                "example": "Environment 1"
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "environment": {
+                                                        "type": "string",
+                                                        "example": "Environment 1"
+                                                    }
+                                                },
+                                                "type": "object"
                                             }
                                         },
                                         "subaccounts": {
                                             "type": "array",
                                             "items": {
-                                                "type": "string",
-                                                "example": "Subaccount 1"
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "subaccount": {
+                                                        "type": "string",
+                                                        "example": "Subaccount 1"
+                                                    },
+                                                    "environment": {
+                                                        "type": "string",
+                                                        "example": "Environment 1"
+                                                    }
+                                                },
+                                                "type": "object"
                                             }
                                         }
                                     },
@@ -16568,15 +16634,37 @@
                                         "environments": {
                                             "type": "array",
                                             "items": {
-                                                "type": "string",
-                                                "example": "Environment 1"
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "environment": {
+                                                        "type": "string",
+                                                        "example": "Environment 1"
+                                                    }
+                                                },
+                                                "type": "object"
                                             }
                                         },
                                         "subaccounts": {
                                             "type": "array",
                                             "items": {
-                                                "type": "string",
-                                                "example": "Subaccount 1"
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "subaccount": {
+                                                        "type": "string",
+                                                        "example": "Subaccount 1"
+                                                    },
+                                                    "environment": {
+                                                        "type": "string",
+                                                        "example": "Environment 1"
+                                                    }
+                                                },
+                                                "type": "object"
                                             }
                                         }
                                     },
@@ -16672,15 +16760,37 @@
                                         "environments": {
                                             "type": "array",
                                             "items": {
-                                                "type": "string",
-                                                "example": "Environment 1"
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "environment": {
+                                                        "type": "string",
+                                                        "example": "Environment 1"
+                                                    }
+                                                },
+                                                "type": "object"
                                             }
                                         },
                                         "subaccounts": {
                                             "type": "array",
                                             "items": {
-                                                "type": "string",
-                                                "example": "Subaccount 1"
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "subaccount": {
+                                                        "type": "string",
+                                                        "example": "Subaccount 1"
+                                                    },
+                                                    "environment": {
+                                                        "type": "string",
+                                                        "example": "Environment 1"
+                                                    }
+                                                },
+                                                "type": "object"
                                             }
                                         }
                                     },
