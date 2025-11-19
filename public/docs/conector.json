@@ -16140,6 +16140,678 @@
                 ]
             }
         },
+        "/api/admin/v1/panel-users": {
+            "get": {
+                "tags": [
+                    "Panel Users"
+                ],
+                "summary": "Get panel users",
+                "description": "Retrieve a list of panel users with profiles equal to or lower than the authenticated user's profile.",
+                "operationId": "getPanelUsers",
+                "responses": {
+                    "200": {
+                        "description": "Successful retrieval of panel users",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "John Doe"
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "example": "john.doe@example.com"
+                                            },
+                                            "profile": {
+                                                "type": "string",
+                                                "example": "Admin"
+                                            },
+                                            "active": {
+                                                "type": "boolean",
+                                                "example": true
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2023-01-01T12:00:00Z"
+                                            },
+                                            "environments": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string",
+                                                    "example": "Environment 1"
+                                                }
+                                            },
+                                            "subaccounts": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string",
+                                                    "example": "Subaccount 1"
+                                                }
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Panel Users"
+                ],
+                "summary": "Create a new panel user",
+                "description": "Create a new panel user with the provided details.",
+                "operationId": "createPanelUser",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "profile"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Jane Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "jane.doe@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    },
+                                    "profile": {
+                                        "type": "string",
+                                        "example": "staff"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Panel user created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 2
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Jane Doe"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "example": "jane.doe@example.com"
+                                        },
+                                        "profile": {
+                                            "type": "string",
+                                            "example": "staff"
+                                        },
+                                        "active": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2023-01-02T12:00:00Z"
+                                        },
+                                        "environments": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "Environment 1"
+                                            }
+                                        },
+                                        "subaccounts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "Subaccount 1"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/panel-users/profiles": {
+            "get": {
+                "tags": [
+                    "Panel Users"
+                ],
+                "summary": "Get available panel user profiles",
+                "description": "Retrieve a list of available panel user profiles.",
+                "operationId": "getPanelUserProfiles",
+                "responses": {
+                    "200": {
+                        "description": "Successful retrieval of panel user profiles",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 2
+                                            },
+                                            "profile_name": {
+                                                "type": "string",
+                                                "example": "admin"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "Administrator profile"
+                                            },
+                                            "level": {
+                                                "type": "integer",
+                                                "example": 1
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/panel-users/{id}": {
+            "post": {
+                "tags": [
+                    "Panel Users"
+                ],
+                "summary": "Update a panel user",
+                "description": "Update the details of a panel user.",
+                "operationId": "updatePanelUser",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the panel user to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Jane Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "jane.doe@example.com"
+                                    },
+                                    "profile": {
+                                        "type": "string",
+                                        "example": "staff"
+                                    },
+                                    "active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Panel user updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 2
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Jane Doe"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "example": "jane.doe@example.com"
+                                        },
+                                        "profile": {
+                                            "type": "string",
+                                            "example": "staff"
+                                        },
+                                        "active": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2023-01-02T12:00:00Z"
+                                        },
+                                        "environments": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "Environment 1"
+                                            }
+                                        },
+                                        "subaccounts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "Subaccount 1"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/panel-users/{id}/environments": {
+            "put": {
+                "tags": [
+                    "Panel Users"
+                ],
+                "summary": "Update panel user environments",
+                "description": "Update the environments associated with a panel user.",
+                "operationId": "updatePanelUserEnvironments",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the panel user to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "environments": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer",
+                                            "example": 1
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Panel user environments updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 2
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Jane Doe"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "example": "jane.doe@example.com"
+                                        },
+                                        "profile": {
+                                            "type": "string",
+                                            "example": "staff"
+                                        },
+                                        "active": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2023-01-02T12:00:00Z"
+                                        },
+                                        "environments": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "Environment 1"
+                                            }
+                                        },
+                                        "subaccounts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "Subaccount 1"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/panel-users/{id}/subaccounts": {
+            "put": {
+                "tags": [
+                    "Panel Users"
+                ],
+                "summary": "Update panel user subaccounts",
+                "description": "Update the subaccounts associated with a panel user.",
+                "operationId": "updatePanelUserSubaccounts",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the panel user to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "subaccounts": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer",
+                                            "example": 1
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Panel user subaccounts updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 2
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Jane Doe"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "example": "jane.doe@example.com"
+                                        },
+                                        "profile": {
+                                            "type": "string",
+                                            "example": "staff"
+                                        },
+                                        "active": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2023-01-02T12:00:00Z"
+                                        },
+                                        "environments": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "Environment 1"
+                                            }
+                                        },
+                                        "subaccounts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "Subaccount 1"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/panel-management/environments": {
+            "get": {
+                "tags": [
+                    "Panel Management"
+                ],
+                "summary": "Get available environments",
+                "description": "Retrieve a list of available environments.",
+                "operationId": "getPanelEnvironments",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/panel-management/subaccounts": {
+            "get": {
+                "tags": [
+                    "Panel Management"
+                ],
+                "summary": "Get available subaccounts",
+                "description": "Retrieve a list of available subaccounts.",
+                "operationId": "getPanelSubaccounts",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "environment": {
+                                                "type": "string"
+                                            },
+                                            "subaccount": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/admin/v1/users": {
             "get": {
                 "tags": [
@@ -17529,6 +18201,14 @@
         {
             "name": "Transfer",
             "description": "Transfer"
+        },
+        {
+            "name": "Panel Users",
+            "description": "Panel Users"
+        },
+        {
+            "name": "Panel Management",
+            "description": "Panel Management"
         },
         {
             "name": "ADM Users Management",
