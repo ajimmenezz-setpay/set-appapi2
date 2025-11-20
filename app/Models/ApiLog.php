@@ -19,5 +19,6 @@ class ApiLog extends Model
         'request_body',
         'response_code',
         'response_body',
+        'execution_time_ms'
     ];
 }
