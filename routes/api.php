@@ -2,11 +2,12 @@
 
 use App\Http\Controllers\Security\Password;
 use App\Http\Middleware\VerifyJwt;
+use App\Http\Middleware\ApiLogger;
 use Illuminate\Support\Facades\Route;
 
 Route::post('login', [App\Http\Controllers\Auth\Login::class, 'login']);
 
-Route::middleware([VerifyJwt::class])->group(function () {
+Route::middleware([VerifyJwt::class, ApiLogger::class])->group(function () {
 
     Route::group(['prefix' => 'modules'], function () {
         Route::get('/user', [App\Http\Controllers\Users\Modules::class, 'index']);
