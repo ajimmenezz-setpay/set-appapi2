@@ -241,6 +241,8 @@ Route::get('card-cloud/info/{clientId}', [App\Http\Controllers\CardCloud\CardMan
 
 Route::get('card-cloud/balanceByCard/{card}', [App\Http\Controllers\CardCloud\CardManagementController::class, 'getBalanceByCardId']);
 
+Route::get('card-cloud/subaccount/{search_term}', [App\Http\Controllers\CardCloud\CardManagementController::class, 'getSubaccountBySearchTerm']);
+
 Route::group(['prefix' => 'dev'], function () {
     Route::group(['prefix' => 'permissions'], function () {
         Route::get('/categories', [App\Http\Controllers\Users\Permissions::class, 'categories']);
@@ -264,15 +266,6 @@ Route::group(['prefix' => 'dev'], function () {
 
     Route::group(['prefix' => 'fixes'], function () {
         Route::post('/fixMissingCompany', [App\Http\Controllers\Users\FixMissingCompany::class, 'fixMissingCompany']);
-    });
-
-    Route::post('/test-push', function () {
-        \App\Http\Controllers\Notifications\FirebasePushController::sendPushNotification(
-            'cUTUYpXhTYi397sCPb4MzK:APA91bHcjOxgOLiS5CScaBw4pUf5TMakie-b-aq2wwQ8l0O6-Nqs8aHpq9xL8GeZBh7e5YD35DwxDWpxoEac52ZKU3Vq0DeOVF031XoaBqbPnjsCkEVfEGo',
-            'Título de prueba',
-            'Este es el cuerpo de la notificación de prueba',
-            ['movementType' => 'WITHDRAWAL', 'description' => 'lorem ipsum dolor sit amet consectetur adipiscing elit ']
-        );
     });
 
     Route::get('/push-notifications/pending', [App\Http\Controllers\Notifications\PushController::class, 'sendPendingPushNotifications']);

@@ -1603,4 +1603,32 @@ class CardManagementController extends Controller
         // Retornar null si no coincide el patrón
         return null;
     }
+
+
+    public function getSubaccountBySearchTerm(Request $request, $search_term)
+    {
+        try {
+            if (!is_numeric($search_term) && preg_match('/^([A-Za-z]+)(\d+)$/', $search_term)) {
+                $clientId = self::splitClientId($search_term);
+                $card = Card::where('CustomerPrefix', $clientId['prefix'])->where('CustomerId', $clientId['number'])->first();
+                if (!$card) {
+                    return self::error("No se encontró información para el clientId proporcionado");
+                }
+            } else if (is_numeric($search_term) && strlen($search_term) == 10) {
+                $cardAssigned = CardAssigned::where('Phone', $search_term)->first();
+                if (!$cardAssigned) {
+                    return self::error("No se encontró información para el número de teléfono proporcionado");
+                }
+            } else if (is_numeric($search_term) && strlen($search_term) == 8) {
+            } else {
+                return self::error("El término de búsqueda debe ser los últimos 8 dígitos de la tarjeta, 10 dígitos de un número de teléfono o un ClientId válido.");
+            }
+
+
+
+            return response()->json($decodedJson);
+        } catch (\Exception $e) {
+            return self::basicError($e->getMessage());
+        }
+    }
 }
