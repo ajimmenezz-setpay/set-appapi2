@@ -1751,20 +1751,49 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "field": {
-                                            "type": "string",
-                                            "example": "merchant_category_code"
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
                                         },
-                                        "values": {
+                                        "subaccount": {
+                                            "type": "string",
+                                            "example": "Subaccount Name"
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "High Risk MCCs"
+                                        },
+                                        "conditions": {
                                             "type": "array",
                                             "items": {
-                                                "type": "string",
-                                                "example": "5999"
+                                                "properties": {
+                                                    "field": {
+                                                        "type": "string",
+                                                        "example": "merchant_category_code"
+                                                    },
+                                                    "values": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "example": "5999"
+                                                        }
+                                                    },
+                                                    "condition": {
+                                                        "type": "string",
+                                                        "example": "in"
+                                                    }
+                                                },
+                                                "type": "object"
                                             }
                                         },
-                                        "condition": {
+                                        "active": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "created_at": {
                                             "type": "string",
-                                            "example": "in"
+                                            "format": "date-time",
+                                            "example": "2025-11-21T12:34:56Z"
                                         }
                                     },
                                     "type": "object"
@@ -1818,58 +1847,58 @@
                                         "type": "string",
                                         "example": "Updated Rule Name"
                                     },
-                                    "mccs": {
+                                    "merchant_category_code": {
                                         "type": "array",
                                         "items": {
                                             "type": "string",
                                             "example": "5999"
                                         }
                                     },
-                                    "mccs_condition": {
+                                    "merchant_category_code_condition": {
                                         "type": "string",
                                         "example": "in"
                                     },
-                                    "commerceids": {
+                                    "establishment_code": {
                                         "type": "array",
                                         "items": {
                                             "type": "string",
                                             "example": "123456"
                                         }
                                     },
-                                    "commerceids_condition": {
+                                    "establishment_code_condition": {
                                         "type": "string",
                                         "example": "in"
                                     },
-                                    "terminalids": {
+                                    "terminal_code": {
                                         "type": "array",
                                         "items": {
                                             "type": "string",
                                             "example": "7890"
                                         }
                                     },
-                                    "terminalids_condition": {
+                                    "terminal_code_condition": {
                                         "type": "string",
                                         "example": "in"
                                     },
-                                    "cps": {
+                                    "pos_postal_code": {
                                         "type": "array",
                                         "items": {
                                             "type": "string",
                                             "example": "CP001"
                                         }
                                     },
-                                    "cps_condition": {
+                                    "pos_postal_code_condition": {
                                         "type": "string",
                                         "example": "in"
                                     },
-                                    "description": {
+                                    "establishment": {
                                         "type": "array",
                                         "items": {
                                             "type": "string",
                                             "example": "Updated Description"
                                         }
                                     },
-                                    "description_condition": {
+                                    "establishment_condition": {
                                         "type": "string",
                                         "example": "in"
                                     },
