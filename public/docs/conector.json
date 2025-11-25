@@ -1577,7 +1577,7 @@
                 ]
             }
         },
-        "/api/admin/v1/advanced_authorization": {
+        "/api/admin/v1/advanced_authorization/{subaccountId}": {
             "get": {
                 "tags": [
                     "Advanced Authorization"
@@ -1654,9 +1654,7 @@
                         "bearerAuth": []
                     }
                 ]
-            }
-        },
-        "/api/admin/v1/advanced_authorization/{subaccountId}": {
+            },
             "post": {
                 "tags": [
                     "Advanced Authorization"
@@ -1685,58 +1683,58 @@
                                         "type": "string",
                                         "example": "High Risk MCCs"
                                     },
-                                    "mccs": {
+                                    "merchant_category_code": {
                                         "type": "array",
                                         "items": {
                                             "type": "string",
                                             "example": "5999"
                                         }
                                     },
-                                    "mccs_condition": {
+                                    "merchant_category_code_condition": {
                                         "type": "string",
                                         "example": "in"
                                     },
-                                    "commerceids": {
+                                    "establishment_code": {
                                         "type": "array",
                                         "items": {
                                             "type": "string",
                                             "example": "123456"
                                         }
                                     },
-                                    "commerceids_condition": {
+                                    "establishment_code_condition": {
                                         "type": "string",
                                         "example": "in"
                                     },
-                                    "terminalids": {
+                                    "terminal_code": {
                                         "type": "array",
                                         "items": {
                                             "type": "string",
                                             "example": "7890"
                                         }
                                     },
-                                    "terminalids_condition": {
+                                    "terminal_code_condition": {
                                         "type": "string",
-                                        "example": "in"
+                                        "example": "not_in"
                                     },
-                                    "cps": {
+                                    "pos_postal_code": {
                                         "type": "array",
                                         "items": {
                                             "type": "string",
                                             "example": "CP001"
                                         }
                                     },
-                                    "cps_condition": {
+                                    "pos_postal_code_condition": {
                                         "type": "string",
-                                        "example": "in"
+                                        "example": "not_in"
                                     },
-                                    "description": {
+                                    "establishment": {
                                         "type": "array",
                                         "items": {
                                             "type": "string",
                                             "example": "Test Description"
                                         }
                                     },
-                                    "description_condition": {
+                                    "establishment_condition": {
                                         "type": "string",
                                         "example": "in"
                                     }
@@ -1755,7 +1753,7 @@
                                     "properties": {
                                         "field": {
                                             "type": "string",
-                                            "example": "mcc"
+                                            "example": "merchant_category_code"
                                         },
                                         "values": {
                                             "type": "array",
