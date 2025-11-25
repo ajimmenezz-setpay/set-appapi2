@@ -1585,6 +1585,17 @@
                 "summary": "Get all advanced authorization rules",
                 "description": "Retrieve a list of all advanced authorization rules.",
                 "operationId": "getAdvancedAuthorizationRules",
+                "parameters": [
+                    {
+                        "name": "subaccountId",
+                        "in": "path",
+                        "description": "UUID of the subaccount",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Successful retrieval of advanced authorization rules",
@@ -1806,6 +1817,96 @@
                     },
                     "404": {
                         "description": "Subaccount not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/advanced_authorization/rule/{ruleId}": {
+            "get": {
+                "tags": [
+                    "Advanced Authorization"
+                ],
+                "summary": "Get advanced authorization rule by ID",
+                "description": "Retrieve a specific advanced authorization rule by its ID.",
+                "operationId": "getAdvancedAuthorizationRuleById",
+                "parameters": [
+                    {
+                        "name": "ruleId",
+                        "in": "path",
+                        "description": "Id of the advanced authorization rule",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful retrieval of advanced authorization rule",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "subaccount": {
+                                            "type": "string",
+                                            "example": "Subaccount Name"
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "High Risk MCCs"
+                                        },
+                                        "conditions": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "field": {
+                                                        "type": "string",
+                                                        "example": "mcc"
+                                                    },
+                                                    "values": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "example": "5999"
+                                                        }
+                                                    },
+                                                    "condition": {
+                                                        "type": "string",
+                                                        "example": "in"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "active": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2025-11-21T12:34:56Z"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Advanced authorization rule not found"
                     },
                     "500": {
                         "description": "Internal server error"
