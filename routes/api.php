@@ -241,7 +241,7 @@ Route::get('card-cloud/info/{clientId}', [App\Http\Controllers\CardCloud\CardMan
 
 Route::get('card-cloud/balanceByCard/{card}', [App\Http\Controllers\CardCloud\CardManagementController::class, 'getBalanceByCardId']);
 
-Route::get('card-cloud/subaccount/{search_term}', [App\Http\Controllers\CardCloud\CardManagementController::class, 'getSubaccountBySearchTerm']);
+Route::get('card-cloud/subaccountByTerm/{search_term}', [App\Http\Controllers\CardCloud\CardManagementController::class, 'getSubaccountBySearchTerm']);
 
 Route::group(['prefix' => 'dev'], function () {
     Route::group(['prefix' => 'permissions'], function () {

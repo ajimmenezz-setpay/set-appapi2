@@ -18,8 +18,11 @@ use App\Models\Users\FirebaseToken;
 use Ramsey\Uuid\Uuid;
 use Carbon\Carbon;
 use App\Http\Controllers\Notifications\FirebasePushController as FirebaseService;
+use App\Models\CardCloud\Subaccount;
+use App\Models\CardCloud\Environment;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use App\Models\Backoffice\Companies\Company;
 
 class CardManagementController extends Controller
 {
@@ -1608,25 +1611,48 @@ class CardManagementController extends Controller
     public function getSubaccountBySearchTerm(Request $request, $search_term)
     {
         try {
+            $search_term = trim($search_term);
+
             if (!is_numeric($search_term) && preg_match('/^([A-Za-z]+)(\d+)$/', $search_term)) {
                 $clientId = self::splitClientId($search_term);
-                $card = Card::where('CustomerPrefix', $clientId['prefix'])->where('CustomerId', $clientId['number'])->first();
-                if (!$card) {
-                    return self::error("No se encontró información para el clientId proporcionado");
-                }
+                $card = Card::where('CustomerPrefix', $clientId['prefix'])->where('CustomerId', $clientId['number'])
+                    ->select('cards.SubAccountId', 'cards.CustomerPrefix', 'cards.CustomerId')
+                    ->first();
             } else if (is_numeric($search_term) && strlen($search_term) == 10) {
                 $cardAssigned = CardAssigned::where('Phone', $search_term)->first();
                 if (!$cardAssigned) {
                     return self::error("No se encontró información para el número de teléfono proporcionado");
                 }
+                $card = Card::where('Id', $cardAssigned->CardCloudId)->select('cards.SubAccountId', 'cards.CustomerPrefix', 'cards.CustomerId')->first();
             } else if (is_numeric($search_term) && strlen($search_term) == 8) {
+                $card = CardPan::join('cards', 'cards.Id', '=', 'card_pan.CardId')->where('card_pan.Pan', 'like', '%' . $search_term)->select('cards.SubAccountId', 'cards.CustomerPrefix', 'cards.CustomerId')->first();
             } else {
                 return self::error("El término de búsqueda debe ser los últimos 8 dígitos de la tarjeta, 10 dígitos de un número de teléfono o un ClientId válido.");
             }
 
+            if (!$card) {
+                return self::error("No se encontró información para el término de búsqueda proporcionado");
+            }
 
+            $environment = Environment::where('Id', $card->CreatorId)->first();
 
-            return response()->json($decodedJson);
+            $subaccount = Subaccount::where('Id', $card->SubAccountId)->first();
+            if (!$subaccount) {
+                return self::error("No se encontró información para el término de búsqueda proporcionado");
+            }
+
+            $company = Company::where('Id', $subaccount->ExternalId)->first();
+            if (!$company) {
+                return self::error("No se encontró información de la empresa asociada a la subcuenta");
+            }
+
+            return response()->json([
+                'subaccount_id' => $subaccount->UUID,
+                'subaccount_name' => $company->TradeName,
+                'environment' => $environment ? $environment->Name : 'N/A',
+                'client_id' => $card->CustomerPrefix . str_pad($card->CustomerId, 7, '0', STR_PAD_LEFT)
+            ]);
+
         } catch (\Exception $e) {
             return self::basicError($e->getMessage());
         }
