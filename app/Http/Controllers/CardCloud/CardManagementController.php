@@ -1619,8 +1619,10 @@ class CardManagementController extends Controller
                     ->select('cards.SubAccountId', 'cards.CustomerPrefix', 'cards.CustomerId', 'cards.CreatorId')
                     ->first();
             } else if (is_numeric($search_term) && strlen($search_term) == 10) {
-                $cardAssigned = CardAssigned::join('t_users', 't_users.Id', '=', 'card_assigned.UserId')
-                    ->where('t_users.Phone', $search_term)->first();
+                $cardAssigned = CardAssigned::join('t_users', 't_users.Id', '=', 't_stp_card_cloud_users.UserId')
+                    ->where('t_users.Phone', $search_term)
+                    ->select('t_stp_card_cloud_users.CardCloudId')
+                    ->first();
                 if (!$cardAssigned) {
                     return self::error("No se encontró información para el número de teléfono proporcionado");
                 }
