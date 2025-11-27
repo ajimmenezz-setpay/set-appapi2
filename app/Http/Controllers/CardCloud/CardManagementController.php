@@ -1616,16 +1616,16 @@ class CardManagementController extends Controller
             if (!is_numeric($search_term) && preg_match('/^([A-Za-z]+)(\d+)$/', $search_term)) {
                 $clientId = self::splitClientId($search_term);
                 $card = Card::where('CustomerPrefix', $clientId['prefix'])->where('CustomerId', $clientId['number'])
-                    ->select('cards.SubAccountId', 'cards.CustomerPrefix', 'cards.CustomerId')
+                    ->select('cards.SubAccountId', 'cards.CustomerPrefix', 'cards.CustomerId', 'cards.CreatorId')
                     ->first();
             } else if (is_numeric($search_term) && strlen($search_term) == 10) {
                 $cardAssigned = CardAssigned::where('Phone', $search_term)->first();
                 if (!$cardAssigned) {
                     return self::error("No se encontró información para el número de teléfono proporcionado");
                 }
-                $card = Card::where('Id', $cardAssigned->CardCloudId)->select('cards.SubAccountId', 'cards.CustomerPrefix', 'cards.CustomerId')->first();
+                $card = Card::where('Id', $cardAssigned->CardCloudId)->select('cards.SubAccountId', 'cards.CustomerPrefix', 'cards.CustomerId', 'cards.CreatorId')->first();
             } else if (is_numeric($search_term) && strlen($search_term) == 8) {
-                $card = CardPan::join('cards', 'cards.Id', '=', 'card_pan.CardId')->where('card_pan.Pan', 'like', '%' . $search_term)->select('cards.SubAccountId', 'cards.CustomerPrefix', 'cards.CustomerId')->first();
+                $card = CardPan::join('cards', 'cards.Id', '=', 'card_pan.CardId')->where('card_pan.Pan', 'like', '%' . $search_term)->select('cards.SubAccountId', 'cards.CustomerPrefix', 'cards.CustomerId', 'cards.CreatorId')->first();
             } else {
                 return self::error("El término de búsqueda debe ser los últimos 8 dígitos de la tarjeta, 10 dígitos de un número de teléfono o un ClientId válido.");
             }
