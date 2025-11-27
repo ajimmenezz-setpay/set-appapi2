@@ -1649,7 +1649,7 @@ class CardManagementController extends Controller
             return response()->json([
                 'subaccount_id' => $subaccount->UUID,
                 'subaccount_name' => $company->TradeName,
-                'environment' => $environment ? $environment->Name : 'N/A',
+                'environment' => $environment ? $environment->name : 'N/A',
                 'client_id' => $card->CustomerPrefix . str_pad($card->CustomerId, 7, '0', STR_PAD_LEFT)
             ]);
 
