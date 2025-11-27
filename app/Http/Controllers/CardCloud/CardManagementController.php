@@ -1623,10 +1623,11 @@ class CardManagementController extends Controller
                     ->where('t_users.Phone', $search_term)
                     ->select('t_stp_card_cloud_users.CardCloudId')
                     ->first();
+
                 if (!$cardAssigned) {
                     return self::error("No se encontró información para el número de teléfono proporcionado");
                 }
-                $card = Card::where('Id', $cardAssigned->CardCloudId)->select('cards.SubAccountId', 'cards.CustomerPrefix', 'cards.CustomerId', 'cards.CreatorId')->first();
+                $card = Card::where('UUID', $cardAssigned->CardCloudId)->select('cards.SubAccountId', 'cards.CustomerPrefix', 'cards.CustomerId', 'cards.CreatorId')->first();
             } else if (is_numeric($search_term) && strlen($search_term) == 8) {
                 $card = CardPan::join('cards', 'cards.Id', '=', 'card_pan.CardId')->where('card_pan.Pan', 'like', '%' . $search_term)->select('cards.SubAccountId', 'cards.CustomerPrefix', 'cards.CustomerId', 'cards.CreatorId')->first();
             } else {
