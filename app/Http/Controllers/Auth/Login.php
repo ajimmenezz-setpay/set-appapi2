@@ -9,6 +9,41 @@ use App\Http\Services\JWTToken;
 
 class Login extends Controller
 {
+    /**
+     * @OA\Post(
+     *      path="/api/login",
+     *      summary="Iniciar sesión con credenciales de usuario",
+     *      tags={"Autenticación"},
+     *      description="Permite a un usuario iniciar sesión proporcionando su nombre de usuario y contraseña. Devuelve un token JWT para autenticación en futuras solicitudes.",
+     *      operationId="loginUser",
+     *
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"username","password"},
+     *              @OA\Property(property="username", type="string", format="email", example="user@example.com"),
+     *              @OA\Property(property="password", type="string", format="password", example="yourpassword")
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Inicio de sesión exitoso",
+     *          @OA\JsonContent(
+     *             @OA\Property(property="token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...")
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=403,
+     *          description="Credenciales incorrectas o cuenta inactiva",
+     *          @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Credenciales incorrectas.")
+     *         )
+     *     )
+     * )
+     */
+
     public function login(Request $request)
     {
         try {
@@ -32,7 +67,7 @@ class Login extends Controller
                 throw new \Exception('Credenciales incorrectas.', 403);
             }
             if ($user->Active == 0) {
-                throw new \Exception('Al parecer su cuenta ha sido desactivada, por favor contacte a su administrador.', 403);
+                throw new \Exception('Al parecer su cuenta esta inactiva, por favor contacte a su administrador.', 403);
             }
 
             $payload = $this->payloadUserData($user);
