@@ -1619,7 +1619,8 @@ class CardManagementController extends Controller
                     ->select('cards.SubAccountId', 'cards.CustomerPrefix', 'cards.CustomerId', 'cards.CreatorId')
                     ->first();
             } else if (is_numeric($search_term) && strlen($search_term) == 10) {
-                $cardAssigned = CardAssigned::where('Phone', $search_term)->first();
+                $cardAssigned = CardAssigned::join('t_users', 't_users.Id', '=', 'card_assigned.UserId')
+                    ->where('t_users.Phone', $search_term)->first();
                 if (!$cardAssigned) {
                     return self::error("No se encontró información para el número de teléfono proporcionado");
                 }
@@ -1652,7 +1653,6 @@ class CardManagementController extends Controller
                 'environment' => $environment ? $environment->name : 'N/A',
                 'client_id' => $card->CustomerPrefix . str_pad($card->CustomerId, 7, '0', STR_PAD_LEFT)
             ]);
-
         } catch (\Exception $e) {
             return self::basicError($e->getMessage());
         }
