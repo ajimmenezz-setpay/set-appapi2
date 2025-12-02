@@ -10460,6 +10460,207 @@
                 ]
             }
         },
+        "/api/admin/v1/liquidations/environment/{id}/subaccount_liquidations": {
+            "get": {
+                "tags": [
+                    "Credit Liquidations"
+                ],
+                "summary": "Get subaccount liquidations for an environment liquidation",
+                "description": "Returns subaccount credit liquidations associated with a specific environment that have outstanding balances",
+                "operationId": "getSubaccountLiquidationsByEnvironmentLiquidation",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the environment liquidation",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "subaccount_id": {
+                                                "type": "integer",
+                                                "example": 10
+                                            },
+                                            "cut_off_date": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "2023-01-31"
+                                            },
+                                            "initial_date": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "2023-01-01"
+                                            },
+                                            "final_date": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "2023-01-31"
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2023-02-01T12:00:00Z"
+                                            },
+                                            "updated_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2023-02-05T15:30:00Z"
+                                            },
+                                            "used": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 500
+                                            },
+                                            "paid": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 300
+                                            },
+                                            "outstanding_balance": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 200
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/liquidations/environment/{id}/subaccount_payments": {
+            "post": {
+                "tags": [
+                    "Credit Liquidations"
+                ],
+                "summary": "Register payments for subaccount liquidations under an environment liquidation",
+                "description": "Registers payments for multiple subaccount credit liquidations associated with a specific environment liquidation",
+                "operationId": "registerEnvironmentSubaccountsPayment",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the environment liquidation",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "file": {
+                                        "description": "Payment proof file (jpeg, png, jpg, pdf)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "date": {
+                                        "description": "Payment date (Y-m-d)",
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "amount": {
+                                        "description": "Total payment amount",
+                                        "type": "number",
+                                        "format": "float"
+                                    },
+                                    "subaccount_liquidations": {
+                                        "description": "Array of subaccount liquidations with payment amounts",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "id": {
+                                                    "description": "ID of the subaccount liquidation",
+                                                    "type": "integer"
+                                                },
+                                                "amount": {
+                                                    "description": "Payment amount for the subaccount liquidation",
+                                                    "type": "number",
+                                                    "format": "float"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Payments registered successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Payments registered successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/credit": {
             "get": {
                 "tags": [
@@ -13049,6 +13250,180 @@
                         }
                     }
                 }
+            }
+        },
+        "/api/admin/v1/reports/render/soriana": {
+            "get": {
+                "tags": [
+                    "Reports - Soriana"
+                ],
+                "summary": "Obtiene el reporte de transacciones para Soriana",
+                "description": "Genera un reporte de transacciones realizadas en un rango de fechas específico para Soriana.",
+                "operationId": "getSorianaReport",
+                "parameters": [
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "description": "Fecha específica para el reporte en formato YYYY-MM-DD.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2024-06-15"
+                        }
+                    },
+                    {
+                        "name": "range_from",
+                        "in": "query",
+                        "description": "Fecha de inicio del rango para el reporte en formato YYYY-MM-DD. Si se proporciona este parámetro, 'range_to' también debe ser proporcionado y date no será considerado.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2024-06-01"
+                        }
+                    },
+                    {
+                        "name": "range_to",
+                        "in": "query",
+                        "description": "Fecha de fin del rango para el reporte en formato YYYY-MM-DD. Si se proporciona este parámetro, 'range_from' también debe ser proporcionado y date no será considerado.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2024-06-15"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reporte generado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "date": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2024-06-15T14:30:00Z"
+                                                    },
+                                                    "total_amount": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 1500.75
+                                                    },
+                                                    "masked_pan": {
+                                                        "type": "string",
+                                                        "example": "4111********1111"
+                                                    },
+                                                    "reference": {
+                                                        "type": "string",
+                                                        "example": null,
+                                                        "nullable": true
+                                                    },
+                                                    "authorization_code": {
+                                                        "type": "string",
+                                                        "example": "012345"
+                                                    },
+                                                    "establishment_affiliation": {
+                                                        "type": "string",
+                                                        "example": "123456789"
+                                                    },
+                                                    "establishment_name": {
+                                                        "type": "string",
+                                                        "example": "Soriana Híper"
+                                                    },
+                                                    "client_id": {
+                                                        "type": "string",
+                                                        "example": "CUST0001234"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "example": "PURCHASE"
+                                                    },
+                                                    "purchase_amount": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 1000.5
+                                                    },
+                                                    "withdrawal_amount": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 500.25
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "last_updated": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2024-06-15T14:30:00Z"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "El usuario no tiene acceso al reporte",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "reason": {
+                                            "type": "string",
+                                            "example": "El usuario no tiene acceso al reporte"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación de parámetros",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "reason": {
+                                            "type": "string",
+                                            "example": "El campo range_from es requerido"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "reason": {
+                                            "type": "string",
+                                            "example": "An error occurred while generating the transactions report."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/admin/v1/report/daily_spend": {
@@ -19073,6 +19448,10 @@
         {
             "name": "Reports",
             "description": "Reports"
+        },
+        {
+            "name": "Reports - Soriana",
+            "description": "Reports - Soriana"
         },
         {
             "name": "2FA",
