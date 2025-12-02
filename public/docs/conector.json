@@ -10492,49 +10492,29 @@
                                                 "type": "integer",
                                                 "example": 1
                                             },
-                                            "subaccount_id": {
-                                                "type": "integer",
-                                                "example": 10
+                                            "subaccount": {
+                                                "type": "string",
+                                                "example": "Subaccount 1"
                                             },
                                             "cut_off_date": {
                                                 "type": "string",
                                                 "format": "date",
                                                 "example": "2023-01-31"
                                             },
-                                            "initial_date": {
-                                                "type": "string",
-                                                "format": "date",
-                                                "example": "2023-01-01"
-                                            },
-                                            "final_date": {
-                                                "type": "string",
-                                                "format": "date",
-                                                "example": "2023-01-31"
-                                            },
-                                            "created_at": {
-                                                "type": "string",
-                                                "format": "date-time",
-                                                "example": "2023-02-01T12:00:00Z"
-                                            },
-                                            "updated_at": {
-                                                "type": "string",
-                                                "format": "date-time",
-                                                "example": "2023-02-05T15:30:00Z"
-                                            },
                                             "used": {
                                                 "type": "number",
                                                 "format": "float",
-                                                "example": 500
+                                                "example": 150
                                             },
                                             "paid": {
                                                 "type": "number",
                                                 "format": "float",
-                                                "example": 300
+                                                "example": 50
                                             },
-                                            "outstanding_balance": {
+                                            "unpaid": {
                                                 "type": "number",
                                                 "format": "float",
-                                                "example": 200
+                                                "example": 100
                                             }
                                         },
                                         "type": "object"
