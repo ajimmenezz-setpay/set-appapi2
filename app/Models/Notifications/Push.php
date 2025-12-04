@@ -16,6 +16,7 @@ class Push extends Model
         'UserId',
         'Token',
         'CardCloudId',
+        'BundleContext',
         'Title',
         'Body',
         'Type',

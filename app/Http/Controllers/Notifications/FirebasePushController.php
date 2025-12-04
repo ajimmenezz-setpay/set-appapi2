@@ -74,7 +74,7 @@ class FirebasePushController extends Controller
         }
     }
 
-    public static function sendPushNotification($firebaseToken, $title, $body, $data = [])
+    public static function sendPushNotification($firebaseToken, $title, $body, $data = [], $headers = [])
     {
         $message = [
             'message' => [
@@ -88,7 +88,7 @@ class FirebasePushController extends Controller
         ];
 
         try {
-            $response = Http::post('http://127.0.0.1:3003/api/fcm/notifications/send', $message);
+            $response = Http::withHeaders($headers)->post('http://127.0.0.1:3003/api/fcm/notifications/send', $message);
 
             if (!$response->successful()) {
                 return [

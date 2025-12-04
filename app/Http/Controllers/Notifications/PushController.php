@@ -9,6 +9,7 @@ use App\Models\Users\FirebaseToken;
 use App\Http\Controllers\Card\CardManagementController as CardCardManagementController;
 use App\Http\Controllers\Notifications\FirebasePushController as FirebaseService;
 use App\Models\Notifications\Push as PushModel;
+use Illuminate\Support\Facades\DB;
 
 class PushController extends Controller
 {
@@ -39,12 +40,21 @@ class PushController extends Controller
             $cardAssigned = CardAssigned::where('CardCloudId', $cardId)->first();
 
             if ($cardAssigned) {
+
+                $bundleContext = DB::table('t_backoffice_business_bundle_context')->where('BusinessId', $cardAssigned->BusinessId)->value('BundleContext');
+                if ($bundleContext) {
+                    $bundle = $bundleContext;
+                }else{
+                    $bundle = 'com.set.transaccionales';
+                }
+
                 $firebaseToken = FirebaseToken::where('UserId', $cardAssigned->UserId)->first();
                 if ($firebaseToken) {
                     PushModel::create([
                         'UserId' => $cardAssigned->UserId,
                         'Token' => $firebaseToken->FirebaseToken,
                         'CardCloudId' => $cardId,
+                        'BundleContext' => $bundle,
                         'Title' => $request->input('title'),
                         'Body' => $request->input('body'),
                         'Type' => $request->input('movement_type'),
@@ -72,6 +82,7 @@ class PushController extends Controller
 
             foreach ($pendingNotifications as $notification) {
 
+
                 $sending = FirebaseService::sendPushNotification(
                     $notification->Token,
                     $notification->Title,
@@ -79,6 +90,9 @@ class PushController extends Controller
                     [
                         'movementType' => $notification->Type,
                         'description' => $notification->Description
+                    ],
+                    [
+                        'x-bundle-id' => [$notification->BundleContext ?? 'com.set.transaccionales']
                     ]
                 );
 
