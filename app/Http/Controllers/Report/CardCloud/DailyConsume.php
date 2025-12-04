@@ -113,7 +113,7 @@ class DailyConsume extends Controller
                 ];
             }
 
-            Validate::userProfile([5, 7, 9, 11], $request->attributes->get('jwt')->profileId);
+            Validate::userProfile([5, 7, 9, 11,13], $request->attributes->get('jwt')->profileId);
 
             $companies = CompaniesByUser::get($request->attributes->get('jwt'));
 

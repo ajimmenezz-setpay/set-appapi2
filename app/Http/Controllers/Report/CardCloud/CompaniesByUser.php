@@ -11,7 +11,7 @@ class CompaniesByUser extends Controller
 {
     public static function get($jwt)
     {
-        if (in_array($jwt->profileId, [7,11,12])) {
+        if (in_array($jwt->profileId, [7,11,12,13])) {
             $companies = CompaniesAndUsers::where('UserId', $jwt->id)->get();
         } else {
             $user = User::where('Id', $jwt->id)->first();
