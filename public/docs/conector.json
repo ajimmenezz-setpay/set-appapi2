@@ -12111,6 +12111,10 @@
                                                     },
                                                     "type": "object"
                                                 }
+                                            },
+                                            "last_updated": {
+                                                "type": "integer",
+                                                "example": 1672617599
                                             }
                                         },
                                         "type": "object"
@@ -12973,6 +12977,126 @@
                         }
                     }
                 }
+            }
+        },
+        "/api/admin/v1/reports/failed_authorizations": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Get failed authorizations report",
+                "description": "Returns a report of failed authorizations within a specified date range.",
+                "operationId": "getFailedAuthorizationsReport",
+                "parameters": [
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "description": "Start date for the report (Unix timestamp)",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "example": "1738300770"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "description": "End date for the report (Unix timestamp)",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "example": "1738300770"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "last_update": {
+                                            "description": "Timestamp of the last update",
+                                            "type": "number",
+                                            "example": "1738300770"
+                                        },
+                                        "data": {
+                                            "description": "List of failed authorizations",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "environment": {
+                                                        "description": "Environment name",
+                                                        "type": "string",
+                                                        "example": "SET"
+                                                    },
+                                                    "subaccount": {
+                                                        "description": "Subaccount name",
+                                                        "type": "string",
+                                                        "example": "Subaccount 1"
+                                                    },
+                                                    "client_id": {
+                                                        "description": "Client identifier",
+                                                        "type": "string",
+                                                        "example": "CUST0001234"
+                                                    },
+                                                    "type": {
+                                                        "description": "Type of transaction",
+                                                        "type": "string",
+                                                        "example": "purchase"
+                                                    },
+                                                    "establishment": {
+                                                        "description": "Establishment name",
+                                                        "type": "string",
+                                                        "example": "Store XYZ"
+                                                    },
+                                                    "date": {
+                                                        "description": "Timestamp of the authorization attempt",
+                                                        "type": "number",
+                                                        "example": "1738300770"
+                                                    },
+                                                    "mcc": {
+                                                        "description": "Merchant category code",
+                                                        "type": "string",
+                                                        "example": "5411"
+                                                    },
+                                                    "terminal_id": {
+                                                        "description": "Terminal identifier",
+                                                        "type": "string",
+                                                        "example": "TERM123"
+                                                    },
+                                                    "commerce_id": {
+                                                        "description": "Commerce identifier",
+                                                        "type": "string",
+                                                        "example": "COMM456"
+                                                    },
+                                                    "postal_code": {
+                                                        "description": "Postal code of the point of sale",
+                                                        "type": "string",
+                                                        "example": "12345"
+                                                    },
+                                                    "error": {
+                                                        "description": "Error message",
+                                                        "type": "string",
+                                                        "example": "Insufficient funds"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/admin/v1/reports/fundings": {
