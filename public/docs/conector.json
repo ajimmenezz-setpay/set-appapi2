@@ -1748,6 +1748,17 @@
                                     "establishment_condition": {
                                         "type": "string",
                                         "example": "in"
+                                    },
+                                    "acquiring_institution_code": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": "123456"
+                                        }
+                                    },
+                                    "acquiring_institution_code_condition": {
+                                        "type": "string",
+                                        "example": "in"
                                     }
                                 },
                                 "type": "object"
@@ -2000,6 +2011,17 @@
                                         }
                                     },
                                     "establishment_condition": {
+                                        "type": "string",
+                                        "example": "in"
+                                    },
+                                    "acquiring_institution_code": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": "123456"
+                                        }
+                                    },
+                                    "acquiring_institution_code_condition": {
                                         "type": "string",
                                         "example": "in"
                                     },
