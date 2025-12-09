@@ -1654,6 +1654,7 @@ class CardManagementController extends Controller
                 'subaccount_id' => $subaccount->UUID,
                 'subaccount_name' => $company->TradeName,
                 'environment' => $environment ? $environment->name : 'N/A',
+                'environment_id' => $environment ? $environment->Id : 0,
                 'client_id' => $card->CustomerPrefix . str_pad($card->CustomerId, 7, '0', STR_PAD_LEFT)
             ]);
         } catch (\Exception $e) {
