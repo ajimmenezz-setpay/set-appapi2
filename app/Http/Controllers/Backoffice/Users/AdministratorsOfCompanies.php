@@ -15,6 +15,7 @@ class AdministratorsOfCompanies extends Controller
             ->where('BusinessId', $request->attributes->get('jwt')->businessId)
             ->where('Active', 1)
             ->select('Id', 'Name', 'Lastname', 'Email')
+            ->orderBy('Name')
             ->get();
 
             $adminsArray = [];
