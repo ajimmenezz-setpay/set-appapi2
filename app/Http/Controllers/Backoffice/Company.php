@@ -515,7 +515,9 @@ class Company extends Controller
 
     public static function getAdminUsersByCompany($companyId)
     {
-        $users = CompaniesAndUsers::where('CompanyId', $companyId)->whereIn('ProfileId', [7, 13])->get();
+        $users = CompaniesAndUsers::where('CompanyId', $companyId)->whereIn('ProfileId', [7, 13]);
+        var_dump(self::printQuery($users));
+
         $arrayUsers = [];
         foreach ($users as $user) {
             $arrayUsers[] = [
@@ -571,47 +573,6 @@ class Company extends Controller
             'feeStp' => 0.00
         ];
     }
-
-    /**
-     *
-     *
-     * {
-  "id": 12345,
-  "tradeName": "Mi Empresa Comercial S.A. de C.V.",
-  "fiscalName": "Razón Social Oficial",
-  "rfc": "ABC123456XYZ",
-  "stpAccountId": 987654321,
-  "users": [
-    {
-      "id": 101,
-      "name": "Admin 1"
-    },
-    {
-      "id": 102,
-      "name": "Admin 2"
-    }
-  ],
-  "services": [
-    {
-      "type": "5",
-      "active": "1",
-      "description": "Card Cloud"
-    },
-    {
-      "type": "4",
-      "active": "0",
-      "description": "SPEI Cloud"
-    }
-  ],
-  "speiCommissions": {
-    "speiOut": 5.50,
-    "internal": 0.00,
-    "feeStp": 2.00,
-    "speiIn": 0.00
-  }
-}
-     */
-
 
     public static function createCompany($request)
     {
