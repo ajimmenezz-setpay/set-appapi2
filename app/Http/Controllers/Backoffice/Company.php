@@ -489,24 +489,24 @@ class Company extends Controller
     {
         try {
             $company = CompanyProjection::select(
-                "Id as id",
-                "TradeName as tradeName",
-                "FiscalName as fiscalName",
-                "Rfc as rfc"
+                "Id",
+                "TradeName",
+                "FiscalName",
+                "Rfc"
             )->where('Id', $id)->first();
             if (!$company) {
                 throw new \Exception('Empresa no encontrada.', 404);
             }
 
             return response()->json([
-                'id' => $company->id,
-                'tradeName' => $company->tradeName,
-                'fiscalName' => $company->fiscalName,
-                'rfc' => $company->rfc,
-                'stpAccountId' => CompanySpeiAccount::where('CompanyId', $company->id)->value('Clabe') ?? null,
-                'users' => self::getAdminUsersByCompany($company->id),
-                'services' => self::getCompanyServices($company->id),
-                'speiCommissions' => self::getCompanySpeiCommissions($company->id)
+                'id' => $company->Id,
+                'tradeName' => $company->TradeName,
+                'fiscalName' => $company->FiscalName,
+                'rfc' => $company->Rfc,
+                'stpAccountId' => self::companyHasSpeiCloud($company->Id) ? CompanySpeiAccount::where('CompanyId', $company->Id)->value('Clabe') : null,
+                'users' => self::getAdminUsersByCompany($company->Id),
+                'services' => self::getCompanyServices($company->Id),
+                'speiCommissions' => self::getCompanySpeiCommissions($company->Id)
             ], 200);
         } catch (\Exception $e) {
             return response($e->getMessage() . (env('APP_DEBUG') ? ' en la línea ' . $e->getLine() : ''), $e->getCode() ?: 400);
@@ -515,8 +515,8 @@ class Company extends Controller
 
     public static function getAdminUsersByCompany($companyId)
     {
-        $users = CompaniesAndUsers::where('CompanyId', $companyId)->whereIn('ProfileId', [7, 13]);
-        var_dump(self::printQuery($users));
+
+        $users = CompaniesAndUsers::where('CompanyId', $companyId)->whereIn('ProfileId', [7, 13])->get();
 
         $arrayUsers = [];
         foreach ($users as $user) {
@@ -572,6 +572,16 @@ class Company extends Controller
             'internal' => 0.00,
             'feeStp' => 0.00
         ];
+    }
+
+    public static function companyHasSpeiCloud($companyId)
+    {
+        $hasSpeiCloud = CompaniesServices::where('CompanyId', $companyId)
+            ->where('Type', 4)
+            ->where('Active', 1)
+            ->first();
+
+        return $hasSpeiCloud ? true : false;
     }
 
     public static function createCompany($request)
