@@ -519,9 +519,10 @@ class Company extends Controller
         $arrayUsers = [];
         foreach ($users as $user) {
             $arrayUsers[] = [
-                'id' => $user->Id,
+                'id' => $user->UserId,
                 'name' => $user->Name . ' ' . $user->LastName,
-                'email' => $user->Email
+                'email' => $user->Email,
+                'profileId' => $user->ProfileId
             ];
         }
         return $arrayUsers;
