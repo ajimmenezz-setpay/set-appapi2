@@ -8,6 +8,7 @@ use App\Http\Controllers\Notifications\FirebasePushController as FirebaseService
 use App\Http\Controllers\Card\CardManagementController as CardCardManagementController;
 
 use App\Http\Services\CardCloudApi;
+use App\Models\Backoffice\Companies\CompaniesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Client;
@@ -18,7 +19,9 @@ use App\Models\CardCloud\NipView;
 use App\Models\CardCloud\Card;
 use App\Models\CardCloud\Credit;
 use App\Models\CardCloud\CreditWallet;
+use App\Models\CardCloud\Subaccount;
 use App\Models\Users\FirebaseToken;
+use Illuminate\Support\Facades\DB;
 
 class CardSensitiveController extends Controller
 {
@@ -85,6 +88,21 @@ class CardSensitiveController extends Controller
                 case 5:
                     $allowed = true;
                     break;
+                case 7:
+                    $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
+                        ->pluck('CompanyId')
+                        ->toArray();
+                    $cardCloudSubaccounts = Subaccount::whereIn('ExternalId', $subaccount)
+                        ->pluck('Id')
+                        ->toArray();
+
+                    $cards = Card::whereIn('SubAccountId', $cardCloudSubaccounts)
+                        ->where('UUID', $cardId)
+                        ->first();
+
+                    $allowed = $cards ? true : false;
+                    break;
+                    
                 case 8:
                     $cardAssigned = CardAssigned::where('CardCloudId', $cardId)
                         ->where('UserId', $request->attributes->get('jwt')->id)
