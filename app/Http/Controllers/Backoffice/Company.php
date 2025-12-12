@@ -19,6 +19,7 @@ use Ramsey\Uuid\Uuid;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use App\Http\Services\CardCloudApi;
+use App\Models\Backoffice\Companies\CompanySpeiAccount;
 use App\Models\Backoffice\Users\CompaniesAndUsers;
 use Carbon\Carbon;
 
@@ -484,6 +485,104 @@ class Company extends Controller
         }
     }
 
+    public function show(Request $request, $id)
+    {
+        try {
+            $company = CompanyProjection::select(
+                "Id",
+                "TradeName",
+                "FiscalName",
+                "Rfc"
+            )->where('Id', $id)->first();
+            if (!$company) {
+                throw new \Exception('Empresa no encontrada.', 404);
+            }
+
+            return response()->json([
+                'id' => $company->Id,
+                'tradeName' => $company->TradeName,
+                'fiscalName' => $company->FiscalName,
+                'rfc' => $company->Rfc,
+                'stpAccountId' => self::companyHasSpeiCloud($company->Id) ? CompanySpeiAccount::where('CompanyId', $company->Id)->value('Clabe') : null,
+                'users' => self::getAdminUsersByCompany($company->Id),
+                'services' => self::getCompanyServices($company->Id),
+                'speiCommissions' => self::getCompanySpeiCommissions($company->Id)
+            ], 200);
+        } catch (\Exception $e) {
+            return response($e->getMessage() . (env('APP_DEBUG') ? ' en la línea ' . $e->getLine() : ''), $e->getCode() ?: 400);
+        }
+    }
+
+    public static function getAdminUsersByCompany($companyId)
+    {
+
+        $users = CompaniesAndUsers::where('CompanyId', $companyId)->whereIn('ProfileId', [7, 13])->get();
+
+        $arrayUsers = [];
+        foreach ($users as $user) {
+            $arrayUsers[] = [
+                'id' => $user->UserId,
+                'name' => $user->Name . ' ' . $user->LastName,
+                'email' => $user->Email,
+                'profileId' => $user->ProfileId
+            ];
+        }
+        return $arrayUsers;
+    }
+
+    public static function getCompanyServices($companyId)
+    {
+        $services = CompaniesServices::join('cat_backoffice_companies_services', 'cat_backoffice_companies_services.Id', '=', 't_backoffice_companies_services.Type')
+            ->select(
+                't_backoffice_companies_services.Type',
+                'cat_backoffice_companies_services.Name',
+                't_backoffice_companies_services.Active'
+            )->where('CompanyId', $companyId)->get();
+
+        $arrayServices = [];
+        foreach ($services as $service) {
+            $arrayServices[] =  [
+                'type' => (string)$service->Type,
+                'active' => (string)$service->Active,
+                'description' => $service->Name
+            ];
+        }
+        return $arrayServices;
+    }
+
+    public static function getCompanySpeiCommissions($companyId)
+    {
+        $commissions = CompaniesCommissions::where('CompanyId', $companyId)
+            ->where('Type', 2)
+            ->first();
+
+        if ($commissions) {
+            $speiCommissions = CompaniesCommissionsSpei::where('Id', $commissions->Id)->first();
+            return [
+                'speiOut' => (float)$speiCommissions->SpeiOut,
+                'speiIn' => (float)$speiCommissions->SpeiIn,
+                'internal' => (float)$speiCommissions->Internal,
+                'feeStp' => (float)$speiCommissions->FeeStp
+            ];
+        }
+
+        return [
+            'speiOut' => 0.00,
+            'speiIn' => 0.00,
+            'internal' => 0.00,
+            'feeStp' => 0.00
+        ];
+    }
+
+    public static function companyHasSpeiCloud($companyId)
+    {
+        $hasSpeiCloud = CompaniesServices::where('CompanyId', $companyId)
+            ->where('Type', 4)
+            ->where('Active', 1)
+            ->first();
+
+        return $hasSpeiCloud ? true : false;
+    }
 
     public static function createCompany($request)
     {
@@ -773,7 +872,7 @@ class Company extends Controller
         }
 
         if ($deleteOthers) {
-            CompaniesAndUsers::where('CompanyId', $company->Id)->where('ProfileId', '!=', "8")->delete();
+            CompaniesAndUsers::where('CompanyId', $company->Id)->whereNotIn('ProfileId', [8, 13])->delete();
         }
 
         foreach ($users as $user) {

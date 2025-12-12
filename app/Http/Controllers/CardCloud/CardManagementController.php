@@ -307,7 +307,7 @@ class CardManagementController extends Controller
                 'BusinessId' => $request->attributes->get('jwt')->businessId,
                 'CardCloudId' => $decodedJson['card_id'],
                 'UserId' => $request->attributes->get('jwt')->id,
-                'Name' => $request->attributes->get('jwt')->firstName,
+                'Name' => $request->attributes->get('jwt')->firstName ?? $request->attributes->get('jwt')->name ?? '',
                 'Lastname' => $request->attributes->get('jwt')->lastname,
                 'Email' => $request->attributes->get('jwt')->email,
                 'IsPending' => 0,
@@ -473,7 +473,7 @@ class CardManagementController extends Controller
                 'BusinessId' => $request->attributes->get('jwt')->businessId,
                 'CardCloudId' => $decodedJson['card_id'],
                 'UserId' => $request->attributes->get('jwt')->id,
-                'Name' => $request->attributes->get('jwt')->firstName,
+                'Name' => $request->attributes->get('jwt')->firstName ?? $request->attributes->get('jwt')->name ?? '',
                 'Lastname' => $request->attributes->get('jwt')->lastname,
                 'Email' => $request->attributes->get('jwt')->email,
                 'IsPending' => 0,
@@ -1654,6 +1654,7 @@ class CardManagementController extends Controller
                 'subaccount_id' => $subaccount->UUID,
                 'subaccount_name' => $company->TradeName,
                 'environment' => $environment ? $environment->name : 'N/A',
+                'environment_id' => $environment ? $environment->Id : 0,
                 'client_id' => $card->CustomerPrefix . str_pad($card->CustomerId, 7, '0', STR_PAD_LEFT)
             ]);
         } catch (\Exception $e) {

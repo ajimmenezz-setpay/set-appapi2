@@ -190,6 +190,11 @@ Route::middleware([VerifyJwt::class, ApiLogger::class])->group(function () {
             Route::post('/new', [App\Http\Controllers\Backoffice\Company::class, 'create']);
             Route::put('/update', [App\Http\Controllers\Backoffice\Company::class, 'update']);
             Route::put('/toggle', [App\Http\Controllers\Backoffice\Company::class, 'toggle']);
+            Route::get('/{id}', [App\Http\Controllers\Backoffice\Company::class, 'show']);
+        });
+
+        Route::group(['prefix' => 'users'], function () {
+            Route::get('/administrators-of-companies', [App\Http\Controllers\Backoffice\Users\AdministratorsOfCompanies::class, 'index']);
         });
     });
 });
