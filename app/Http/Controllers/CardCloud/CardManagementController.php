@@ -1355,6 +1355,20 @@ class CardManagementController extends Controller
             case 12:
                 $allowed = true;
                 break;
+            case 7:
+                $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
+                    ->pluck('CompanyId')
+                    ->toArray();
+                $cardCloudSubaccounts = Subaccount::whereIn('ExternalId', $subaccount)
+                    ->pluck('Id')
+                    ->toArray();
+
+                $cards = Card::whereIn('SubAccountId', $cardCloudSubaccounts)
+                    ->where('UUID', $cardId)
+                    ->first();
+
+                $allowed = $cards ? true : false;
+                break;
             case 8:
                 $cardAssigned = CardAssigned::where('CardCloudId', $cardId)
                     ->where('UserId', $request->attributes->get('jwt')->id)
@@ -1465,6 +1479,20 @@ class CardManagementController extends Controller
             case 11:
             case 12:
                 $allowed = true;
+                break;
+            case 7:
+                $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
+                    ->pluck('CompanyId')
+                    ->toArray();
+                $cardCloudSubaccounts = Subaccount::whereIn('ExternalId', $subaccount)
+                    ->pluck('Id')
+                    ->toArray();
+
+                $cards = Card::whereIn('SubAccountId', $cardCloudSubaccounts)
+                    ->where('UUID', $cardId)
+                    ->first();
+
+                $allowed = $cards ? true : false;
                 break;
             case 8:
                 $cardAssigned = CardAssigned::where('CardCloudId', $cardId)
