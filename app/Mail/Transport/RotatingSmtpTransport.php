@@ -9,6 +9,8 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\RawMessage;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Address;
 use Throwable;
 
 class RotatingSmtpTransport implements TransportInterface
@@ -24,29 +26,28 @@ class RotatingSmtpTransport implements TransportInterface
         $smtp = null;
 
         try {
+            // 1️⃣ Obtener SMTP según rotación
             $smtp = $this->rotation->acquire();
+
+            // 2️⃣ Crear transport SMTP dinámico
             $transport = $this->factory->build($smtp);
 
-            if (method_exists($message, 'getHeaders')) {
-                $headers = $message->getHeaders();
-
-                // Elimina cualquier From previo (ej: "Example")
-                if ($headers->has('From')) {
-                    $headers->remove('From');
-                }
-
-                $headers->addMailboxHeader(
-                    'From',
-                    $smtp->from_address,
-                    $smtp->from_name
+            // 3️⃣ FORZAR FROM DINÁMICO (FORMA CORRECTA SYMFONY)
+            if ($message instanceof Email) {
+                $message->from(
+                    new Address(
+                        $smtp->from_address,
+                        $smtp->from_name
+                    )
                 );
             }
 
+            // 4️⃣ Enviar correo
             $sent = $transport->send($message, $envelope);
 
             $duration = (int) round((microtime(true) - $started) * 1000);
 
-            // ✅ health reset (si salió bien)
+            // 5️⃣ Health reset del SMTP (envío exitoso)
             DB::table('smtp_accounts')->where('id', $smtp->id)->update([
                 'fail_count' => 0,
                 'last_error' => null,
@@ -55,6 +56,7 @@ class RotatingSmtpTransport implements TransportInterface
                 'updated_at' => now(),
             ]);
 
+            // 6️⃣ Log de envío exitoso
             DB::table('mail_delivery_logs')->insert([
                 'smtp_account_id' => $smtp->id,
                 'to_email' => $this->extractTo($envelope),
@@ -69,20 +71,24 @@ class RotatingSmtpTransport implements TransportInterface
             ]);
 
             return $sent;
+
         } catch (Throwable $e) {
             $duration = (int) round((microtime(true) - $started) * 1000);
 
+            // 7️⃣ Circuit breaker si falla
             if ($smtp) {
-                // Circuit breaker: 3 fallos => disable 15 min
                 DB::table('smtp_accounts')->where('id', $smtp->id)->update([
                     'fail_count' => DB::raw('fail_count + 1'),
                     'last_error' => substr($e->getMessage(), 0, 1000),
-                    'disabled_until' => DB::raw("IF(fail_count + 1 >= 3, DATE_ADD(NOW(), INTERVAL 15 MINUTE), disabled_until)"),
+                    'disabled_until' => DB::raw(
+                        "IF(fail_count + 1 >= 3, DATE_ADD(NOW(), INTERVAL 15 MINUTE), disabled_until)"
+                    ),
                     'active' => DB::raw("IF(fail_count + 1 >= 3, 0, active)"),
                     'updated_at' => now(),
                 ]);
             }
 
+            // 8️⃣ Log de fallo
             DB::table('mail_delivery_logs')->insert([
                 'smtp_account_id' => $smtp->id ?? null,
                 'to_email' => $this->extractTo($envelope),
@@ -107,17 +113,20 @@ class RotatingSmtpTransport implements TransportInterface
 
     private function extractTo(?Envelope $envelope): ?string
     {
-        if (!$envelope) return null;
+        if (!$envelope) {
+            return null;
+        }
+
         $recipients = $envelope->getRecipients();
         return $recipients[0]->getAddress() ?? null;
     }
 
     private function extractSubject(RawMessage $message): ?string
     {
-        if (!method_exists($message, 'getHeaders')) return null;
-        $headers = $message->getHeaders();
-        if (!$headers->has('Subject')) return null;
+        if (!$message instanceof Email) {
+            return null;
+        }
 
-        return (string) $headers->get('Subject')->getBodyAsString();
+        return $message->getSubject();
     }
 }
