@@ -27,6 +27,21 @@ class RotatingSmtpTransport implements TransportInterface
             $smtp = $this->rotation->acquire();
             $transport = $this->factory->build($smtp);
 
+            if (method_exists($message, 'getHeaders')) {
+                $headers = $message->getHeaders();
+
+                // Elimina cualquier From previo (ej: "Example")
+                if ($headers->has('From')) {
+                    $headers->remove('From');
+                }
+
+                $headers->addMailboxHeader(
+                    'From',
+                    $smtp->from_address,
+                    $smtp->from_name
+                );
+            }
+
             $sent = $transport->send($message, $envelope);
 
             $duration = (int) round((microtime(true) - $started) * 1000);
@@ -54,7 +69,6 @@ class RotatingSmtpTransport implements TransportInterface
             ]);
 
             return $sent;
-
         } catch (Throwable $e) {
             $duration = (int) round((microtime(true) - $started) * 1000);
 
