@@ -309,7 +309,7 @@ class CardManagementController extends Controller
                 'CardCloudId' => $decodedJson['card_id'],
                 'UserId' => $request->attributes->get('jwt')->id,
                 'Name' => $request->attributes->get('jwt')->firstName ?? $request->attributes->get('jwt')->name ?? '',
-                'Lastname' => $request->attributes->get('jwt')->lastname,
+                'Lastname' => $request->attributes->get('jwt')->lastname ?? '',
                 'Email' => $request->attributes->get('jwt')->email,
                 'IsPending' => 0,
                 'CreatedByUser' => $request->attributes->get('jwt')->id,
