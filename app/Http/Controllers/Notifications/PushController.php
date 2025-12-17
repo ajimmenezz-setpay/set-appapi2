@@ -70,7 +70,7 @@ class PushController extends Controller
                 'message' => 'Notificación push guardada para enviar'
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error sending push notification: ' . $e->getMessage());
+            // Log::error('Error sending push notification: ' . $e->getMessage());
             return response()->json([
                 'message' => $e->getMessage()
             ], 200);

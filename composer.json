@@ -15,6 +15,7 @@
         "laravel/tinker": "^2.9",
         "maatwebsite/excel": "^3.1",
         "pragmarx/google2fa": "^8.0",
+        "predis/predis": "^3.3",
         "ramsey/uuid": "^4.7",
         "simplesoftwareio/simple-qrcode": "^4.2",
         "spomky-labs/otphp": "*",
