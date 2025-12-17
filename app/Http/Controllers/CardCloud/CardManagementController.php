@@ -23,6 +23,7 @@ use App\Models\CardCloud\Environment;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Models\Backoffice\Companies\Company;
+use Exception;
 
 class CardManagementController extends Controller
 {
@@ -442,31 +443,60 @@ class CardManagementController extends Controller
                 GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->auth_code);
             }
 
-            if (CardAssigned::where('CardCloudId', $request->source_card)->where('UserId', $request->attributes->get('jwt')->id)->count() == 0) {
-                return self::basicError("La tarjeta de origen no está asignada al usuario");
+            switch ($request->attributes->get('jwt')->profileId) {
+                case 5:
+                    $allowed = true;
+                    break;
+                case 7:
+                    $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
+                        ->pluck('CompanyId')
+                        ->toArray();
+                    $cardCloudSubaccounts = Subaccount::whereIn('ExternalId', $subaccount)
+                        ->pluck('Id')
+                        ->toArray();
+
+                    $cards = Card::whereIn('SubAccountId', $cardCloudSubaccounts)
+                        ->where('UUID', $request->source_card)
+                        ->first();
+
+                    $allowed = $cards ? true : false;
+                    break;
+                case 8:
+                    $cardAssigned = CardAssigned::where('CardCloudId', $request->source_card)
+                        ->where('UserId', $request->attributes->get('jwt')->id)
+                        ->first();
+                    $allowed = $cardAssigned ? true : false;
+
+                    break;
+                default:
+                    $allowed = false;
             }
 
-            $allowChange = DB::connection('card_cloud')->table('cards')
-                ->join('subaccount_blocks', 'cards.SubAccountId', '=', 'subaccount_blocks.SubaccountId')
-                ->where('UUID', $request->source_card)
-                ->where('subaccount_blocks.BuyVirtualCard', 1)
-                ->first();
-            if ($allowChange) {
-                return response("Esta función no esta disponible para tu empresa. Contacta al CAE SETPAY o a tu administrador", 400);
-            }
+            if (!$allowed) {
+                throw new Exception("La tarjeta de origen no pertenece al usuario");
+            } else {
 
-            $client = new Client();
-            $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $request->source_card . '/buy_virtual_card', [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
-                ],
-                'json' => [
-                    'months' => $request->months
-                ]
-            ]);
+                $allowChange = DB::connection('card_cloud')->table('cards')
+                    ->join('subaccount_blocks', 'cards.SubAccountId', '=', 'subaccount_blocks.SubaccountId')
+                    ->where('UUID', $request->source_card)
+                    ->where('subaccount_blocks.BuyVirtualCard', 1)
+                    ->first();
+                if ($allowChange) {
+                    return response("Esta función no esta disponible para tu empresa. Contacta al CAE SETPAY o a tu administrador", 400);
+                }
 
-            $decodedJson = json_decode($response->getBody(), true);
+                $client = new Client();
+                $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $request->source_card . '/buy_virtual_card', [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                    ],
+                    'json' => [
+                        'months' => $request->months
+                    ]
+                ]);
+
+                $decodedJson = json_decode($response->getBody(), true);
 
             CardAssigned::create([
                 'Id' => Uuid::uuid7(),

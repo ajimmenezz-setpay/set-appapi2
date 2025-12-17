@@ -10,6 +10,7 @@ use App\Http\Controllers\Card\CardManagementController as CardCardManagementCont
 use App\Http\Controllers\Notifications\FirebasePushController as FirebaseService;
 use App\Models\Notifications\Push as PushModel;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PushController extends Controller
 {
@@ -69,6 +70,7 @@ class PushController extends Controller
                 'message' => 'Notificación push guardada para enviar'
             ], 200);
         } catch (\Exception $e) {
+            // Log::error('Error sending push notification: ' . $e->getMessage());
             return response()->json([
                 'message' => $e->getMessage()
             ], 200);
