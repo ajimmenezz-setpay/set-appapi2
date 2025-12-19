@@ -184,7 +184,7 @@ class SubaccountCardController extends Controller
                 if ($email != "") {
                     $user = User::where("Email", $email)->first();
                     if ($user) {
-                        $errors[] = "El correo electrónico ya ha sido registrado, utilice otra cuenta de correo";
+                        $errors[] = "El correo electrónico ya ha sido registrado, utilice otra cuenta de correo para el cliente con ID: $clientId.";
                         continue;
                     }
                 }
