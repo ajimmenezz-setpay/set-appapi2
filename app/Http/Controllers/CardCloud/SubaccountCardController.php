@@ -164,6 +164,14 @@ class SubaccountCardController extends Controller
 
                 $assigned = CardAssigned::where('CardCloudId', $card->UUID)->first();
                 if ($assigned) {
+                    CardAssigned::where('CardCloudId', $card->UUID)->update([
+                        'Name' => $name,
+                        'Lastname' => $lastname
+                    ]);
+                    User::where('Id', $assigned->UserId)->update([
+                        'Name' => $name,
+                        'Lastname' => $lastname
+                    ]);
                     $errors[] = "La tarjeta {$clientId} ya está asignada al usuario {$assigned->Name} {$assigned->Lastname}.";
                     continue;
                 }
