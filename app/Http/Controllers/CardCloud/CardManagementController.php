@@ -299,8 +299,15 @@ class CardManagementController extends Controller
                 return response("La tarjeta ya está asignada a un usuario", 400);
             }
 
-            if (!self::validateUserCompany($decodedJson['subaccount_id'], $request->attributes->get('jwt')->id)) {
-                return self::basicError("La tarjeta de origen no pertenece a la empresa del usuario");
+            if (!in_array($decodedJson['subaccount_id'], [
+                '019b1f10-2659-73b1-a936-aad15cd6be85', //Tabasco Fin de año
+                '019a6ec2-0dac-72ed-b6b2-c65ef79e8a49', //Salud Tabasco
+                '019b380d-71bb-73b1-bb8d-6b6050077278', //Conalep
+                '019b3812-3fa6-719d-9fed-8e72a10f6129' //Conalep fin de año
+            ])) {
+                if (!self::validateUserCompany($decodedJson['subaccount_id'], $request->attributes->get('jwt')->id)) {
+                    return self::basicError("La tarjeta de origen no pertenece a la empresa del usuario");
+                }
             }
 
             CardAssigned::create([
