@@ -41,13 +41,13 @@ class UserV2 extends Controller
 
                 return response()->json([
                     'profiles' => $profiles
-                ]);
+                ], 201);
             } else {
                 $payload = self::payloadNonMultiProfile($user);
 
                 return response()->json([
                     'token' => JWTToken::generateToken($payload)
-                ]);
+                ], 200);
             }
         } catch (InvalidCredentialsException $e) {
             return response()->json([
