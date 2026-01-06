@@ -14257,6 +14257,550 @@
                 ]
             }
         },
+        "/api/admin/v1/stp_management/allowed_payment_accounts": {
+            "get": {
+                "tags": [
+                    "STP Management"
+                ],
+                "summary": "Get Allowed Payment Accounts",
+                "description": "Retrieve a list of allowed payment accounts associated with STP accounts.",
+                "operationId": "getAllowedPaymentAccounts",
+                "responses": {
+                    "200": {
+                        "description": "Successful retrieval of allowed payment accounts",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "accounts": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": "1"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Main Company Account"
+                                                    },
+                                                    "account_number": {
+                                                        "type": "string",
+                                                        "example": "646180502504000003"
+                                                    },
+                                                    "environment_name": {
+                                                        "type": "string",
+                                                        "example": "Environment 1"
+                                                    },
+                                                    "stp_account_id": {
+                                                        "type": "string",
+                                                        "example": "95847a2a-efa3-424a-87fe-55d84ee7ae57"
+                                                    },
+                                                    "stp_company": {
+                                                        "type": "string",
+                                                        "example": "COMPANY NAME"
+                                                    },
+                                                    "active": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "STP Management"
+                ],
+                "summary": "Create a new allowed payment account for an STP account",
+                "description": "Creates a new allowed payment account associated with a specific STP account.",
+                "operationId": "storeAllowedPaymentAccount",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "stp_account_id",
+                                    "description",
+                                    "account_number"
+                                ],
+                                "properties": {
+                                    "stp_account_id": {
+                                        "description": "The UUID of the STP account to which the allowed payment account will be linked.",
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "example": "95847a2a-efa3-424a-87fe-55d84ee7ae57"
+                                    },
+                                    "description": {
+                                        "description": "A brief description of the allowed payment account.",
+                                        "type": "string",
+                                        "example": "Main Company Account"
+                                    },
+                                    "account_number": {
+                                        "description": "The 18-digit account number to be allowed for payments.",
+                                        "type": "string",
+                                        "example": "646180502504000003"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Allowed payment account created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "account": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": "1"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Main Company Account"
+                                                },
+                                                "account_number": {
+                                                    "type": "string",
+                                                    "example": "646180502504000003"
+                                                },
+                                                "environment_name": {
+                                                    "type": "string",
+                                                    "example": "Environment 1"
+                                                },
+                                                "stp_account_id": {
+                                                    "type": "string",
+                                                    "example": "95847a2a-efa3-424a-87fe-55d84ee7ae57"
+                                                },
+                                                "stp_company": {
+                                                    "type": "string",
+                                                    "example": "COMPANY NAME"
+                                                },
+                                                "active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "STP Account Not Found"
+                    },
+                    "409": {
+                        "description": "Conflict - Duplicate Account"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/stp_management/allowed_payment_accounts/{id}": {
+            "get": {
+                "tags": [
+                    "STP Management"
+                ],
+                "summary": "Get Allowed Payment Account by ID",
+                "description": "Retrieve a specific allowed payment account by its ID.",
+                "operationId": "getAllowedPaymentAccountById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the allowed payment account to retrieve",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful retrieval of the allowed payment account",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "account": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": "1"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Main Company Account"
+                                                },
+                                                "account_number": {
+                                                    "type": "string",
+                                                    "example": "646180502504000003"
+                                                },
+                                                "environment_name": {
+                                                    "type": "string",
+                                                    "example": "Environment 1"
+                                                },
+                                                "stp_account_id": {
+                                                    "type": "string",
+                                                    "example": "95847a2a-efa3-424a-87fe-55d84ee7ae57"
+                                                },
+                                                "stp_company": {
+                                                    "type": "string",
+                                                    "example": "COMPANY NAME"
+                                                },
+                                                "active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Allowed Payment Account Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "STP Management"
+                ],
+                "summary": "Update an existing allowed payment account",
+                "description": "Updates the details of an existing allowed payment account associated with a specific STP account.",
+                "operationId": "updateAllowedPaymentAccount",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the allowed payment account to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "description": {
+                                        "description": "A brief description of the allowed payment account.",
+                                        "type": "string",
+                                        "example": "Updated Company Account"
+                                    },
+                                    "account_number": {
+                                        "description": "The 18-digit account number to be allowed for payments.",
+                                        "type": "string",
+                                        "example": "646180502504000004"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Allowed payment account updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "account": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": "1"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Updated Company Account"
+                                                },
+                                                "account_number": {
+                                                    "type": "string",
+                                                    "example": "646180502504000004"
+                                                },
+                                                "environment_name": {
+                                                    "type": "string",
+                                                    "example": "Environment 1"
+                                                },
+                                                "stp_account_id": {
+                                                    "type": "string",
+                                                    "example": "95847a2a-efa3-424a-87fe-55d84ee7ae57"
+                                                },
+                                                "stp_company": {
+                                                    "type": "string",
+                                                    "example": "COMPANY NAME"
+                                                },
+                                                "active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Allowed Payment Account Not Found"
+                    },
+                    "409": {
+                        "description": "Conflict - Duplicate Account"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/stp_management/allowed_payment_accounts/{id}/enable": {
+            "post": {
+                "tags": [
+                    "STP Management"
+                ],
+                "summary": "Enable an allowed payment account",
+                "description": "Enables an allowed payment account by its ID.",
+                "operationId": "enableAllowedPaymentAccount",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the allowed payment account to enable",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Allowed payment account enabled successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Allowed payment account enabled successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Allowed Payment Account Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/stp_management/allowed_payment_accounts/{id}/disable": {
+            "post": {
+                "tags": [
+                    "STP Management"
+                ],
+                "summary": "Disable an allowed payment account",
+                "description": "Disables an allowed payment account by its ID.",
+                "operationId": "disableAllowedPaymentAccount",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the allowed payment account to disable",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Allowed payment account disabled successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Allowed payment account disabled successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Allowed Payment Account Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/stp_management/accounts": {
+            "get": {
+                "tags": [
+                    "STP Management"
+                ],
+                "summary": "Get STP Accounts",
+                "description": "Retrieve a list of STP accounts along with their environment names, balances, and statuses.",
+                "operationId": "getStpAccounts",
+                "responses": {
+                    "200": {
+                        "description": "Successful retrieval of STP accounts",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "accounts": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "Id": {
+                                                        "type": "string",
+                                                        "example": "95847a2a-efa3-424a-87fe-55d84ee7ae57"
+                                                    },
+                                                    "Number": {
+                                                        "type": "string",
+                                                        "example": "646180502504000003"
+                                                    },
+                                                    "Acronym": {
+                                                        "type": "string",
+                                                        "example": "COM"
+                                                    },
+                                                    "Company": {
+                                                        "type": "string",
+                                                        "example": "COMPANY NAME"
+                                                    },
+                                                    "EnvironmentName": {
+                                                        "type": "string",
+                                                        "example": "Environment 1"
+                                                    },
+                                                    "Balance": {
+                                                        "type": "string",
+                                                        "example": "15000.00"
+                                                    },
+                                                    "BalanceDate": {
+                                                        "type": "string",
+                                                        "example": "2023-10-01 12:00:00"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/admin/v1/subaccount": {
             "get": {
                 "tags": [
@@ -19654,6 +20198,10 @@
         {
             "name": "2FA",
             "description": "2FA"
+        },
+        {
+            "name": "STP Management",
+            "description": "STP Management"
         },
         {
             "name": "ADM Subaccounts Management",
