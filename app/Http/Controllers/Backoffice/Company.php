@@ -414,7 +414,16 @@ class Company extends Controller
                 CompaniesServices::where('CompanyId', $request->id)
                     ->where('Type', 4)
                     ->update(['Active' => 0, 'UpdateByUser' => $request->attributes->get('jwt')->id, 'UpdateDate' => now()]);
+                $companyProjection = CompanyProjection::where('Id', $request->id)->first();
+                $services = json_decode($companyProjection->Services, true);
+                $newServices = [];
+                foreach ($services as $index => $service) {
+                    if ($service['type'] != 4) {
+                        array_push($newServices, $service);
+                    }
+                }
 
+                CompanyProjection::where('Id', $request->id)->update(['Services' => json_encode($newServices)]);
             }
 
             DB::beginTransaction();
@@ -450,7 +459,7 @@ class Company extends Controller
 
             $projection = self::updateProjection($company, $commissions ?? [], $services, $users);
 
-            FixMissingCompany::fixMissingCompanyStatic();
+            // FixMissingCompany::fixMissingCompanyStatic();
 
             DB::commit();
 

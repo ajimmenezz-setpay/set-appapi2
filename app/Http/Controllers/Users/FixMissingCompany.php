@@ -177,9 +177,9 @@ class FixMissingCompany extends Controller
                     }
                 }
 
-                if($projection->Id == "01987c93-2455-72c6-9549-efd83b8f4dc4"){
-                    var_dump($realUsers);
-                }
+                // if($projection->Id == "01987c93-2455-72c6-9549-efd83b8f4dc4"){
+                //     var_dump($realUsers);
+                // }
 
                 $relatedUsers = DB::table('t_backoffice_companies_and_users')
                     ->where('CompanyId', $companyId->Id)
