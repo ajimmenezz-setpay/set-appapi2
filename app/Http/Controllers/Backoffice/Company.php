@@ -736,6 +736,9 @@ class Company extends Controller
             switch ($type) {
                 case 4:
                     if ($enabled) {
+                        CompaniesServices::where('Id', $mainService->Id)
+                            ->update(['Active' => 1, 'UpdateByUser' => $request->attributes->get('jwt')->id, 'UpdateDate' => now()]);
+
                         $serviceSpei = CompaniesServicesSpei::where('Id', $mainService->Id)->first();
                         if (!$serviceSpei) {
                             $serviceSpei = new CompaniesServicesSpei();
