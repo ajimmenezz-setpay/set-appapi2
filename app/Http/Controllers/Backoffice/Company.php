@@ -410,6 +410,11 @@ class Company extends Controller
                     $stpService = CompaniesServicesSpei::where('Id', $hasSpeiCloud->Id)->first();
                     $availableAccount = DB::table('t_backoffice_bank_accounts')->where('Id', $stpService->BankAccountId)->first();
                 }
+            } else {
+                CompaniesServices::where('CompanyId', $request->id)
+                    ->where('Type', 4)
+                    ->update(['Active' => 0, 'UpdateByUser' => $request->attributes->get('jwt')->id, 'UpdateDate' => now()]);
+
             }
 
             DB::beginTransaction();
