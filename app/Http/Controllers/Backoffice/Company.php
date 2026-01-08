@@ -410,21 +410,22 @@ class Company extends Controller
                     $stpService = CompaniesServicesSpei::where('Id', $hasSpeiCloud->Id)->first();
                     $availableAccount = DB::table('t_backoffice_bank_accounts')->where('Id', $stpService->BankAccountId)->first();
                 }
-            } else {
-                CompaniesServices::where('CompanyId', $request->id)
-                    ->where('Type', 4)
-                    ->update(['Active' => 0, 'UpdateByUser' => $request->attributes->get('jwt')->id, 'UpdateDate' => now()]);
-                $companyProjection = CompanyProjection::where('Id', $request->id)->first();
-                $services = json_decode($companyProjection->Services, true);
-                $newServices = [];
-                foreach ($services as $index => $service) {
-                    if ($service['type'] != 4) {
-                        array_push($newServices, $service);
-                    }
-                }
-
-                CompanyProjection::where('Id', $request->id)->update(['Services' => json_encode($newServices)]);
             }
+            // else {
+            //     CompaniesServices::where('CompanyId', $request->id)
+            //         ->where('Type', 4)
+            //         ->update(['Active' => 0, 'UpdateByUser' => $request->attributes->get('jwt')->id, 'UpdateDate' => now()]);
+            //     $companyProjection = CompanyProjection::where('Id', $request->id)->first();
+            //     $services = json_decode($companyProjection->Services, true);
+            //     $newServices = [];
+            //     foreach ($services as $index => $service) {
+            //         if ($service['type'] != 4) {
+            //             array_push($newServices, $service);
+            //         }
+            //     }
+
+            //     CompanyProjection::where('Id', $request->id)->update(['Services' => json_encode($newServices)]);
+            // }
 
             DB::beginTransaction();
             $company = self::updateCompany($request);
