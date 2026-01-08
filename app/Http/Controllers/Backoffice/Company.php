@@ -757,6 +757,9 @@ class Company extends Controller
                             $service['bankAccountNumber'] = "$serviceSpei->BankAccountNumber";
                         }
                     } else {
+
+                        CompaniesServices::where('Id', $mainService->Id)
+                            ->update(['Active' => 0, 'UpdateByUser' => $request->attributes->get('jwt')->id, 'UpdateDate' => now()]);
                         $service = [];
                     }
                     break;
