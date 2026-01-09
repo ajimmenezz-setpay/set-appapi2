@@ -128,7 +128,9 @@ class UserV2 extends Controller
                 case 5:
                     $environments = UserEnvironments::join('t_backoffice_business', 't_backoffice_business.Id', '=', 't_backoffice_user_environments.EnvironmentId')
                         ->where('t_backoffice_business.Active', true)
+                        ->where('t_backoffice_user_environments.UserId', $user->Id)
                         ->select('t_backoffice_user_environments.EnvironmentId', 't_backoffice_business.Name')
+                        ->groupBy('t_backoffice_user_environments.EnvironmentId', 't_backoffice_business.Name')
                         ->get();
                     foreach ($environments as $env) {
                         $token = self::tokenMultiProfile($user, $profile, $env->EnvironmentId);
