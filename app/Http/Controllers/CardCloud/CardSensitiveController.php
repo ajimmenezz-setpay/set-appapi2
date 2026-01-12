@@ -376,10 +376,53 @@ class CardSensitiveController extends Controller
     public function dynamicCvv(Request $request, $cardId)
     {
         try {
-            if (CardAssigned::where('CardCloudId', $cardId)->where('UserId', $request->attributes->get('jwt')->id)->count() == 0) {
-                throw new Exception('El usuario no tiene acceso a la tarjeta.');
-            } else {
+            switch ($request->attributes->get('jwt')->profileId) {
+                case 5:
+                    $allowed = true;
+                    break;
+                case 7:
+                    $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
+                        ->pluck('CompanyId')
+                        ->toArray();
+                    $cardCloudSubaccounts = Subaccount::whereIn('ExternalId', $subaccount)
+                        ->pluck('Id')
+                        ->toArray();
 
+                    $cards = Card::whereIn('SubAccountId', $cardCloudSubaccounts)
+                        ->where('UUID', $cardId)
+                        ->first();
+
+                    $allowed = $cards ? true : false;
+                    break;
+                case 8:
+                    $cardAssigned = CardAssigned::where('CardCloudId', $cardId)
+                        ->where('UserId', $request->attributes->get('jwt')->id)
+                        ->first();
+                    $allowed = $cardAssigned ? true : false;
+
+                    if (!$allowed) {
+                        $cardCloud = Card::where('UUID', $cardId)->first();
+                        if ($cardCloud && $cardCloud->ProductType == "revolving") {
+                            $creditWallet = CreditWallet::where('Id', $cardCloud->CreditWalletId)->first();
+                            if ($creditWallet) {
+                                $creditUserAssociation = Credit::where('ExternalId', $creditWallet->UUID)
+                                    ->where('UserId', $request->attributes->get('jwt')->id)
+                                    ->first();
+                                if ($creditUserAssociation) {
+                                    $allowed = true;
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+                default:
+                    $allowed = false;
+            }
+
+            if (!$allowed) {
+                throw new Exception("No tienes permisos para ver los datos sensibles de la tarjeta");
+            } else {
                 try {
 
                     $client = new Client();
