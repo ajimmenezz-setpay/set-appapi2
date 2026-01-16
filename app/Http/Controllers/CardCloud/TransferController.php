@@ -360,4 +360,156 @@ class TransferController extends Controller
             return self::error($e->getMessage());
         }
     }
+
+    public function transfer(Request $request)
+    {
+        try {
+            $this->validate($request, [
+                'source' => 'required',
+                'sourceType' => 'required|in:subaccount,card',
+                'destination' => 'required',
+                'destinationType' => 'required|in:subaccount,card',
+                'amount' => 'required|numeric',
+                'description' => 'required|max:120'
+            ], [
+                'source.required' => 'El origen es requerido',
+                'sourceType.required' => 'El tipo de origen es requerido',
+                'sourceType.in' => 'El tipo de origen no es válido',
+                'destination.required' => 'El destino es requerido',
+                'destinationType.required' => 'El tipo de destino es requerido',
+                'destinationType.in' => 'El tipo de destino no es válido',
+                'amount.required' => 'El monto a transferir es requerido',
+                'amount.numeric' => 'El monto a transferir debe ser un número',
+                'description.required' => 'El concepto de la transferencia es requerido',
+                'description.max' => 'El concepto de la transferencia no debe exceder los 120 caracteres'
+            ]);
+
+            if (
+                !$request->hasHeader('app-location-latitude') ||
+                !$request->hasHeader('app-location-longitude')
+            ) {
+                return response("Debes permitir el acceso a la ubicación para procesar fondeos. Por favor, habilita los permisos de ubicación en el navegador y vuelve a intentarlo.", 400);
+            }
+
+            $client = new Client();
+            $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/transfer', [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                    'App-Location-Latitude' => $request->header('app-location-latitude'),
+                    'App-Location-Longitude' => $request->header('app-location-longitude')
+                ],
+                'json' => [
+                    'source' => $request->source,
+                    'sourceType' => $request->sourceType,
+                    'destination' => $request->destination,
+                    'destinationType' => $request->destinationType,
+                    'amount' => $request->amount,
+                    'description' => $request->description,
+                    'approver' => $request->attributes->get('jwt')->name,
+                    'approver_id' => $request->attributes->get('jwt')->id
+                ]
+            ]);
+
+            $decodedJson = json_decode($response->getBody(), true);
+
+            return response()->json($decodedJson);
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                $statusCode = $e->getResponse()->getStatusCode();
+                $responseBody = $e->getResponse()->getBody()->getContents();
+                $decodedJson = json_decode($responseBody, true);
+                $message = 'Error al procesar la transferencia.';
+
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $message .= " " . $decodedJson['message'];
+                }
+
+                return response($message, $statusCode);
+            } else {
+                return response("Error al procesar la transferencia.", 400);
+            }
+        } catch (\Exception $e) {
+            return self::basicError($e->getMessage());
+        }
+    }
+
+
+    public function transfersFromFile(Request $request)
+    {
+        ini_set('max_execution_time', 3600);
+        ini_set('memory_limit', '512M');
+        set_time_limit(3600);
+
+        try {
+            $this->validate($request, [
+                'file' => 'required|file|mimes:xlsx,xls',
+                'subAccount' => 'string',
+                'googleAuthenticatorCode' => 'required|min:6|max:6'
+            ], [
+                'file.required' => 'El archivo es requerido',
+                'file.file' => 'El archivo debe ser un archivo válido',
+                'file.mimes' => 'El archivo debe ser de tipo XLSX o XLS',
+                'subAccount.required' => 'La subcuenta es requerida',
+                'subAccount.string' => 'La subcuenta debe ser válida',
+                'googleAuthenticatorCode.required' => 'El código de autenticación es requerido',
+                'googleAuthenticatorCode.min' => 'El código de autenticación debe tener 6 caracteres',
+                'googleAuthenticatorCode.max' => 'El código de autenticación debe tener 6 caracteres'
+            ]);
+
+            GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->googleAuthenticatorCode);
+
+            if (
+                !$request->hasHeader('app-location-latitude') ||
+                !$request->hasHeader('app-location-longitude')
+            ) {
+                return response("Debes permitir el acceso a la ubicación para procesar fondeos. Por favor, habilita los permisos de ubicación en el navegador y vuelve a intentarlo.", 400);
+            }
+
+            $client = new Client();
+            $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/subaccounts/' . $request->subAccount . '/fund_layout', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                    'App-Location-Latitude' => $request->header('app-location-latitude'),
+                    'App-Location-Longitude' => $request->header('app-location-longitude')
+                ],
+                'multipart' => [
+                    [
+                        'name'     => 'layout',
+                        'contents' => fopen($request->file('file')->getPathname(), 'r'),
+                        'filename' => $request->file('file')->getClientOriginalName()
+                    ],
+                    [
+                        'name'     => 'approver',
+                        'contents' => $request->attributes->get('jwt')->name
+                    ],
+                    [
+                        'name'     => 'approver_id',
+                        'contents' => $request->attributes->get('jwt')->id
+                    ]
+                ]
+            ]);
+
+            $decodedJson = json_decode($response->getBody(), true);
+
+            return response()->json($decodedJson);
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                $statusCode = $e->getResponse()->getStatusCode();
+                $responseBody = $e->getResponse()->getBody()->getContents();
+                $decodedJson = json_decode($responseBody, true);
+                $message = 'Error al procesar el archivo.';
+
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $message .= " " . $decodedJson['message'];
+                }
+
+                return response($message, $statusCode);
+            } else {
+                return response("Error al procesar el archivo.", 400);
+            }
+        } catch (\Exception $e) {
+            return self::basicError($e->getMessage());
+        }
+    }
 }

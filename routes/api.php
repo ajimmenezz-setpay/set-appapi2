@@ -112,6 +112,9 @@ Route::middleware([VerifyJwt::class, ApiLogger::class])->group(function () {
             Route::get('/{uuid}/virtual_card_price', [App\Http\Controllers\CardCloud\Credits\SubaccountCreditController::class, 'virtualCardPrice']);
             Route::post('/{uuid}/buy_virtual_card', [App\Http\Controllers\CardCloud\Credits\SubaccountCreditController::class, 'buyVirtualCard']);
         });
+
+        Route::post('/transfers-from-file', [App\Http\Controllers\CardCloud\TransferController::class, 'transfersFromFile']);
+        Route::post('/transfer', [App\Http\Controllers\CardCloud\TransferController::class, 'transfer']);
     });
 
     Route::group(['prefix' => 'speiCloud'], function () {
