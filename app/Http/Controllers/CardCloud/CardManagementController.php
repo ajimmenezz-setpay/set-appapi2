@@ -24,6 +24,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Models\Backoffice\Companies\Company;
 use Exception;
+use App\Models\CardCloud\Credit;
+use App\Models\CardCloud\CreditWallet;
 
 class CardManagementController extends Controller
 {
@@ -205,7 +207,55 @@ class CardManagementController extends Controller
 
             $decodedJson = json_decode($response->getBody(), true);
 
-            return response()->json($decodedJson);
+            switch ($request->attributes->get('jwt')->profileId) {
+                case 5:
+                    $allowed = true;
+                    break;
+                case 7:
+                    $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
+                        ->pluck('CompanyId')
+                        ->toArray();
+                    $cardCloudSubaccounts = Subaccount::whereIn('ExternalId', $subaccount)
+                        ->pluck('Id')
+                        ->toArray();
+
+                    $cards = Card::whereIn('SubAccountId', $cardCloudSubaccounts)
+                        ->where('UUID', $decodedJson['card_id'])
+                        ->first();
+
+                    $allowed = $cards ? true : false;
+                    break;
+                case 8:
+                    $cardAssigned = CardAssigned::where('CardCloudId', $decodedJson['card_id'])
+                        ->where('UserId', $request->attributes->get('jwt')->id)
+                        ->first();
+                    $allowed = $cardAssigned ? true : false;
+
+                    if (!$allowed) {
+                        $cardCloud = Card::where('UUID', $decodedJson['card_id'])->first();
+                        if ($cardCloud && $cardCloud->ProductType == "revolving") {
+                            $creditWallet = CreditWallet::where('Id', $cardCloud->CreditWalletId)->first();
+                            if ($creditWallet) {
+                                $creditUserAssociation = Credit::where('ExternalId', $creditWallet->UUID)
+                                    ->where('UserId', $request->attributes->get('jwt')->id)
+                                    ->first();
+                                if ($creditUserAssociation) {
+                                    $allowed = true;
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+                default:
+                    $allowed = false;
+            }
+
+            if (!$allowed) {
+                throw new Exception("No tienes permisos para ver esta tarjeta.");
+            } else {
+                return response()->json($decodedJson);
+            }
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
                 $statusCode = $e->getResponse()->getStatusCode();
@@ -813,7 +863,55 @@ class CardManagementController extends Controller
             unset($decodedJson['pan']);
 
 
-            return response()->json($decodedJson);
+            switch ($request->attributes->get('jwt')->profileId) {
+                case 5:
+                    $allowed = true;
+                    break;
+                case 7:
+                    $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
+                        ->pluck('CompanyId')
+                        ->toArray();
+                    $cardCloudSubaccounts = Subaccount::whereIn('ExternalId', $subaccount)
+                        ->pluck('Id')
+                        ->toArray();
+
+                    $cards = Card::whereIn('SubAccountId', $cardCloudSubaccounts)
+                        ->where('UUID', $decodedJson['card_id'])
+                        ->first();
+
+                    $allowed = $cards ? true : false;
+                    break;
+                case 8:
+                    $cardAssigned = CardAssigned::where('CardCloudId', $decodedJson['card_id'])
+                        ->where('UserId', $request->attributes->get('jwt')->id)
+                        ->first();
+                    $allowed = $cardAssigned ? true : false;
+
+                    if (!$allowed) {
+                        $cardCloud = Card::where('UUID', $decodedJson['card_id'])->first();
+                        if ($cardCloud && $cardCloud->ProductType == "revolving") {
+                            $creditWallet = CreditWallet::where('Id', $cardCloud->CreditWalletId)->first();
+                            if ($creditWallet) {
+                                $creditUserAssociation = Credit::where('ExternalId', $creditWallet->UUID)
+                                    ->where('UserId', $request->attributes->get('jwt')->id)
+                                    ->first();
+                                if ($creditUserAssociation) {
+                                    $allowed = true;
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+                default:
+                    $allowed = false;
+            }
+
+            if (!$allowed) {
+                throw new Exception("No tienes permisos para ver esta tarjeta", 403);
+            } else {
+                return response()->json($decodedJson);
+            }
         } catch (\Exception $e) {
             return self::basicError($e->getMessage(), $e->getCode() ?? 400);
         }
@@ -949,26 +1047,75 @@ class CardManagementController extends Controller
     public function setup(Request $request, $cardId, $setupName, $action)
     {
         try {
-            $validSetups = ['ecommerce', 'international', 'stripe', 'wallet', 'withdrawal', 'contactless', 'pin_offline', 'pin_on_us'];
-            if (!in_array($setupName, $validSetups)) {
-                return self::basicError("El setup no es válido");
+            switch ($request->attributes->get('jwt')->profileId) {
+                case 5:
+                    $allowed = true;
+                    break;
+                case 7:
+                    $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
+                        ->pluck('CompanyId')
+                        ->toArray();
+                    $cardCloudSubaccounts = Subaccount::whereIn('ExternalId', $subaccount)
+                        ->pluck('Id')
+                        ->toArray();
+
+                    $cards = Card::whereIn('SubAccountId', $cardCloudSubaccounts)
+                        ->where('UUID', $cardId)
+                        ->first();
+
+                    $allowed = $cards ? true : false;
+                    break;
+                case 8:
+                    $cardAssigned = CardAssigned::where('CardCloudId', $cardId)
+                        ->where('UserId', $request->attributes->get('jwt')->id)
+                        ->first();
+                    $allowed = $cardAssigned ? true : false;
+
+                    if (!$allowed) {
+                        $cardCloud = Card::where('UUID', $cardId)->first();
+                        if ($cardCloud && $cardCloud->ProductType == "revolving") {
+                            $creditWallet = CreditWallet::where('Id', $cardCloud->CreditWalletId)->first();
+                            if ($creditWallet) {
+                                $creditUserAssociation = Credit::where('ExternalId', $creditWallet->UUID)
+                                    ->where('UserId', $request->attributes->get('jwt')->id)
+                                    ->first();
+                                if ($creditUserAssociation) {
+                                    $allowed = true;
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+                default:
+                    $allowed = false;
             }
 
-            if (!in_array($action, ['enable', 'disable'])) {
-                return self::basicError("La acción no es válida");
+            if (!$allowed) {
+                throw new Exception("No tienes permisos para ajustar el setup de esta tarjeta");
+            } else {
+
+                $validSetups = ['ecommerce', 'international', 'stripe', 'wallet', 'withdrawal', 'contactless', 'pin_offline', 'pin_on_us'];
+                if (!in_array($setupName, $validSetups)) {
+                    return self::basicError("El setup no es válido");
+                }
+
+                if (!in_array($action, ['enable', 'disable'])) {
+                    return self::basicError("La acción no es válida");
+                }
+
+                $client = new Client();
+                $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/setup/' . $setupName . '/' . $action, [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                    ]
+                ]);
+
+                $decodedJson = json_decode($response->getBody(), true);
+
+                return response()->json(['message' => $decodedJson['message']]);
             }
-
-            $client = new Client();
-            $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/setup/' . $setupName . '/' . $action, [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
-                ]
-            ]);
-
-            $decodedJson = json_decode($response->getBody(), true);
-
-            return response()->json(['message' => $decodedJson['message']]);
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
                 $statusCode = $e->getResponse()->getStatusCode();
@@ -1041,17 +1188,66 @@ class CardManagementController extends Controller
     public function webhooks(Request $request, $cardId)
     {
         try {
-            $client = new Client();
-            $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/webhooks', [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id)
-                ]
-            ]);
+            switch ($request->attributes->get('jwt')->profileId) {
+                case 5:
+                    $allowed = true;
+                    break;
+                case 7:
+                    $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
+                        ->pluck('CompanyId')
+                        ->toArray();
+                    $cardCloudSubaccounts = Subaccount::whereIn('ExternalId', $subaccount)
+                        ->pluck('Id')
+                        ->toArray();
 
-            $decodedJson = json_decode($response->getBody(), true);
+                    $cards = Card::whereIn('SubAccountId', $cardCloudSubaccounts)
+                        ->where('UUID', $cardId)
+                        ->first();
 
-            return response()->json($decodedJson);
+                    $allowed = $cards ? true : false;
+                    break;
+                case 8:
+                    $cardAssigned = CardAssigned::where('CardCloudId', $cardId)
+                        ->where('UserId', $request->attributes->get('jwt')->id)
+                        ->first();
+                    $allowed = $cardAssigned ? true : false;
+
+                    if (!$allowed) {
+                        $cardCloud = Card::where('UUID', $cardId)->first();
+                        if ($cardCloud && $cardCloud->ProductType == "revolving") {
+                            $creditWallet = CreditWallet::where('Id', $cardCloud->CreditWalletId)->first();
+                            if ($creditWallet) {
+                                $creditUserAssociation = Credit::where('ExternalId', $creditWallet->UUID)
+                                    ->where('UserId', $request->attributes->get('jwt')->id)
+                                    ->first();
+                                if ($creditUserAssociation) {
+                                    $allowed = true;
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+                default:
+                    $allowed = false;
+            }
+
+            if (!$allowed) {
+                throw new Exception("No tienes permisos para ver los webhooks de esta tarjeta.");
+            } else {
+
+                $client = new Client();
+                $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/webhooks', [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id)
+                    ]
+                ]);
+
+                $decodedJson = json_decode($response->getBody(), true);
+
+                return response()->json($decodedJson);
+            }
         } catch (RequestException $e) {
             echo $e->getMessage() . " - " . $e->getCode() . " - " . $e->getFile() . " - " . $e->getLine();
             if ($e->hasResponse()) {
@@ -1128,17 +1324,65 @@ class CardManagementController extends Controller
     public function failedAuthorizations(Request $request, $cardId)
     {
         try {
-            $client = new Client();
-            $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/failed_authorization', [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id)
-                ]
-            ]);
+            switch ($request->attributes->get('jwt')->profileId) {
+                case 5:
+                    $allowed = true;
+                    break;
+                case 7:
+                    $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
+                        ->pluck('CompanyId')
+                        ->toArray();
+                    $cardCloudSubaccounts = Subaccount::whereIn('ExternalId', $subaccount)
+                        ->pluck('Id')
+                        ->toArray();
 
-            $decodedJson = json_decode($response->getBody(), true);
+                    $cards = Card::whereIn('SubAccountId', $cardCloudSubaccounts)
+                        ->where('UUID', $cardId)
+                        ->first();
 
-            return response()->json($decodedJson);
+                    $allowed = $cards ? true : false;
+                    break;
+                case 8:
+                    $cardAssigned = CardAssigned::where('CardCloudId', $cardId)
+                        ->where('UserId', $request->attributes->get('jwt')->id)
+                        ->first();
+                    $allowed = $cardAssigned ? true : false;
+
+                    if (!$allowed) {
+                        $cardCloud = Card::where('UUID', $cardId)->first();
+                        if ($cardCloud && $cardCloud->ProductType == "revolving") {
+                            $creditWallet = CreditWallet::where('Id', $cardCloud->CreditWalletId)->first();
+                            if ($creditWallet) {
+                                $creditUserAssociation = Credit::where('ExternalId', $creditWallet->UUID)
+                                    ->where('UserId', $request->attributes->get('jwt')->id)
+                                    ->first();
+                                if ($creditUserAssociation) {
+                                    $allowed = true;
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+                default:
+                    $allowed = false;
+            }
+
+            if (!$allowed) {
+                throw new Exception("No tienes permisos para ver las autorizaciones fallidas de esta tarjeta.");
+            } else {
+                $client = new Client();
+                $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/failed_authorization', [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id)
+                    ]
+                ]);
+
+                $decodedJson = json_decode($response->getBody(), true);
+
+                return response()->json($decodedJson);
+            }
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
                 $statusCode = $e->getResponse()->getStatusCode();
@@ -1219,26 +1463,75 @@ class CardManagementController extends Controller
     public function movements(Request $request, $cardId)
     {
         try {
-            $from = isset($request['from']) ? Carbon::createFromTimestamp($request->from) : Carbon::now()->subMonth();
-            $to = isset($request['to']) ? Carbon::createFromTimestamp($request->to) : Carbon::now();
+            switch ($request->attributes->get('jwt')->profileId) {
+                case 5:
+                    $allowed = true;
+                    break;
+                case 7:
+                    $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
+                        ->pluck('CompanyId')
+                        ->toArray();
+                    $cardCloudSubaccounts = Subaccount::whereIn('ExternalId', $subaccount)
+                        ->pluck('Id')
+                        ->toArray();
 
-            if ($from > $to) return response()->json(['message' => 'Invalid date range'], 400);
+                    $cards = Card::whereIn('SubAccountId', $cardCloudSubaccounts)
+                        ->where('UUID', $cardId)
+                        ->first();
 
-            $client = new Client();
-            $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/movements', [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id)
-                ],
-                'json' => [
-                    "from" => $from->timestamp,
-                    "to" => $to->timestamp
-                ]
-            ]);
+                    $allowed = $cards ? true : false;
+                    break;
+                case 8:
+                    $cardAssigned = CardAssigned::where('CardCloudId', $cardId)
+                        ->where('UserId', $request->attributes->get('jwt')->id)
+                        ->first();
+                    $allowed = $cardAssigned ? true : false;
 
-            $decodedJson = json_decode($response->getBody(), true);
+                    if (!$allowed) {
+                        $cardCloud = Card::where('UUID', $cardId)->first();
+                        if ($cardCloud && $cardCloud->ProductType == "revolving") {
+                            $creditWallet = CreditWallet::where('Id', $cardCloud->CreditWalletId)->first();
+                            if ($creditWallet) {
+                                $creditUserAssociation = Credit::where('ExternalId', $creditWallet->UUID)
+                                    ->where('UserId', $request->attributes->get('jwt')->id)
+                                    ->first();
+                                if ($creditUserAssociation) {
+                                    $allowed = true;
+                                }
+                            }
+                        }
+                    }
 
-            return response()->json($decodedJson);
+                    break;
+                default:
+                    $allowed = false;
+            }
+
+            if (!$allowed) {
+                throw new Exception("No tienes permisos para ver los movimientos de esta tarjeta.");
+            } else {
+
+                $from = isset($request['from']) ? Carbon::createFromTimestamp($request->from) : Carbon::now()->subMonth();
+                $to = isset($request['to']) ? Carbon::createFromTimestamp($request->to) : Carbon::now();
+
+                if ($from > $to) return response()->json(['message' => 'Invalid date range'], 400);
+
+                $client = new Client();
+                $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/movements', [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id)
+                    ],
+                    'json' => [
+                        "from" => $from->timestamp,
+                        "to" => $to->timestamp
+                    ]
+                ]);
+
+                $decodedJson = json_decode($response->getBody(), true);
+
+                return response()->json($decodedJson);
+            }
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
                 $statusCode = $e->getResponse()->getStatusCode();
@@ -1309,17 +1602,66 @@ class CardManagementController extends Controller
     public function unassignUser(Request $request, $cardId)
     {
         try {
-            $client = new Client();
-            $response = $client->request('DELETE', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/user_unassign', [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id)
-                ]
-            ]);
+            switch ($request->attributes->get('jwt')->profileId) {
+                case 5:
+                    $allowed = true;
+                    break;
+                case 7:
+                    $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
+                        ->pluck('CompanyId')
+                        ->toArray();
+                    $cardCloudSubaccounts = Subaccount::whereIn('ExternalId', $subaccount)
+                        ->pluck('Id')
+                        ->toArray();
 
-            $decodedJson = json_decode($response->getBody(), true);
+                    $cards = Card::whereIn('SubAccountId', $cardCloudSubaccounts)
+                        ->where('UUID', $cardId)
+                        ->first();
 
-            return response()->json(['message' => $decodedJson['message']]);
+                    $allowed = $cards ? true : false;
+                    break;
+                case 8:
+                    $cardAssigned = CardAssigned::where('CardCloudId', $cardId)
+                        ->where('UserId', $request->attributes->get('jwt')->id)
+                        ->first();
+                    $allowed = $cardAssigned ? true : false;
+
+                    if (!$allowed) {
+                        $cardCloud = Card::where('UUID', $cardId)->first();
+                        if ($cardCloud && $cardCloud->ProductType == "revolving") {
+                            $creditWallet = CreditWallet::where('Id', $cardCloud->CreditWalletId)->first();
+                            if ($creditWallet) {
+                                $creditUserAssociation = Credit::where('ExternalId', $creditWallet->UUID)
+                                    ->where('UserId', $request->attributes->get('jwt')->id)
+                                    ->first();
+                                if ($creditUserAssociation) {
+                                    $allowed = true;
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+                default:
+                    $allowed = false;
+            }
+
+            if (!$allowed) {
+                throw new Exception("No tienes permisos para desasignar el usuario de esta tarjeta.");
+            } else {
+
+                $client = new Client();
+                $response = $client->request('DELETE', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/user_unassign', [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id)
+                    ]
+                ]);
+
+                $decodedJson = json_decode($response->getBody(), true);
+
+                return response()->json(['message' => $decodedJson['message']]);
+            }
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
                 $statusCode = $e->getResponse()->getStatusCode();

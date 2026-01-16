@@ -9,6 +9,9 @@ use GuzzleHttp\Client;
 use App\Http\Services\CardCloudApi;
 use GuzzleHttp\Exception\RequestException;
 use App\Models\CardCloud\CardAssigned;
+use App\Models\CardCloud\Subaccount;
+use App\Models\Backoffice\Users\CompaniesAndUsers;
+use Exception;
 
 class TransferController extends Controller
 {
@@ -457,42 +460,70 @@ class TransferController extends Controller
                 'googleAuthenticatorCode.max' => 'El código de autenticación debe tener 6 caracteres'
             ]);
 
-            GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->googleAuthenticatorCode);
+            switch ($request->attributes->get('jwt')->profileId) {
+                case 5:
+                    $allowed = true;
+                    break;
+                case 7:
+                    $subaccount = CompaniesAndUsers::where('UserId', $request->attributes->get('jwt')->id)
+                        ->pluck('CompanyId')
+                        ->toArray();
+                    $cardCloudSubaccounts = Subaccount::whereIn('ExternalId', $subaccount)
+                        ->pluck('Id')
+                        ->toArray();
 
-            if (
-                !$request->hasHeader('app-location-latitude') ||
-                !$request->hasHeader('app-location-longitude')
-            ) {
-                return response("Debes permitir el acceso a la ubicación para procesar fondeos. Por favor, habilita los permisos de ubicación en el navegador y vuelve a intentarlo.", 400);
+                    if (in_array($request->subAccount, $cardCloudSubaccounts)) {
+                        $allowed = true;
+                    } else {
+                        $allowed = false;
+                    }
+                    break;
+                default:
+                    $allowed = false;
             }
 
-            $client = new Client();
-            $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/subaccounts/' . $request->subAccount . '/fund_layout', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
-                    'App-Location-Latitude' => $request->header('app-location-latitude'),
-                    'App-Location-Longitude' => $request->header('app-location-longitude')
-                ],
-                'multipart' => [
-                    [
-                        'name'     => 'layout',
-                        'contents' => fopen($request->file('file')->getPathname(), 'r'),
-                        'filename' => $request->file('file')->getClientOriginalName()
+            if (!$allowed) {
+                throw new Exception("No tienes permisos para ver los datos solicitados.");
+            } else {
+
+
+                GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->googleAuthenticatorCode);
+
+                if (
+                    !$request->hasHeader('app-location-latitude') ||
+                    !$request->hasHeader('app-location-longitude')
+                ) {
+                    return response("Debes permitir el acceso a la ubicación para procesar fondeos. Por favor, habilita los permisos de ubicación en el navegador y vuelve a intentarlo.", 400);
+                }
+
+                $client = new Client();
+                $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/subaccounts/' . $request->subAccount . '/fund_layout', [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                        'App-Location-Latitude' => $request->header('app-location-latitude'),
+                        'App-Location-Longitude' => $request->header('app-location-longitude')
                     ],
-                    [
-                        'name'     => 'approver',
-                        'contents' => $request->attributes->get('jwt')->name
-                    ],
-                    [
-                        'name'     => 'approver_id',
-                        'contents' => $request->attributes->get('jwt')->id
+                    'multipart' => [
+                        [
+                            'name'     => 'layout',
+                            'contents' => fopen($request->file('file')->getPathname(), 'r'),
+                            'filename' => $request->file('file')->getClientOriginalName()
+                        ],
+                        [
+                            'name'     => 'approver',
+                            'contents' => $request->attributes->get('jwt')->name
+                        ],
+                        [
+                            'name'     => 'approver_id',
+                            'contents' => $request->attributes->get('jwt')->id
+                        ]
                     ]
-                ]
-            ]);
+                ]);
 
-            $decodedJson = json_decode($response->getBody(), true);
+                $decodedJson = json_decode($response->getBody(), true);
 
-            return response()->json($decodedJson);
+                return response()->json($decodedJson);
+            }
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
                 $statusCode = $e->getResponse()->getStatusCode();

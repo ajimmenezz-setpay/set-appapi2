@@ -8,6 +8,12 @@ use App\Models\CardCloud\CardAssigned;
 use GuzzleHttp\Client;
 use App\Http\Services\CardCloudApi;
 use GuzzleHttp\Exception\RequestException;
+use App\Models\CardCloud\Credit;
+use App\Models\CardCloud\CreditWallet;
+use App\Models\Backoffice\Companies\CompaniesUsers;
+use App\Models\CardCloud\Subaccount;
+use App\Models\CardCloud\Card;
+use Exception;
 
 class CardBarcodeController extends Controller
 {
@@ -74,6 +80,7 @@ class CardBarcodeController extends Controller
     public function generateCode(Request $request, $cardId)
     {
         try {
+
             $this->validate($request, [
                 'amount' => 'required|numeric|min:1',
                 'type' => 'required|string|in:deposit,withdrawal',
@@ -86,9 +93,55 @@ class CardBarcodeController extends Controller
                 'type.in' => 'El tipo de transacción debe ser "deposit" o "withdrawal" (type)',
             ]);
 
-            if (CardAssigned::where('CardCloudId', $cardId)->where('UserId', $request->attributes->get('jwt')->id)->count() == 0) {
-                return response("La tarjeta no está asignada al usuario", 400);
+            switch ($request->attributes->get('jwt')->profileId) {
+                case 5:
+                    $allowed = true;
+                    break;
+                case 7:
+                    $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
+                        ->pluck('CompanyId')
+                        ->toArray();
+                    $cardCloudSubaccounts = Subaccount::whereIn('ExternalId', $subaccount)
+                        ->pluck('Id')
+                        ->toArray();
+
+                    $cards = Card::whereIn('SubAccountId', $cardCloudSubaccounts)
+                        ->where('UUID', $cardId)
+                        ->first();
+
+                    $allowed = $cards ? true : false;
+                    break;
+                case 8:
+                    $cardAssigned = CardAssigned::where('CardCloudId', $cardId)
+                        ->where('UserId', $request->attributes->get('jwt')->id)
+                        ->first();
+                    $allowed = $cardAssigned ? true : false;
+
+                    if (!$allowed) {
+                        $cardCloud = Card::where('UUID', $cardId)->first();
+                        if ($cardCloud && $cardCloud->ProductType == "revolving") {
+                            $creditWallet = CreditWallet::where('Id', $cardCloud->CreditWalletId)->first();
+                            if ($creditWallet) {
+                                $creditUserAssociation = Credit::where('ExternalId', $creditWallet->UUID)
+                                    ->where('UserId', $request->attributes->get('jwt')->id)
+                                    ->first();
+                                if ($creditUserAssociation) {
+                                    $allowed = true;
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+                default:
+                    $allowed = false;
+            }
+
+            if (!$allowed) {
+                throw new Exception("No tienes permisos para generar códigos de barras para esta tarjeta.");
             } else {
+
+
                 try {
                     $client = new Client();
                     $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/barcode', [
@@ -213,8 +266,52 @@ class CardBarcodeController extends Controller
     public function getBarcodes(Request $request, $cardId)
     {
         try {
-            if (CardAssigned::where('CardCloudId', $cardId)->where('UserId', $request->attributes->get('jwt')->id)->count() == 0) {
-                return response("La tarjeta no está asignada al usuario", 400);
+            switch ($request->attributes->get('jwt')->profileId) {
+                case 5:
+                    $allowed = true;
+                    break;
+                case 7:
+                    $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
+                        ->pluck('CompanyId')
+                        ->toArray();
+                    $cardCloudSubaccounts = Subaccount::whereIn('ExternalId', $subaccount)
+                        ->pluck('Id')
+                        ->toArray();
+
+                    $cards = Card::whereIn('SubAccountId', $cardCloudSubaccounts)
+                        ->where('UUID', $cardId)
+                        ->first();
+
+                    $allowed = $cards ? true : false;
+                    break;
+                case 8:
+                    $cardAssigned = CardAssigned::where('CardCloudId', $cardId)
+                        ->where('UserId', $request->attributes->get('jwt')->id)
+                        ->first();
+                    $allowed = $cardAssigned ? true : false;
+
+                    if (!$allowed) {
+                        $cardCloud = Card::where('UUID', $cardId)->first();
+                        if ($cardCloud && $cardCloud->ProductType == "revolving") {
+                            $creditWallet = CreditWallet::where('Id', $cardCloud->CreditWalletId)->first();
+                            if ($creditWallet) {
+                                $creditUserAssociation = Credit::where('ExternalId', $creditWallet->UUID)
+                                    ->where('UserId', $request->attributes->get('jwt')->id)
+                                    ->first();
+                                if ($creditUserAssociation) {
+                                    $allowed = true;
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+                default:
+                    $allowed = false;
+            }
+
+            if (!$allowed) {
+                throw new Exception("No tienes permisos para ver los códigos de barras de esta tarjeta.");
             } else {
 
                 $this->validate($request, [
@@ -313,8 +410,52 @@ class CardBarcodeController extends Controller
     public function deleteBarcode(Request $request, $cardId)
     {
         try {
-            if (CardAssigned::where('CardCloudId', $cardId)->where('UserId', $request->attributes->get('jwt')->id)->count() == 0) {
-                return response("La tarjeta no está asignada al usuario", 400);
+            switch ($request->attributes->get('jwt')->profileId) {
+                case 5:
+                    $allowed = true;
+                    break;
+                case 7:
+                    $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
+                        ->pluck('CompanyId')
+                        ->toArray();
+                    $cardCloudSubaccounts = Subaccount::whereIn('ExternalId', $subaccount)
+                        ->pluck('Id')
+                        ->toArray();
+
+                    $cards = Card::whereIn('SubAccountId', $cardCloudSubaccounts)
+                        ->where('UUID', $cardId)
+                        ->first();
+
+                    $allowed = $cards ? true : false;
+                    break;
+                case 8:
+                    $cardAssigned = CardAssigned::where('CardCloudId', $cardId)
+                        ->where('UserId', $request->attributes->get('jwt')->id)
+                        ->first();
+                    $allowed = $cardAssigned ? true : false;
+
+                    if (!$allowed) {
+                        $cardCloud = Card::where('UUID', $cardId)->first();
+                        if ($cardCloud && $cardCloud->ProductType == "revolving") {
+                            $creditWallet = CreditWallet::where('Id', $cardCloud->CreditWalletId)->first();
+                            if ($creditWallet) {
+                                $creditUserAssociation = Credit::where('ExternalId', $creditWallet->UUID)
+                                    ->where('UserId', $request->attributes->get('jwt')->id)
+                                    ->first();
+                                if ($creditUserAssociation) {
+                                    $allowed = true;
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+                default:
+                    $allowed = false;
+            }
+
+            if (!$allowed) {
+                throw new Exception("No tienes permisos para eliminar códigos de barras de esta tarjeta.");
             } else {
                 $this->validate($request, [
                     'barcode' => 'required|string',

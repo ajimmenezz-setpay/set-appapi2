@@ -15,64 +15,92 @@ use App\Models\User;
 use Maatwebsite\Excel\Facades\Excel;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Str;
+use App\Models\CardCloud\Subaccount;
+use Exception;
 
 class SubaccountCardController extends Controller
 {
     public function index(Request $request, $uuid)
     {
+        switch ($request->attributes->get('jwt')->profileId) {
+            case 5:
+                $allowed = true;
+                break;
+            case 7:
+                $subaccount = CompaniesAndUsers::where('UserId', $request->attributes->get('jwt')->id)
+                    ->pluck('CompanyId')
+                    ->toArray();
+                $cardCloudSubaccounts = Subaccount::whereIn('ExternalId', $subaccount)
+                    ->pluck('Id')
+                    ->toArray();
 
-        $subaccount = DB::connection('card_cloud')
-            ->table('subaccounts')
-            ->where('UUID', $uuid)
-            ->first();
-
-        if (!$subaccount) {
-            return response("No se encontraron tarjetas para la subcuenta especificada.", 404);
+                if (in_array($uuid, $cardCloudSubaccounts)) {
+                    $allowed = true;
+                } else {
+                    $allowed = false;
+                }
+                break;
+            default:
+                $allowed = false;
         }
 
-        $businessUsers = self::businessCardUsers($request->attributes->get('jwt')->businessId);
+        if (!$allowed) {
+            throw new Exception("No tienes permisos para ver los datos solicitados.");
+        } else {
 
-        $cards = DB::connection('card_cloud')
-            ->table('cards')
-            ->join('card_setup', 'cards.Id', '=', 'card_setup.CardId')
-            ->leftJoin('card_pan', 'card_pan.CardId', '=', 'cards.Id')
-            ->where('card_setup.Status', '<>', 'CANCELED')
-            ->whereNotNull('cards.Pan')
-            ->where('cards.SubAccountId', $subaccount->Id)
-            ->get();
+            $subaccount = DB::connection('card_cloud')
+                ->table('subaccounts')
+                ->where('UUID', $uuid)
+                ->first();
+
+            if (!$subaccount) {
+                return response("No se encontraron tarjetas para la subcuenta especificada.", 404);
+            }
+
+            $businessUsers = self::businessCardUsers($request->attributes->get('jwt')->businessId);
+
+            $cards = DB::connection('card_cloud')
+                ->table('cards')
+                ->join('card_setup', 'cards.Id', '=', 'card_setup.CardId')
+                ->leftJoin('card_pan', 'card_pan.CardId', '=', 'cards.Id')
+                ->where('card_setup.Status', '<>', 'CANCELED')
+                ->whereNotNull('cards.Pan')
+                ->where('cards.SubAccountId', $subaccount->Id)
+                ->get();
 
 
-        $cards = $cards->map(function ($card) use ($businessUsers, $request) {
-            return [
-                'card_id' => $card->UUID,
-                'card_external_id' => $card->ExternalId,
-                'card_type' => $card->Type,
-                'brand' => $card->Brand,
-                'bin' => (strlen($card->Pan) >= 16) ? "XXXX " . substr($card->Pan, -4) : "",
-                'pan' => $card->Pan,
-                'client_id' => self::getClientId($card->CustomerPrefix, $card->CustomerId),
-                'masked_pan' => (strlen($card->Pan) >= 16) ? "XXXX XXXX XXXX " . substr($card->Pan, -4) : "",
-                'balance' => $request->attributes->get('jwt')->profileId != 12 ? self::decrypt($card->Balance) : "hidden",
-                'clabe' => $card->ShowSTPAccount == 1 ? $card->STPAccount : null,
-                'status' => $card->Status,
-                'name' => $businessUsers[$card->UUID]['name'] ?? "",
-                'lastname' => $businessUsers[$card->UUID]['lastname'] ?? "",
-                'email' => $businessUsers[$card->UUID]['email'] ?? "",
-                'ownerId' => $businessUsers[$card->UUID]['ownerId'] ?? "",
-                'setups' => [
-                    'Ecommerce' => $card->Ecommerce,
-                    'International' => $card->International,
-                    'Stripe' => $card->Stripe,
-                    'Wallet' => $card->Wallet,
-                    'Withdrawal' => $card->Withdrawal,
-                    'Contactless' => $card->Contactless,
-                    'PinOffline' => $card->PinOffline,
-                    'PinOnUs' => $card->PinOnUs
-                ]
-            ];
-        });
+            $cards = $cards->map(function ($card) use ($businessUsers, $request) {
+                return [
+                    'card_id' => $card->UUID,
+                    'card_external_id' => $card->ExternalId,
+                    'card_type' => $card->Type,
+                    'brand' => $card->Brand,
+                    'bin' => (strlen($card->Pan) >= 16) ? "XXXX " . substr($card->Pan, -4) : "",
+                    'pan' => $card->Pan,
+                    'client_id' => self::getClientId($card->CustomerPrefix, $card->CustomerId),
+                    'masked_pan' => (strlen($card->Pan) >= 16) ? "XXXX XXXX XXXX " . substr($card->Pan, -4) : "",
+                    'balance' => $request->attributes->get('jwt')->profileId != 12 ? self::decrypt($card->Balance) : "hidden",
+                    'clabe' => $card->ShowSTPAccount == 1 ? $card->STPAccount : null,
+                    'status' => $card->Status,
+                    'name' => $businessUsers[$card->UUID]['name'] ?? "",
+                    'lastname' => $businessUsers[$card->UUID]['lastname'] ?? "",
+                    'email' => $businessUsers[$card->UUID]['email'] ?? "",
+                    'ownerId' => $businessUsers[$card->UUID]['ownerId'] ?? "",
+                    'setups' => [
+                        'Ecommerce' => $card->Ecommerce,
+                        'International' => $card->International,
+                        'Stripe' => $card->Stripe,
+                        'Wallet' => $card->Wallet,
+                        'Withdrawal' => $card->Withdrawal,
+                        'Contactless' => $card->Contactless,
+                        'PinOffline' => $card->PinOffline,
+                        'PinOnUs' => $card->PinOnUs
+                    ]
+                ];
+            });
 
-        return response()->json($cards);
+            return response()->json($cards);
+        }
     }
 
     public static function businessCardUsers($businessId)
