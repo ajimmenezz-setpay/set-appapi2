@@ -27,6 +27,8 @@ class SubaccountCardController extends Controller
                 $allowed = true;
                 break;
             case 7:
+            case 11:
+            case 13:
                 $subaccount = CompaniesAndUsers::where('UserId', $request->attributes->get('jwt')->id)
                     ->pluck('CompanyId')
                     ->toArray();
