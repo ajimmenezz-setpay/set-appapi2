@@ -11,7 +11,7 @@ class AdministratorsOfCompanies extends Controller
     public function index(Request $request)
     {
         try {
-            $admins = User::whereIn('ProfileId', [7, 13])
+            $admins = User::whereIn('ProfileId', [7, 11, 13])
             ->where('BusinessId', $request->attributes->get('jwt')->businessId)
             ->where('Active', 1)
             ->select('Id', 'Name', 'Lastname', 'Email')
