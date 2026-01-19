@@ -16,6 +16,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Str;
 use App\Models\CardCloud\Subaccount;
+use App\Http\Controllers\Card\CardManagementController;
 use Exception;
 
 class SubaccountCardController extends Controller
@@ -70,8 +71,11 @@ class SubaccountCardController extends Controller
                 ->where('cards.SubAccountId', $subaccount->Id)
                 ->get();
 
-
             $cards = $cards->map(function ($card) use ($businessUsers, $request) {
+                $balance = CardManagementController::fixBalanceNormalization(
+                    Card::where('Id', $card->Id)->first()
+                );
+
                 return [
                     'card_id' => $card->UUID,
                     'card_external_id' => $card->ExternalId,
@@ -81,7 +85,7 @@ class SubaccountCardController extends Controller
                     'pan' => $card->Pan,
                     'client_id' => self::getClientId($card->CustomerPrefix, $card->CustomerId),
                     'masked_pan' => (strlen($card->Pan) >= 16) ? "XXXX XXXX XXXX " . substr($card->Pan, -4) : "",
-                    'balance' => $request->attributes->get('jwt')->profileId != 12 ? self::decrypt($card->Balance) : "hidden",
+                    'balance' => $request->attributes->get('jwt')->profileId != 12 ? number_format($balance, 2, '.', '') : "hidden",
                     'clabe' => $card->ShowSTPAccount == 1 ? $card->STPAccount : null,
                     'status' => $card->Status,
                     'name' => $businessUsers[$card->UUID]['name'] ?? "",

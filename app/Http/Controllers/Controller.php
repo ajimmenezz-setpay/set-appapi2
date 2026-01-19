@@ -72,6 +72,28 @@ abstract class Controller extends BaseController
         return $encrypter->decrypt($data);
     }
 
+    static public function needsNormalization($value): int
+    {
+        if (!is_numeric($value)) {
+            return -1;
+        }
+
+        $value = (string) $value;
+
+        // Notación científica
+        if (stripos($value, 'e') !== false) {
+            return 1;
+        }
+
+        // Más de 2 decimales
+        if (preg_match('/\.\d{3,}$/', $value)) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+
     static public function getClientId($prefix, $id)
     {
         return $prefix . str_pad($id, 7, '0', STR_PAD_LEFT);

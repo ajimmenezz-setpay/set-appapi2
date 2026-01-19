@@ -8,7 +8,9 @@ use GuzzleHttp\Client;
 use App\Http\Services\CardCloudApi;
 use GuzzleHttp\Exception\RequestException;
 use App\Models\Backoffice\Companies\CompanyProjection;
+use App\Models\CardCloud\Card;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class CardManagementController extends Controller
 {
@@ -339,5 +341,24 @@ class CardManagementController extends Controller
             ->where('UUID', $cardId)->first();
 
         return $cards ? $cards->Pan : null;
+    }
+
+    public static function fixBalanceNormalization($card)
+    {
+        $balance = self::decrypt($card->Balance);
+        switch (self::needsNormalization($balance)) {
+            case -1:
+                $balance = '0.00';
+                Card::where('Id', $card->Id)->update(['Balance' => self::encrypt($balance), 'updated_at' => Carbon::now()]);
+                break;
+            case 1:
+                $balance = number_format(round(floatval($balance), 2), 2, '.', '');
+                Card::where('Id', $card->Id)->update(['Balance' => self::encrypt($balance), 'updated_at' => Carbon::now()]);
+                break;
+            default:
+                break;
+        }
+
+        return $balance;
     }
 }
