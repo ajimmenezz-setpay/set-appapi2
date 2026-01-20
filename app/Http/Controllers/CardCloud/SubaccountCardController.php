@@ -95,9 +95,13 @@ class SubaccountCardController extends Controller
                     ->get();
 
                 $cards = $cards->map(function ($card) use ($businessUsers, $request) {
-                    $balance = CardManagementController::fixBalanceNormalization(
-                        Card::where('UUID', $card->UUID)->first()
-                    );
+                    if (count($cards) <= 1000) {
+                        $balance = CardManagementController::fixBalanceNormalization(
+                            Card::where('UUID', $card->UUID)->first()
+                        );
+                    } else {
+                        $balance = self::decrypt($card->Balance);
+                    }
 
                     return [
                         'card_id' => $card->UUID,
@@ -137,7 +141,6 @@ class SubaccountCardController extends Controller
                 'line' => $e->getLine()
             ]);
             return self::basicError($e->getMessage());
-
         }
     }
 
