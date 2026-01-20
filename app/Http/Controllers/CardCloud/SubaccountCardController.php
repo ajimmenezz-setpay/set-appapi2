@@ -71,6 +71,7 @@ class SubaccountCardController extends Controller
                     ->where('card_setup.Status', '<>', 'CANCELED')
                     ->whereNotNull('cards.Pan')
                     ->where('cards.SubAccountId', $subaccount->Id)
+                    ->groupBy('cards.Id')
                     ->get();
 
                 $cards = $cards->map(function ($card) use ($businessUsers, $request) {
