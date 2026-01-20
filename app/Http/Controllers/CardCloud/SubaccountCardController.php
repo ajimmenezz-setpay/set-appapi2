@@ -92,7 +92,7 @@ class SubaccountCardController extends Controller
                         'card_setup.PinOffline',
                         'card_setup.PinOnUs'
                     )
-                    ->groupBy('cards.Id', 'card_setup.Id', 'card_pan.Id', 'cards.UUID', 'cards.ExternalId', 'cards.Type', 'cards.Brand', 'cards.Pan', 'cards.CustomerPrefix', 'cards.CustomerId', 'cards.ShowSTPAccount', 'cards.STPAccount', 'card_setup.Status', 'card_setup.Ecommerce', 'card_setup.International', 'card_setup.Stripe', 'card_setup.Wallet', 'card_setup.Withdrawal', 'card_setup.Contactless', 'card_setup.PinOffline', 'card_setup.PinOnUs')
+                    ->groupBy('cards.Id', 'card_setup.Id', 'card_pan.Id', 'cards.UUID', 'cards.Balance', 'cards.ExternalId', 'cards.Type', 'cards.Brand', 'cards.Pan', 'cards.CustomerPrefix', 'cards.CustomerId', 'cards.ShowSTPAccount', 'cards.STPAccount', 'card_setup.Status', 'card_setup.Ecommerce', 'card_setup.International', 'card_setup.Stripe', 'card_setup.Wallet', 'card_setup.Withdrawal', 'card_setup.Contactless', 'card_setup.PinOffline', 'card_setup.PinOnUs')
                     ->get();
 
                 $cards = $cards->map(function ($card) use ($businessUsers, $request, $cards) {
