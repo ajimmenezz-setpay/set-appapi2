@@ -81,6 +81,7 @@ class SubaccountCardController extends Controller
                         'cards.CustomerId',
                         'cards.ShowSTPAccount',
                         'cards.STPAccount',
+                        'cards.Balance',
                         'card_setup.Status',
                         'card_setup.Ecommerce',
                         'card_setup.International',
