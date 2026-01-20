@@ -79,6 +79,8 @@ class SubaccountCardController extends Controller
                     //     Card::where('UUID', $card->UUID)->first()
                     // );
 
+                    $balance = self::decrypt($card->Balance);
+
                     return [
                         'card_id' => $card->UUID,
                         'card_external_id' => $card->ExternalId,
