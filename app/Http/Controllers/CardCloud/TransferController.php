@@ -469,7 +469,7 @@ class TransferController extends Controller
                         ->pluck('CompanyId')
                         ->toArray();
                     $cardCloudSubaccounts = Subaccount::whereIn('ExternalId', $subaccount)
-                        ->pluck('Id')
+                        ->pluck('UUID')
                         ->toArray();
 
                     if (in_array($request->subAccount, $cardCloudSubaccounts)) {
