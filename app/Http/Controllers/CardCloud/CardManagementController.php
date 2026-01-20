@@ -226,25 +226,27 @@ class CardManagementController extends Controller
                     $allowed = $cards ? true : false;
                     break;
                 case 8:
-                    $cardAssigned = CardAssigned::where('CardCloudId', $decodedJson['card_id'])
-                        ->where('UserId', $request->attributes->get('jwt')->id)
-                        ->first();
-                    $allowed = $cardAssigned ? true : false;
+                    // $cardAssigned = CardAssigned::where('CardCloudId', $decodedJson['card_id'])
+                    //     ->where('UserId', $request->attributes->get('jwt')->id)
+                    //     ->first();
+                    // $allowed = $cardAssigned ? true : false;
 
-                    if (!$allowed) {
-                        $cardCloud = Card::where('UUID', $decodedJson['card_id'])->first();
-                        if ($cardCloud && $cardCloud->ProductType == "revolving") {
-                            $creditWallet = CreditWallet::where('Id', $cardCloud->CreditWalletId)->first();
-                            if ($creditWallet) {
-                                $creditUserAssociation = Credit::where('ExternalId', $creditWallet->UUID)
-                                    ->where('UserId', $request->attributes->get('jwt')->id)
-                                    ->first();
-                                if ($creditUserAssociation) {
-                                    $allowed = true;
-                                }
-                            }
-                        }
-                    }
+                    // if (!$allowed) {
+                    //     $cardCloud = Card::where('UUID', $decodedJson['card_id'])->first();
+                    //     if ($cardCloud && $cardCloud->ProductType == "revolving") {
+                    //         $creditWallet = CreditWallet::where('Id', $cardCloud->CreditWalletId)->first();
+                    //         if ($creditWallet) {
+                    //             $creditUserAssociation = Credit::where('ExternalId', $creditWallet->UUID)
+                    //                 ->where('UserId', $request->attributes->get('jwt')->id)
+                    //                 ->first();
+                    //             if ($creditUserAssociation) {
+                    //                 $allowed = true;
+                    //             }
+                    //         }
+                    //     }
+                    // }
+
+                    $allowed = true;
 
                     break;
                 default:
