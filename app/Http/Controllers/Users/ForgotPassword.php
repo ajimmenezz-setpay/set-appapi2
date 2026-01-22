@@ -12,6 +12,8 @@ use Carbon\Carbon;
 use App\Mail\VerificationAccountCode;
 use App\Models\Users\UsersCode;
 use Illuminate\Support\Facades\Log;
+use App\Models\Users\FirebaseToken;
+use App\Models\Notifications\Push as PushModel;
 
 
 class ForgotPassword extends Controller
@@ -82,6 +84,29 @@ class ForgotPassword extends Controller
             ]);
         } catch (\Exception $e) {
             return self::basicError($e->getMessage());
+        } finally {
+            $bundleContext = DB::table('t_backoffice_business_bundle_context')->where('BusinessId', $user->BusinessId)->value('BundleContext');
+            if ($bundleContext) {
+                $bundle = $bundleContext;
+            } else {
+                $bundle = 'com.set.transaccionales';
+            }
+
+            $firebaseToken = FirebaseToken::where('UserId', $user->Id)->first();
+            if ($firebaseToken) {
+                PushModel::create([
+                    'UserId' => $user->Id,
+                    'Token' => $firebaseToken->FirebaseToken,
+                    'CardCloudId' => null,
+                    'BundleContext' => $bundle,
+                    'Title' => "Código de verificación",
+                    'Body' => "Tu código de verificación es: $code",
+                    'Type' => "PASSWORD_CHANGE",
+                    'Description' => "Hemos enviado un código de verificación para restablecer tu contraseña. Si no solicitaste este cambio, por favor contácta a soporte.",
+                    'IsSent' => false,
+                    'IsFailed' => false,
+                ]);
+            }
         }
     }
 
@@ -179,7 +204,30 @@ class ForgotPassword extends Controller
                 'line' => $e->getLine(),
                 'code' => $e->getCode()
             ]);
-            return response()->json(['message' => 'Error al actualizar la contraseña, '.$e->getMessage()], 500);
+            return response()->json(['message' => 'Error al actualizar la contraseña, ' . $e->getMessage()], 500);
+        } finally {
+            $bundleContext = DB::table('t_backoffice_business_bundle_context')->where('BusinessId', $user->BusinessId)->value('BundleContext');
+            if ($bundleContext) {
+                $bundle = $bundleContext;
+            } else {
+                $bundle = 'com.set.transaccionales';
+            }
+
+            $firebaseToken = FirebaseToken::where('UserId', $user->Id)->first();
+            if ($firebaseToken) {
+                PushModel::create([
+                    'UserId' => $user->Id,
+                    'Token' => $firebaseToken->FirebaseToken,
+                    'CardCloudId' => null,
+                    'BundleContext' => $bundle,
+                    'Title' => "Código de verificación",
+                    'Body' => "Tu código de verificación es: $code",
+                    'Type' => "PASSWORD_CHANGE",
+                    'Description' => "Hemos enviado un código de verificación para restablecer tu contraseña. Si no solicitaste este cambio, por favor contácta a soporte.",
+                    'IsSent' => false,
+                    'IsFailed' => false,
+                ]);
+            }
         }
     }
 }
