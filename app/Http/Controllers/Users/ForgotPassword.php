@@ -220,10 +220,10 @@ class ForgotPassword extends Controller
                     'Token' => $firebaseToken->FirebaseToken,
                     'CardCloudId' => null,
                     'BundleContext' => $bundle,
-                    'Title' => "Código de verificación",
-                    'Body' => "Tu código de verificación es: $code",
+                    'Title' => "Cambio de contraseña",
+                    'Body' => "Tu contraseña ha sido cambiada exitosamente.",
                     'Type' => "PASSWORD_CHANGE",
-                    'Description' => "Hemos enviado un código de verificación para restablecer tu contraseña. Si no solicitaste este cambio, por favor contácta a soporte.",
+                    'Description' => "Su contraseña ha sido restablecida correctamente. Si no realizaste este cambio, por favor contácta a soporte.",
                     'IsSent' => false,
                     'IsFailed' => false,
                 ]);
