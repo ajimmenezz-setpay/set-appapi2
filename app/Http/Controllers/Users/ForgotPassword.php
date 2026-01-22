@@ -103,7 +103,7 @@ class ForgotPassword extends Controller
                         'Title' => "Código de verificación",
                         'Body' => "Tu código de verificación es: $code",
                         'Type' => "PASSWORD_CHANGE",
-                        'Description' => "Hemos enviado un código de verificación para restablecer tu contraseña. Si no solicitaste este cambio, por favor contácta a soporte.",
+                        'Description' => "Se ha enviado el código $code para restablecer tu contraseña. Si no solicitaste este cambio, por favor contácta a soporte.",
                         'IsSent' => false,
                         'IsFailed' => false,
                     ]);
