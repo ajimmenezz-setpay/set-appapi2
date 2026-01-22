@@ -85,7 +85,7 @@ class ForgotPassword extends Controller
         } catch (\Exception $e) {
             return self::basicError($e->getMessage());
         } finally {
-            if ($user && $code) {
+            if (isset($user) && isset($code) && $user && $code) {
                 $bundleContext = DB::table('t_backoffice_business_bundle_context')->where('BusinessId', $user->BusinessId)->value('BundleContext');
                 if ($bundleContext) {
                     $bundle = $bundleContext;
