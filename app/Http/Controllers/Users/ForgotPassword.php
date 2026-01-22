@@ -85,27 +85,29 @@ class ForgotPassword extends Controller
         } catch (\Exception $e) {
             return self::basicError($e->getMessage());
         } finally {
-            $bundleContext = DB::table('t_backoffice_business_bundle_context')->where('BusinessId', $user->BusinessId)->value('BundleContext');
-            if ($bundleContext) {
-                $bundle = $bundleContext;
-            } else {
-                $bundle = 'com.set.transaccionales';
-            }
+            if ($user && $code) {
+                $bundleContext = DB::table('t_backoffice_business_bundle_context')->where('BusinessId', $user->BusinessId)->value('BundleContext');
+                if ($bundleContext) {
+                    $bundle = $bundleContext;
+                } else {
+                    $bundle = 'com.set.transaccionales';
+                }
 
-            $firebaseToken = FirebaseToken::where('UserId', $user->Id)->first();
-            if ($firebaseToken) {
-                PushModel::create([
-                    'UserId' => $user->Id,
-                    'Token' => $firebaseToken->FirebaseToken,
-                    'CardCloudId' => null,
-                    'BundleContext' => $bundle,
-                    'Title' => "Código de verificación",
-                    'Body' => "Tu código de verificación es: $code",
-                    'Type' => "PASSWORD_CHANGE",
-                    'Description' => "Hemos enviado un código de verificación para restablecer tu contraseña. Si no solicitaste este cambio, por favor contácta a soporte.",
-                    'IsSent' => false,
-                    'IsFailed' => false,
-                ]);
+                $firebaseToken = FirebaseToken::where('UserId', $user->Id)->first();
+                if ($firebaseToken) {
+                    PushModel::create([
+                        'UserId' => $user->Id,
+                        'Token' => $firebaseToken->FirebaseToken,
+                        'CardCloudId' => null,
+                        'BundleContext' => $bundle,
+                        'Title' => "Código de verificación",
+                        'Body' => "Tu código de verificación es: $code",
+                        'Type' => "PASSWORD_CHANGE",
+                        'Description' => "Hemos enviado un código de verificación para restablecer tu contraseña. Si no solicitaste este cambio, por favor contácta a soporte.",
+                        'IsSent' => false,
+                        'IsFailed' => false,
+                    ]);
+                }
             }
         }
     }
