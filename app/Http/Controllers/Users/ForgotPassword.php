@@ -57,7 +57,7 @@ class ForgotPassword extends Controller
             ]);
 
             $user = User::where('email', $request->email)->first();
-            if (!$user) throw new \Exception('El correo electrónico no está registrado');
+            if (!$user) return self::basicError('Ya se ha enviado un código de verificación recientemente, por favor intente en 15 minutos.');
 
             $cutoff = Carbon::now('America/Mexico_City')->subMinutes(15);
 
