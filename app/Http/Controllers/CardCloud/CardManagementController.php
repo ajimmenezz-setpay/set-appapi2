@@ -872,6 +872,8 @@ class CardManagementController extends Controller
                     $allowed = true;
                     break;
                 case 7:
+                case 11:
+                case 13:
                     $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
                         ->pluck('CompanyId')
                         ->toArray();
@@ -1479,6 +1481,8 @@ class CardManagementController extends Controller
                     $allowed = true;
                     break;
                 case 7:
+                case 11:
+                case 13:
                     $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
                         ->pluck('CompanyId')
                         ->toArray();
@@ -1491,6 +1495,7 @@ class CardManagementController extends Controller
                         ->first();
 
                     $allowed = $cards ? true : false;
+
                     break;
                 case 8:
                     $cardAssigned = CardAssigned::where('CardCloudId', $cardId)
@@ -1517,6 +1522,7 @@ class CardManagementController extends Controller
                     break;
                 default:
                     $allowed = false;
+                    break;
             }
 
             if (!$allowed) {
@@ -1758,12 +1764,13 @@ class CardManagementController extends Controller
         $businessId = null;
         switch ($request->attributes->get('jwt')->profileId) {
             case 5:
-            case 10:
-            case 11:
-            case 12:
                 $allowed = true;
                 break;
             case 7:
+            case 10:
+            case 11:
+            case 12:
+            case 13:
                 $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
                     ->pluck('CompanyId')
                     ->toArray();
@@ -1885,12 +1892,13 @@ class CardManagementController extends Controller
         $businessId = null;
         switch ($request->attributes->get('jwt')->profileId) {
             case 5:
-            case 10:
-            case 11:
-            case 12:
                 $allowed = true;
                 break;
             case 7:
+            case 10:
+            case 11:
+            case 12:
+            case 13:
                 $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
                     ->pluck('CompanyId')
                     ->toArray();
