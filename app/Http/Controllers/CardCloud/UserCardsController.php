@@ -34,13 +34,18 @@ class UserCardsController extends Controller
             $cardList = [];
 
             foreach ($cards as $card) {
-                $client = new Client();
-                $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $card->CardCloudId, [
-                    'headers' => [
-                        'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id, $card->BusinessId),
-                    ]
-                ]);
+                try {
+                    $client = new Client();
+                    $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $card->CardCloudId, [
+                        'headers' => [
+                            'Content-Type' => 'application/json',
+                            'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id, $card->BusinessId),
+                        ]
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Error fetching card from CardCloud API: ' . $e->getMessage());
+                    continue;
+                }
 
                 $decodedJson = json_decode($response->getBody(), true);
                 $decodedJson['cardNumber'] = $card->CardCloudNumber;
