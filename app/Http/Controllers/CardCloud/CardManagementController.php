@@ -92,7 +92,7 @@ class CardManagementController extends Controller
             'new_nip.max' => 'El campo new_nip debe tener como máximo 4 caracteres'
         ]);
 
-
+        $businessId = null;
         switch ($request->attributes->get('jwt')->profileId) {
             case 5:
                 $allowed = true;
@@ -102,6 +102,7 @@ class CardManagementController extends Controller
                     ->where('UserId', $request->attributes->get('jwt')->id)
                     ->first();
                 $allowed = $cardAssigned ? true : false;
+                $businessId = $cardAssigned ? $cardAssigned->BusinessId : null;
 
                 $allowChange = DB::connection('card_cloud')->table('cards')
                     ->join('subaccount_blocks', 'cards.SubAccountId', '=', 'subaccount_blocks.SubaccountId')
@@ -124,7 +125,7 @@ class CardManagementController extends Controller
                 $response = $client->request('PATCH', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/update_nip', [
                     'headers' => [
                         'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id, $businessId),
                     ],
                     'json' => [
                         'old_nip' => $request->old_nip,
@@ -502,6 +503,7 @@ class CardManagementController extends Controller
                 GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->auth_code);
             }
 
+            $businessId = null;
             switch ($request->attributes->get('jwt')->profileId) {
                 case 5:
                     $allowed = true;
@@ -525,7 +527,7 @@ class CardManagementController extends Controller
                         ->where('UserId', $request->attributes->get('jwt')->id)
                         ->first();
                     $allowed = $cardAssigned ? true : false;
-
+                    $businessId = $cardAssigned ? $cardAssigned->BusinessId : null;
                     break;
                 default:
                     $allowed = false;
@@ -548,7 +550,7 @@ class CardManagementController extends Controller
                 $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $request->source_card . '/buy_virtual_card', [
                     'headers' => [
                         'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id, $businessId),
                     ],
                     'json' => [
                         'months' => $request->months
@@ -559,7 +561,7 @@ class CardManagementController extends Controller
 
                 CardAssigned::create([
                     'Id' => Uuid::uuid7(),
-                    'BusinessId' => $request->attributes->get('jwt')->businessId,
+                    'BusinessId' => $businessId ?? $request->attributes->get('jwt')->businessId,
                     'CardCloudId' => $decodedJson['card_id'],
                     'UserId' => $request->attributes->get('jwt')->id,
                     'Name' => $request->attributes->get('jwt')->firstName ?? $request->attributes->get('jwt')->name ?? '',
@@ -1049,6 +1051,7 @@ class CardManagementController extends Controller
     public function setup(Request $request, $cardId, $setupName, $action)
     {
         try {
+            $businessId = null;
             switch ($request->attributes->get('jwt')->profileId) {
                 case 5:
                     $allowed = true;
@@ -1072,6 +1075,7 @@ class CardManagementController extends Controller
                         ->where('UserId', $request->attributes->get('jwt')->id)
                         ->first();
                     $allowed = $cardAssigned ? true : false;
+                    $businessId = $cardAssigned ? $cardAssigned->BusinessId : null;
 
                     if (!$allowed) {
                         $cardCloud = Card::where('UUID', $cardId)->first();
@@ -1110,7 +1114,7 @@ class CardManagementController extends Controller
                 $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/setup/' . $setupName . '/' . $action, [
                     'headers' => [
                         'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id, $businessId),
                     ]
                 ]);
 
@@ -1190,6 +1194,7 @@ class CardManagementController extends Controller
     public function webhooks(Request $request, $cardId)
     {
         try {
+            $businessId = null;
             switch ($request->attributes->get('jwt')->profileId) {
                 case 5:
                     $allowed = true;
@@ -1213,6 +1218,7 @@ class CardManagementController extends Controller
                         ->where('UserId', $request->attributes->get('jwt')->id)
                         ->first();
                     $allowed = $cardAssigned ? true : false;
+                    $businessId = $cardAssigned ? $cardAssigned->BusinessId : null;
 
                     if (!$allowed) {
                         $cardCloud = Card::where('UUID', $cardId)->first();
@@ -1242,7 +1248,7 @@ class CardManagementController extends Controller
                 $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/webhooks', [
                     'headers' => [
                         'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id)
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id, $businessId)
                     ]
                 ]);
 
@@ -1326,6 +1332,7 @@ class CardManagementController extends Controller
     public function failedAuthorizations(Request $request, $cardId)
     {
         try {
+            $businessId = null;
             switch ($request->attributes->get('jwt')->profileId) {
                 case 5:
                     $allowed = true;
@@ -1349,6 +1356,7 @@ class CardManagementController extends Controller
                         ->where('UserId', $request->attributes->get('jwt')->id)
                         ->first();
                     $allowed = $cardAssigned ? true : false;
+                    $businessId = $cardAssigned ? $cardAssigned->BusinessId : null;
 
                     if (!$allowed) {
                         $cardCloud = Card::where('UUID', $cardId)->first();
@@ -1377,7 +1385,7 @@ class CardManagementController extends Controller
                 $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/failed_authorization', [
                     'headers' => [
                         'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id)
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id, $businessId)
                     ]
                 ]);
 
@@ -1465,6 +1473,7 @@ class CardManagementController extends Controller
     public function movements(Request $request, $cardId)
     {
         try {
+            $businessId = null;
             switch ($request->attributes->get('jwt')->profileId) {
                 case 5:
                     $allowed = true;
@@ -1488,6 +1497,7 @@ class CardManagementController extends Controller
                         ->where('UserId', $request->attributes->get('jwt')->id)
                         ->first();
                     $allowed = $cardAssigned ? true : false;
+                    $businessId = $cardAssigned ? $cardAssigned->BusinessId : null;
 
                     if (!$allowed) {
                         $cardCloud = Card::where('UUID', $cardId)->first();
@@ -1513,16 +1523,29 @@ class CardManagementController extends Controller
                 throw new Exception("No tienes permisos para ver los movimientos de esta tarjeta.");
             } else {
 
-                $from = isset($request['from']) ? Carbon::createFromTimestamp($request->from) : Carbon::now()->subMonth();
-                $to = isset($request['to']) ? Carbon::createFromTimestamp($request->to) : Carbon::now();
+                $from = Carbon::now()->subMonth();
+                if ($request->has('from')) {
+                    $from = Carbon::createFromTimestamp($request->from);
+                } else if ($request->has('fromDate')) {
+                    $from = Carbon::createFromTimestamp($request->fromDate);
+                }
+
+                $to = Carbon::now();
+                if ($request->has('to')) {
+                    $to = Carbon::createFromTimestamp($request->to);
+                } else if ($request->has('toDate')) {
+                    $to = Carbon::createFromTimestamp($request->toDate);
+                }
 
                 if ($from > $to) return response()->json(['message' => 'Invalid date range'], 400);
+
+                Log::error("Fetching movements for card $cardId from " . $from->toDateTimeString() . " to " . $to->toDateTimeString());
 
                 $client = new Client();
                 $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/movements', [
                     'headers' => [
                         'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id)
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id, $businessId)
                     ],
                     'json' => [
                         "from" => $from->timestamp,
@@ -1604,6 +1627,7 @@ class CardManagementController extends Controller
     public function unassignUser(Request $request, $cardId)
     {
         try {
+            $businessId = null;
             switch ($request->attributes->get('jwt')->profileId) {
                 case 5:
                     $allowed = true;
@@ -1627,6 +1651,7 @@ class CardManagementController extends Controller
                         ->where('UserId', $request->attributes->get('jwt')->id)
                         ->first();
                     $allowed = $cardAssigned ? true : false;
+                    $businessId = $cardAssigned ? $cardAssigned->BusinessId : null;
 
                     if (!$allowed) {
                         $cardCloud = Card::where('UUID', $cardId)->first();
@@ -1656,7 +1681,7 @@ class CardManagementController extends Controller
                 $response = $client->request('DELETE', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/user_unassign', [
                     'headers' => [
                         'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id)
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id, $businessId)
                     ]
                 ]);
 
@@ -1730,6 +1755,7 @@ class CardManagementController extends Controller
 
     public function blockCard(Request $request, $cardId)
     {
+        $businessId = null;
         switch ($request->attributes->get('jwt')->profileId) {
             case 5:
             case 10:
@@ -1756,6 +1782,7 @@ class CardManagementController extends Controller
                     ->where('UserId', $request->attributes->get('jwt')->id)
                     ->first();
                 $allowed = $cardAssigned ? true : false;
+                $businessId = $cardAssigned ? $cardAssigned->BusinessId : null;
                 break;
             default:
                 $allowed = false;
@@ -1770,7 +1797,7 @@ class CardManagementController extends Controller
                 $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/block', [
                     'headers' => [
                         'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id)
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id, $businessId)
                     ]
                 ]);
 
@@ -1855,6 +1882,7 @@ class CardManagementController extends Controller
      */
     public function unblockCard(Request $request, $cardId)
     {
+        $businessId = null;
         switch ($request->attributes->get('jwt')->profileId) {
             case 5:
             case 10:
@@ -1881,6 +1909,7 @@ class CardManagementController extends Controller
                     ->where('UserId', $request->attributes->get('jwt')->id)
                     ->first();
                 $allowed = $cardAssigned ? true : false;
+                $businessId = $cardAssigned ? $cardAssigned->BusinessId : null;
                 break;
             default:
                 $allowed = false;
@@ -1894,7 +1923,7 @@ class CardManagementController extends Controller
                 $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/unblock', [
                     'headers' => [
                         'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id)
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id, $businessId)
                     ]
                 ]);
 

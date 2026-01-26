@@ -115,6 +115,8 @@ Route::middleware([VerifyJwt::class, ApiLogger::class])->group(function () {
 
         Route::post('/transfers-from-file', [App\Http\Controllers\CardCloud\TransferController::class, 'transfersFromFile']);
         Route::post('/transfer', [App\Http\Controllers\CardCloud\TransferController::class, 'transfer']);
+
+        Route::get('/user-cards', [App\Http\Controllers\CardCloud\UserCardsController::class, 'index']);
     });
 
     Route::group(['prefix' => 'speiCloud'], function () {

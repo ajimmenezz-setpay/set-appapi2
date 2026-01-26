@@ -11,6 +11,8 @@ use GuzzleHttp\Exception\RequestException;
 use App\Models\CardCloud\CardAssigned;
 use App\Models\CardCloud\Subaccount;
 use App\Models\Backoffice\Users\CompaniesAndUsers;
+use App\Models\Backoffice\Companies\CompaniesUsers;
+use App\Models\CardCloud\Card;
 use Exception;
 
 class TransferController extends Controller
@@ -222,21 +224,48 @@ class TransferController extends Controller
                 'concept.max' => 'El concepto del depósito no debe exceder los 120 caracteres'
             ]);
 
-            $client = new Client();
-            $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/deposit', [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
-                ],
-                'json' => [
-                    'amount' => $request->amount,
-                    'description' => $request->concept
-                ]
-            ]);
+            switch ($request->attributes->get('jwt')->profileId) {
+                case 5:
+                    $allowed = true;
+                    break;
+                case 7:
+                    $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
+                        ->pluck('CompanyId')
+                        ->toArray();
+                    $cardCloudSubaccounts = Subaccount::whereIn('ExternalId', $subaccount)
+                        ->pluck('Id')
+                        ->toArray();
 
-            $decodedJson = json_decode($response->getBody(), true);
+                    $cards = Card::whereIn('SubAccountId', $cardCloudSubaccounts)
+                        ->where('UUID', $cardId)
+                        ->first();
 
-            return response()->json($decodedJson);
+                    $allowed = $cards ? true : false;
+                    break;
+                default:
+                    $allowed = false;
+                    break;
+            }
+
+            if (!$allowed) {
+                return response("No está permitido realizar esta acción con la tarjeta especificada", 400);
+            } else {
+                $client = new Client();
+                $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/deposit', [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                    ],
+                    'json' => [
+                        'amount' => $request->amount,
+                        'description' => $request->concept
+                    ]
+                ]);
+
+                $decodedJson = json_decode($response->getBody(), true);
+
+                return response()->json($decodedJson);
+            }
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
                 $statusCode = $e->getResponse()->getStatusCode();
@@ -325,21 +354,48 @@ class TransferController extends Controller
                 'concept.max' => 'El concepto de la reversa no debe exceder los 120 caracteres'
             ]);
 
-            $client = new Client();
-            $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/reverse', [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
-                ],
-                'json' => [
-                    'amount' => $request->amount,
-                    'description' => $request->concept
-                ]
-            ]);
+            switch ($request->attributes->get('jwt')->profileId) {
+                case 5:
+                    $allowed = true;
+                    break;
+                case 7:
+                    $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
+                        ->pluck('CompanyId')
+                        ->toArray();
+                    $cardCloudSubaccounts = Subaccount::whereIn('ExternalId', $subaccount)
+                        ->pluck('Id')
+                        ->toArray();
 
-            $decodedJson = json_decode($response->getBody(), true);
+                    $cards = Card::whereIn('SubAccountId', $cardCloudSubaccounts)
+                        ->where('UUID', $cardId)
+                        ->first();
 
-            return response()->json($decodedJson);
+                    $allowed = $cards ? true : false;
+                    break;
+                default:
+                    $allowed = false;
+                    break;
+            }
+
+            if (!$allowed) {
+                return response("No está permitido realizar esta acción con la tarjeta especificada", 400);
+            } else {
+                $client = new Client();
+                $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/reverse', [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                    ],
+                    'json' => [
+                        'amount' => $request->amount,
+                        'description' => $request->concept
+                    ]
+                ]);
+
+                $decodedJson = json_decode($response->getBody(), true);
+
+                return response()->json($decodedJson);
+            }
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
                 $statusCode = $e->getResponse()->getStatusCode();

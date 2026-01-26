@@ -84,6 +84,7 @@ class CardSensitiveController extends Controller
     public function sensitive(Request $request, $cardId)
     {
         try {
+            $businessId = null;
             switch ($request->attributes->get('jwt')->profileId) {
                 case 5:
                     $allowed = true;
@@ -107,6 +108,7 @@ class CardSensitiveController extends Controller
                         ->where('UserId', $request->attributes->get('jwt')->id)
                         ->first();
                     $allowed = $cardAssigned ? true : false;
+                    $businessId = $cardAssigned ? $cardAssigned->BusinessId : null;
 
                     if (!$allowed) {
                         $cardCloud = Card::where('UUID', $cardId)->first();
@@ -138,7 +140,7 @@ class CardSensitiveController extends Controller
                     $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/sensitive', [
                         'headers' => [
                             'Content-Type' => 'application/json',
-                            'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                            'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id, $businessId),
                         ]
                     ]);
 
@@ -188,7 +190,7 @@ class CardSensitiveController extends Controller
     public function pin(Request $request, $cardId)
     {
         try {
-
+            $businessId = null;
             switch ($request->attributes->get('jwt')->profileId) {
                 case 5:
                     $allowed = true;
@@ -212,6 +214,7 @@ class CardSensitiveController extends Controller
                         ->where('UserId', $request->attributes->get('jwt')->id)
                         ->first();
                     $allowed = $cardAssigned ? true : false;
+                    $businessId = $cardAssigned ? $cardAssigned->BusinessId : null;
                     break;
                 default:
                     $allowed = false;
@@ -227,7 +230,7 @@ class CardSensitiveController extends Controller
                     $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/cards_management/' . $cardId . '/pin', [
                         'headers' => [
                             'Content-Type' => 'application/json',
-                            'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                            'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id, $businessId),
                         ]
                     ]);
 
@@ -376,6 +379,7 @@ class CardSensitiveController extends Controller
     public function dynamicCvv(Request $request, $cardId)
     {
         try {
+            $businessId = null;
             switch ($request->attributes->get('jwt')->profileId) {
                 case 5:
                     $allowed = true;
@@ -399,6 +403,7 @@ class CardSensitiveController extends Controller
                         ->where('UserId', $request->attributes->get('jwt')->id)
                         ->first();
                     $allowed = $cardAssigned ? true : false;
+                    $businessId = $cardAssigned ? $cardAssigned->BusinessId : null;
 
                     if (!$allowed) {
                         $cardCloud = Card::where('UUID', $cardId)->first();
@@ -429,7 +434,7 @@ class CardSensitiveController extends Controller
                     $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/cvv', [
                         'headers' => [
                             'Content-Type' => 'application/json',
-                            'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                            'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id, $businessId),
                         ]
                     ]);
 

@@ -6,17 +6,23 @@ use App\Http\Controllers\Security\Crypt;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Facades\Log;
 
 class CardCloudApi
 {
-    public static function getToken($user_id)
+    public static function getToken($user_id = null, $business_id = null)
     {
         try {
-            $user = User::where('Id', $user_id)->first();
-
-            $credentials = DB::table('t_stp_card_cloud_credentials')
-                ->where('BusinessId', $user->BusinessId)
-                ->first();
+            if (!is_null($business_id)) {
+                $credentials = DB::table('t_stp_card_cloud_credentials')
+                    ->where('BusinessId', $business_id)
+                    ->first();
+            } else {
+                $user = User::where('Id', $user_id)->first();
+                $credentials = DB::table('t_stp_card_cloud_credentials')
+                    ->where('BusinessId', $user->BusinessId)
+                    ->first();
+            }
 
             if (!$credentials) {
                 throw new \Exception('Card Cloud credentials not found');
@@ -34,11 +40,13 @@ class CardCloudApi
 
             ]);
 
-            if($response->getStatusCode() != 200) {
+            if ($response->getStatusCode() != 200) {
                 return null;
             }
 
             $response = json_decode($response->getBody()->getContents());
+
+            Log::error('CardCloud API token retrieved successfully for BusinessId: ' . $credentials->BusinessId);
 
             return $response->access_token;
         } catch (RequestException $e) {
