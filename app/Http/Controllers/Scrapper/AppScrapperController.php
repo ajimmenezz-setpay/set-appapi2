@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Scrapper;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class AppScrapperController extends Controller
 {
@@ -16,6 +17,7 @@ class AppScrapperController extends Controller
             if ($response->successful()) {
                 return response()->json($response->json());
             } else {
+                Log::error('Error al obtener la información de la app desde Google Play: ' . $response->body());
                 return $this->error('Error al obtener la información de la app');
             }
         } catch (\Exception $e) {
