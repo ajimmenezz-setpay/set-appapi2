@@ -12220,6 +12220,906 @@
                 }
             }
         },
+        "/api/admin/v1/pld/customer_data/{id}/address": {
+            "get": {
+                "tags": [
+                    "PLD Customer Address Data"
+                ],
+                "summary": "Get Customer Address Data",
+                "description": "Returns the address data of a customer depending on the address type",
+                "operationId": "getCustomerAddressData",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Customer Data Id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "$ref": "#/components/schemas/CustomerNationalAddressResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/CustomerForeignAddressResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/CustomerNoAddressResponse"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "PLD Customer Address Data"
+                ],
+                "summary": "Store Customer Address Data",
+                "description": "Stores the address data of a customer depending on the address type",
+                "operationId": "storeCustomerAddressData",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Customer Data Id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "oneOf": [
+                                    {
+                                        "$ref": "#/components/schemas/StoreNationalAddressRequest"
+                                    },
+                                    {
+                                        "$ref": "#/components/schemas/StoreForeignAddressRequest"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "$ref": "#/components/schemas/CustomerNationalAddressResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/CustomerForeignAddressResponse"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/admin/v1/pld/customer_general_data/{id}/contact": {
+            "get": {
+                "tags": [
+                    "PLD Customer Contact Data"
+                ],
+                "summary": "Get Customer Contact Data",
+                "description": "Returns the contact data for a specific customer",
+                "operationId": "getCustomerContactData",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Customer Data ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ContactObject"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "PLD Customer Contact Data"
+                ],
+                "summary": "Store Customer Contact Data",
+                "description": "Stores the contact data for a specific customer",
+                "operationId": "storeCustomerContactData",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Customer Data ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "country_code_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "phone_number": {
+                                        "type": "string",
+                                        "example": "1234567890",
+                                        "nullable": true
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "example@example.com",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ContactObject"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/api/admin/v1/pld/customer_general_data/{id}/owners": {
+            "get": {
+                "tags": [
+                    "PLD Customer Owners Data"
+                ],
+                "summary": "Get Customer Owners List",
+                "description": "Returns the owners list for a specific customer",
+                "operationId": "getCustomerOwnersList",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Customer Data ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "oneOf": [
+                                            {
+                                                "$ref": "#/components/schemas/FisicalOwnerResponse"
+                                            },
+                                            {
+                                                "$ref": "#/components/schemas/MoralOwnerResponse"
+                                            },
+                                            {
+                                                "$ref": "#/components/schemas/TrustOwnerResponse"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "PLD Customer Owners Data"
+                ],
+                "summary": "Store Customer Owners Data",
+                "description": "Stores the owners data for a specific customer",
+                "operationId": "storeCustomerOwnersData",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Customer Data ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "oneOf": [
+                                    {
+                                        "$ref": "#/components/schemas/FisicalOwnerRequest"
+                                    },
+                                    {
+                                        "$ref": "#/components/schemas/MoralOwnerRequest"
+                                    },
+                                    {
+                                        "$ref": "#/components/schemas/TrustOwnerRequest"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/api/admin/v1/pld/customer_general_data/{id}/owners/{owner_id}": {
+            "get": {
+                "tags": [
+                    "PLD Customer Owners Data"
+                ],
+                "summary": "Get Customer Owner Data",
+                "description": "Returns the owner data for a specific customer",
+                "operationId": "getCustomerOwnerData",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Customer Data ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "owner_id",
+                        "in": "path",
+                        "description": "Owner Data ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "$ref": "#/components/schemas/FisicalOwnerResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/MoralOwnerResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/TrustOwnerResponse"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "PLD Customer Owners Data"
+                ],
+                "summary": "Update Customer Owner Data",
+                "description": "Updates the owner data for a specific customer",
+                "operationId": "updateCustomerOwnerData",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Customer Data ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "owner_id",
+                        "in": "path",
+                        "description": "Owner Data ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "oneOf": [
+                                    {
+                                        "$ref": "#/components/schemas/FisicalOwnerRequest"
+                                    },
+                                    {
+                                        "$ref": "#/components/schemas/MoralOwnerRequest"
+                                    },
+                                    {
+                                        "$ref": "#/components/schemas/TrustOwnerRequest"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "PLD Customer Owners Data"
+                ],
+                "summary": "Delete Customer Owner Data",
+                "description": "Deletes the owner data for a specific customer",
+                "operationId": "deleteCustomerOwnerData",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Customer Data ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "owner_id",
+                        "in": "path",
+                        "description": "Owner Data ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/api/admin/v1/pld/customer_general_data/{id}/person_data": {
+            "get": {
+                "tags": [
+                    "PLD Customer General Data"
+                ],
+                "summary": "Get Person Data",
+                "description": "Get person data for a customer depending on person type",
+                "operationId": "getPersonData",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Customer General Data ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "$ref": "#/components/schemas/FisicalPersonDataResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/MoralPersonDataResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/TrustPersonDataResponse"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "PLD Customer General Data"
+                ],
+                "summary": "Store Person Data",
+                "description": "Store or update person data for a customer",
+                "operationId": "storePersonData",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Customer General Data ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Person data to be stored or updated depending on person type",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "oneOf": [
+                                    {
+                                        "$ref": "#/components/schemas/FisicalPersonDataRequest"
+                                    },
+                                    {
+                                        "$ref": "#/components/schemas/MoralPersonDataRequest"
+                                    },
+                                    {
+                                        "$ref": "#/components/schemas/TrustPersonDataRequest"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "$ref": "#/components/schemas/FisicalPersonDataResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/MoralPersonDataResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/TrustPersonDataResponse"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/admin/v1/pld/customer_data/{id}/person_type": {
+            "get": {
+                "tags": [
+                    "PLD Customer General Data"
+                ],
+                "summary": "Get Person Type",
+                "description": "Get person type for a customer",
+                "operationId": "getPersonType",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Customer Data ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PersonTypeObject"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "PLD Customer General Data"
+                ],
+                "summary": "Store Person Type",
+                "description": "Store or update person type for a customer",
+                "operationId": "storePersonType",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Customer Data ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "person_type_id"
+                                ],
+                                "properties": {
+                                    "person_type_id": {
+                                        "description": "ID of the person type",
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PersonTypeObject"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/admin/v1/pld/lists/commercial_lines": {
+            "get": {
+                "tags": [
+                    "PLD Lists"
+                ],
+                "summary": "Get Commercial Lines",
+                "description": "Returns a list of commercial lines",
+                "operationId": "getCommercialLines",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CommercialLineObject"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/api/admin/v1/pld/lists/countries": {
+            "get": {
+                "tags": [
+                    "PLD Lists"
+                ],
+                "summary": "Get Countries",
+                "description": "Returns a list of countries",
+                "operationId": "getCountries",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CountryObject"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/api/admin/v1/pld/lists/economic_activities": {
+            "get": {
+                "tags": [
+                    "PLD Lists"
+                ],
+                "summary": "Get Economic Activities",
+                "description": "Returns a list of economic activities",
+                "operationId": "getEconomicActivities",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/EconomicActivityObject"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/api/admin/v1/pld/lists/person_types": {
+            "get": {
+                "tags": [
+                    "PLD Lists"
+                ],
+                "summary": "Get Person Types",
+                "description": "Returns a list of person types",
+                "operationId": "getPersonTypes",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/PersonTypeObject"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/api/admin/v1/pld/environments": {
+            "get": {
+                "tags": [
+                    "PLD"
+                ],
+                "summary": "Get PLD Environments",
+                "description": "Returns a list of PLD Environments",
+                "operationId": "getPldEnvironments",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Environment Name"
+                                            },
+                                            "percentage": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 10.5
+                                            },
+                                            "customer_data_id": {
+                                                "type": "integer",
+                                                "example": 5
+                                            },
+                                            "registration_date": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2023-01-01T12:00:00Z"
+                                            },
+                                            "last_update_date": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2023-01-10T15:30:00Z"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/api/admin/v1/pld/subaccounts": {
+            "get": {
+                "tags": [
+                    "PLD"
+                ],
+                "summary": "Get PLD Subaccounts",
+                "description": "Returns a list of PLD Subaccounts",
+                "operationId": "getPldSubaccounts",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Subaccount Name"
+                                            },
+                                            "percentage": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 10.5
+                                            },
+                                            "customer_data_id": {
+                                                "type": "integer",
+                                                "example": 5
+                                            },
+                                            "registration_date": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2023-01-01T12:00:00Z"
+                                            },
+                                            "last_update_date": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2023-01-10T15:30:00Z"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
         "/api/admin/v1/profiles/webapp": {
             "get": {
                 "tags": [
@@ -19991,6 +20891,897 @@
         }
     },
     "components": {
+        "schemas": {
+            "CustomerNoAddressResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "person_type_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "address_type": {
+                        "$ref": "#/components/schemas/MissingAddressTypeObject"
+                    }
+                },
+                "type": "object"
+            },
+            "CustomerNationalAddressResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "person_type_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "address_type": {
+                        "$ref": "#/components/schemas/NationalAddressTypeObject"
+                    },
+                    "colony": {
+                        "type": "string",
+                        "example": "Colony Name",
+                        "nullable": true
+                    },
+                    "street": {
+                        "type": "string",
+                        "example": "Street Name",
+                        "nullable": true
+                    },
+                    "external_number": {
+                        "type": "string",
+                        "example": "123",
+                        "nullable": true
+                    },
+                    "internal_number": {
+                        "type": "string",
+                        "example": "Apt 4B",
+                        "nullable": true
+                    },
+                    "postal_code": {
+                        "type": "string",
+                        "example": "12345",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "CustomerForeignAddressResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "person_type_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "address_type": {
+                        "$ref": "#/components/schemas/ForeignAddressTypeObject"
+                    },
+                    "nationality_country": {
+                        "$ref": "#/components/schemas/CountryObject"
+                    },
+                    "state": {
+                        "type": "string",
+                        "example": "State Name",
+                        "nullable": true
+                    },
+                    "city": {
+                        "type": "string",
+                        "example": "City Name",
+                        "nullable": true
+                    },
+                    "colony": {
+                        "type": "string",
+                        "example": "Colony Name",
+                        "nullable": true
+                    },
+                    "street": {
+                        "type": "string",
+                        "example": "Street Name",
+                        "nullable": true
+                    },
+                    "external_number": {
+                        "type": "string",
+                        "example": "123",
+                        "nullable": true
+                    },
+                    "internal_number": {
+                        "type": "string",
+                        "example": "Apt 4B",
+                        "nullable": true
+                    },
+                    "postal_code": {
+                        "type": "string",
+                        "example": "12345",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "MissingAddressTypeObject": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "address_type_name": {
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "NationalAddressTypeObject": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "N"
+                    },
+                    "address_type_name": {
+                        "type": "string",
+                        "example": "National"
+                    }
+                },
+                "type": "object"
+            },
+            "ForeignAddressTypeObject": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "E"
+                    },
+                    "address_type_name": {
+                        "type": "string",
+                        "example": "Foreign"
+                    }
+                },
+                "type": "object"
+            },
+            "StoreNationalAddressRequest": {
+                "required": [
+                    "address_type_id",
+                    "colony",
+                    "street",
+                    "external_number",
+                    "postal_code"
+                ],
+                "properties": {
+                    "address_type_id": {
+                        "description": "Address Type Id. Allowed value: N (National) or E (Foreign)",
+                        "type": "string",
+                        "example": "N"
+                    },
+                    "colony": {
+                        "type": "string",
+                        "example": "Colony Name"
+                    },
+                    "street": {
+                        "type": "string",
+                        "example": "Street Name"
+                    },
+                    "external_number": {
+                        "type": "string",
+                        "example": "123"
+                    },
+                    "internal_number": {
+                        "type": "string",
+                        "example": "Apt 4B",
+                        "nullable": true
+                    },
+                    "postal_code": {
+                        "description": "Postal Code must be 5 characters",
+                        "type": "string",
+                        "example": "12345"
+                    }
+                },
+                "type": "object"
+            },
+            "StoreForeignAddressRequest": {
+                "required": [
+                    "address_type_id",
+                    "nationality_country",
+                    "state",
+                    "city",
+                    "colony",
+                    "street",
+                    "external_number",
+                    "postal_code"
+                ],
+                "properties": {
+                    "address_type_id": {
+                        "description": "Address Type Id. Allowed value: N (National) or E (Foreign)",
+                        "type": "string",
+                        "example": "E"
+                    },
+                    "nationality_country": {
+                        "description": "Nationality Country Id. Must exist in countries list.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "state": {
+                        "type": "string",
+                        "example": "State Name"
+                    },
+                    "city": {
+                        "type": "string",
+                        "example": "City Name"
+                    },
+                    "colony": {
+                        "type": "string",
+                        "example": "Colony Name"
+                    },
+                    "street": {
+                        "type": "string",
+                        "example": "Street Name"
+                    },
+                    "external_number": {
+                        "type": "string",
+                        "example": "123"
+                    },
+                    "internal_number": {
+                        "type": "string",
+                        "example": "Apt 4B",
+                        "nullable": true
+                    },
+                    "postal_code": {
+                        "description": "Postal Code must be 5 characters",
+                        "type": "string",
+                        "example": "12345"
+                    }
+                },
+                "type": "object"
+            },
+            "ContactObject": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "person_type_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "contact": {
+                        "properties": {
+                            "country_code": {
+                                "$ref": "#/components/schemas/CountryObject"
+                            },
+                            "phone_number": {
+                                "type": "string",
+                                "example": "1234567890",
+                                "nullable": true
+                            },
+                            "email": {
+                                "type": "string",
+                                "example": "example@example.com",
+                                "nullable": true
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "FisicalOwnerResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "person_type_id": {
+                        "$ref": "#/components/schemas/PersonTypeObject"
+                    },
+                    "ownership_percentage": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 50.5
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "second_last_name": {
+                        "type": "string",
+                        "example": "Smith"
+                    },
+                    "birth_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "19800101"
+                    },
+                    "rfc": {
+                        "type": "string",
+                        "example": "DOEJ800101XXX"
+                    },
+                    "curp": {
+                        "type": "string",
+                        "example": "DOEJ800101HDFXXX01"
+                    },
+                    "nationality": {
+                        "$ref": "#/components/schemas/CountryObject"
+                    },
+                    "visible_name": {
+                        "type": "string",
+                        "example": "John Doe Smith"
+                    }
+                },
+                "type": "object"
+            },
+            "MoralOwnerResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "person_type_id": {
+                        "$ref": "#/components/schemas/PersonTypeObject"
+                    },
+                    "ownership_percentage": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 75
+                    },
+                    "business_name": {
+                        "type": "string",
+                        "example": "Acme Corp"
+                    },
+                    "constitution_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "20000515"
+                    },
+                    "rfc": {
+                        "type": "string",
+                        "example": "ACM000515XXX"
+                    },
+                    "visible_name": {
+                        "type": "string",
+                        "example": "Acme Corp"
+                    }
+                },
+                "type": "object"
+            },
+            "TrustOwnerResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "person_type_id": {
+                        "$ref": "#/components/schemas/PersonTypeObject"
+                    },
+                    "ownership_percentage": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 100
+                    },
+                    "trust_name": {
+                        "type": "string",
+                        "example": "Family Trust"
+                    },
+                    "rfc": {
+                        "type": "string",
+                        "example": "FAM000101XXX"
+                    },
+                    "registration_number": {
+                        "type": "string",
+                        "example": "REG123456"
+                    },
+                    "visible_name": {
+                        "type": "string",
+                        "example": "Family Trust"
+                    }
+                },
+                "type": "object"
+            },
+            "FisicalOwnerRequest": {
+                "properties": {
+                    "person_type_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "ownership_percentage": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 50.5
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "second_last_name": {
+                        "type": "string",
+                        "example": "Smith"
+                    },
+                    "birth_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "1980-01-01"
+                    },
+                    "rfc": {
+                        "type": "string",
+                        "example": "DOEJ800101XXX"
+                    },
+                    "curp": {
+                        "type": "string",
+                        "example": "DOEJ800101HDFXXX01"
+                    },
+                    "nationality": {
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "MoralOwnerRequest": {
+                "properties": {
+                    "person_type_id": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "ownership_percentage": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 75
+                    },
+                    "business_name": {
+                        "type": "string",
+                        "example": "Acme Corp"
+                    },
+                    "constitution_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2000-05-15"
+                    },
+                    "rfc": {
+                        "type": "string",
+                        "example": "ACM000515XXX"
+                    },
+                    "nationality": {
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "TrustOwnerRequest": {
+                "properties": {
+                    "person_type_id": {
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "ownership_percentage": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 100
+                    },
+                    "trust_name": {
+                        "type": "string",
+                        "example": "Family Trust"
+                    },
+                    "rfc": {
+                        "type": "string",
+                        "example": "FAM000101XXX"
+                    },
+                    "registration_number": {
+                        "type": "string",
+                        "example": "REG123456"
+                    }
+                },
+                "type": "object"
+            },
+            "FisicalPersonDataRequest": {
+                "required": [
+                    "name",
+                    "last_name",
+                    "second_last_name",
+                    "birth_date",
+                    "rfc",
+                    "curp",
+                    "nationality",
+                    "economic_activity"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Juan"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "example": "Pérez"
+                    },
+                    "second_last_name": {
+                        "type": "string",
+                        "example": "Gómez"
+                    },
+                    "birth_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "1990-01-01"
+                    },
+                    "rfc": {
+                        "type": "string",
+                        "example": "RFC123456HDF"
+                    },
+                    "curp": {
+                        "type": "string",
+                        "example": "CURP123456HDF"
+                    },
+                    "nationality": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "economic_activity": {
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "MoralPersonDataRequest": {
+                "required": [
+                    "business_name",
+                    "constitution_date",
+                    "rfc",
+                    "nationality",
+                    "commercial_line",
+                    "representative_name",
+                    "representative_last_name",
+                    "representative_second_last_name",
+                    "representative_birth_date",
+                    "representative_rfc",
+                    "representative_curp"
+                ],
+                "properties": {
+                    "business_name": {
+                        "type": "string",
+                        "example": "Empresa S.A. de C.V."
+                    },
+                    "constitution_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2000-05-15"
+                    },
+                    "rfc": {
+                        "type": "string",
+                        "example": "RFC123456HDF"
+                    },
+                    "nationality": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "commercial_line": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "representative_name": {
+                        "type": "string",
+                        "example": "Ana"
+                    },
+                    "representative_last_name": {
+                        "type": "string",
+                        "example": "López"
+                    },
+                    "representative_second_last_name": {
+                        "type": "string",
+                        "example": "Martínez"
+                    },
+                    "representative_birth_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "1980-07-20"
+                    },
+                    "representative_rfc": {
+                        "type": "string",
+                        "example": "RFC987654HDF"
+                    },
+                    "representative_curp": {
+                        "type": "string",
+                        "example": "CURP987654HDF"
+                    }
+                },
+                "type": "object"
+            },
+            "TrustPersonDataRequest": {
+                "required": [
+                    "trust_name",
+                    "rfc",
+                    "registration_number",
+                    "representative_name",
+                    "representative_last_name",
+                    "representative_second_last_name",
+                    "representative_birth_date",
+                    "representative_rfc",
+                    "representative_curp"
+                ],
+                "properties": {
+                    "trust_name": {
+                        "type": "string",
+                        "example": "Fideicomiso XYZ"
+                    },
+                    "rfc": {
+                        "type": "string",
+                        "example": "RFC123456HDF"
+                    },
+                    "registration_number": {
+                        "type": "string",
+                        "example": "REF123456"
+                    },
+                    "representative_name": {
+                        "type": "string",
+                        "example": "Carlos"
+                    },
+                    "representative_last_name": {
+                        "type": "string",
+                        "example": "Sánchez"
+                    },
+                    "representative_second_last_name": {
+                        "type": "string",
+                        "example": "Ruiz"
+                    },
+                    "representative_birth_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "1975-03-10"
+                    },
+                    "representative_rfc": {
+                        "type": "string",
+                        "example": "RFC654321HDF"
+                    },
+                    "representative_curp": {
+                        "type": "string",
+                        "example": "CURP654321HDF"
+                    }
+                },
+                "type": "object"
+            },
+            "FisicalPersonDataResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "person_type_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Juan"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "example": "Pérez"
+                    },
+                    "second_last_name": {
+                        "type": "string",
+                        "example": "Gómez"
+                    },
+                    "birth_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "1990-01-01"
+                    },
+                    "rfc": {
+                        "type": "string",
+                        "example": "RFC123456HDF"
+                    },
+                    "curp": {
+                        "type": "string",
+                        "example": "CURP123456HDF"
+                    },
+                    "nationality_country": {
+                        "$ref": "#/components/schemas/CountryObject"
+                    },
+                    "economic_activity": {
+                        "$ref": "#/components/schemas/EconomicActivityObject"
+                    }
+                },
+                "type": "object"
+            },
+            "MoralPersonDataResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "person_type_id": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "business_name": {
+                        "type": "string",
+                        "example": "Empresa S.A. de C.V."
+                    },
+                    "constitution_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2000-05-15"
+                    },
+                    "rfc": {
+                        "type": "string",
+                        "example": "RFC123456HDF"
+                    },
+                    "nationality_country": {
+                        "$ref": "#/components/schemas/CountryObject"
+                    },
+                    "commercial_line": {
+                        "$ref": "#/components/schemas/CommercialLineObject"
+                    },
+                    "representative_name": {
+                        "type": "string",
+                        "example": "Ana"
+                    },
+                    "representative_last_name": {
+                        "type": "string",
+                        "example": "López"
+                    },
+                    "representative_second_last_name": {
+                        "type": "string",
+                        "example": "Martínez"
+                    },
+                    "representative_birth_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "1980-07-20"
+                    },
+                    "representative_rfc": {
+                        "type": "string",
+                        "example": "RFC987654HDF"
+                    },
+                    "representative_curp": {
+                        "type": "string",
+                        "example": "CURP987654HDF"
+                    }
+                },
+                "type": "object"
+            },
+            "TrustPersonDataResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "person_type_id": {
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "trust_name": {
+                        "type": "string",
+                        "example": "Fideicomiso XYZ"
+                    },
+                    "rfc": {
+                        "type": "string",
+                        "example": "RFC123456HDF"
+                    },
+                    "registration_number": {
+                        "type": "string",
+                        "example": "REF123456"
+                    },
+                    "representative_name": {
+                        "type": "string",
+                        "example": "Carlos"
+                    },
+                    "representative_last_name": {
+                        "type": "string",
+                        "example": "Sánchez"
+                    },
+                    "representative_second_last_name": {
+                        "type": "string",
+                        "example": "Ruiz"
+                    },
+                    "representative_birth_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "1975-03-10"
+                    },
+                    "representative_rfc": {
+                        "type": "string",
+                        "example": "RFC654321HDF"
+                    },
+                    "representative_curp": {
+                        "type": "string",
+                        "example": "CURP654321HDF"
+                    }
+                },
+                "type": "object"
+            },
+            "CountryObject": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 154
+                    },
+                    "country_name": {
+                        "type": "string",
+                        "example": "Mexico"
+                    }
+                },
+                "type": "object"
+            },
+            "EconomicActivityObject": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "economic_activity": {
+                        "type": "string",
+                        "example": "Economic Activity Name"
+                    }
+                },
+                "type": "object"
+            },
+            "CommercialLineObject": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "commercial_line": {
+                        "type": "string",
+                        "example": "Commercial Line Name"
+                    }
+                },
+                "type": "object"
+            },
+            "PersonTypeObject": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "person_type": {
+                        "type": "string",
+                        "example": "Person Type Name"
+                    }
+                },
+                "type": "object"
+            }
+        },
         "responses": {
             "403": {
                 "description": "Código 2FA inválido",
@@ -20182,6 +21973,30 @@
         {
             "name": "Dashboard",
             "description": "Dashboard"
+        },
+        {
+            "name": "PLD Customer Address Data",
+            "description": "PLD Customer Address Data"
+        },
+        {
+            "name": "PLD Customer Contact Data",
+            "description": "PLD Customer Contact Data"
+        },
+        {
+            "name": "PLD Customer Owners Data",
+            "description": "PLD Customer Owners Data"
+        },
+        {
+            "name": "PLD Customer General Data",
+            "description": "PLD Customer General Data"
+        },
+        {
+            "name": "PLD Lists",
+            "description": "PLD Lists"
+        },
+        {
+            "name": "PLD",
+            "description": "PLD"
         },
         {
             "name": "ADM - Web App Profiles",
