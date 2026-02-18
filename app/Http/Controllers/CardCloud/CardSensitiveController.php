@@ -88,6 +88,7 @@ class CardSensitiveController extends Controller
             switch ($request->attributes->get('jwt')->profileId) {
                 case 5:
                     $allowed = true;
+                    $businessId = $request->attributes->get('jwt')->businessId;
                     break;
                 case 7:
                     $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
@@ -194,6 +195,7 @@ class CardSensitiveController extends Controller
             switch ($request->attributes->get('jwt')->profileId) {
                 case 5:
                     $allowed = true;
+                    $businessId = $request->attributes->get('jwt')->businessId;
                     break;
                 case 7:
                     $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
@@ -383,6 +385,7 @@ class CardSensitiveController extends Controller
             switch ($request->attributes->get('jwt')->profileId) {
                 case 5:
                     $allowed = true;
+                    $businessId = $request->attributes->get('jwt')->businessId;
                     break;
                 case 7:
                     $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)

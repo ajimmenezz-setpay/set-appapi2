@@ -105,15 +105,18 @@ class TransferController extends Controller
                 GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->auth_code);
             }
 
+            $businessId = null;
             switch ($request->attributes->get('jwt')->profileId) {
                 case 5:
                     $allowed = true;
+                    $businessId = $request->attributes->get('jwt')->businessId;
                     break;
                 case 8:
                     $cardAssigned = CardAssigned::where('CardCloudId', $request->source_card)
                         ->where('UserId', $request->attributes->get('jwt')->id)
                         ->first();
                     $allowed = $cardAssigned ? true : false;
+                    $businessId = $cardAssigned ? $cardAssigned->BusinessId : null;
                     break;
                 default:
                     $allowed = false;
@@ -127,7 +130,7 @@ class TransferController extends Controller
                 $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card_transfer', [
                     'headers' => [
                         'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id, $businessId),
                     ],
                     'json' => [
                         'source_card' => $request->source_card,
@@ -353,10 +356,12 @@ class TransferController extends Controller
                 'concept.required' => 'El concepto de la reversa es requerido',
                 'concept.max' => 'El concepto de la reversa no debe exceder los 120 caracteres'
             ]);
-
+            
+            $businessId = null;
             switch ($request->attributes->get('jwt')->profileId) {
                 case 5:
                     $allowed = true;
+                    $businessId = $request->attributes->get('jwt')->businessId;
                     break;
                 case 7:
                     $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
@@ -371,6 +376,7 @@ class TransferController extends Controller
                         ->first();
 
                     $allowed = $cards ? true : false;
+
                     break;
                 default:
                     $allowed = false;
@@ -384,7 +390,7 @@ class TransferController extends Controller
                 $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/reverse', [
                     'headers' => [
                         'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id, $businessId),
                     ],
                     'json' => [
                         'amount' => $request->amount,

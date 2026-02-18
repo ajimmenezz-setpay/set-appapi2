@@ -1479,6 +1479,7 @@ class CardManagementController extends Controller
             switch ($request->attributes->get('jwt')->profileId) {
                 case 5:
                     $allowed = true;
+                    $businessId = $request->attributes->get('jwt')->businessId;
                     break;
                 case 7:
                 case 11:
@@ -1765,6 +1766,7 @@ class CardManagementController extends Controller
         switch ($request->attributes->get('jwt')->profileId) {
             case 5:
                 $allowed = true;
+                $businessId = $request->attributes->get('jwt')->businessId;
                 break;
             case 7:
             case 10:
@@ -1893,6 +1895,7 @@ class CardManagementController extends Controller
         switch ($request->attributes->get('jwt')->profileId) {
             case 5:
                 $allowed = true;
+                $businessId = $request->attributes->get('jwt')->businessId;
                 break;
             case 7:
             case 10:
