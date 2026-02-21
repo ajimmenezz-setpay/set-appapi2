@@ -1546,8 +1546,6 @@ class CardManagementController extends Controller
 
                 if ($from > $to) return response()->json(['message' => 'Invalid date range'], 400);
 
-                Log::error("Fetching movements for card $cardId from " . $from->toDateTimeString() . " to " . $to->toDateTimeString());
-
                 $client = new Client();
                 $response = $client->request('GET', env('CARD_CLOUD_BASE_URL') . '/api/v1/card/' . $cardId . '/movements', [
                     'headers' => [

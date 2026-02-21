@@ -46,8 +46,6 @@ class CardCloudApi
 
             $response = json_decode($response->getBody()->getContents());
 
-            Log::error('CardCloud API token retrieved successfully for BusinessId: ' . $credentials->BusinessId);
-
             return $response->access_token;
         } catch (RequestException $e) {
             return null;
