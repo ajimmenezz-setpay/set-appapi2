@@ -17,7 +17,6 @@ class AppScrapperController extends Controller
             if ($response->successful()) {
                 return response()->json($response->json());
             } else {
-                Log::error('Error al obtener la información de la app desde Google Play: ' . $response->body());
                 return $this->error('Error al obtener la información de la app');
             }
         } catch (\Exception $e) {
