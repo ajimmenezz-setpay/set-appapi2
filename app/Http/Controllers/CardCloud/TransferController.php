@@ -356,7 +356,7 @@ class TransferController extends Controller
                 'concept.required' => 'El concepto de la reversa es requerido',
                 'concept.max' => 'El concepto de la reversa no debe exceder los 120 caracteres'
             ]);
-            
+
             $businessId = null;
             switch ($request->attributes->get('jwt')->profileId) {
                 case 5:
@@ -456,11 +456,66 @@ class TransferController extends Controller
                 return response("Debes permitir el acceso a la ubicación para procesar fondeos. Por favor, habilita los permisos de ubicación en el navegador y vuelve a intentarlo.", 400);
             }
 
+            $businessId = null;
+            $allowed = false;
+            switch ($request->attributes->get('jwt')->profileId) {
+                case 5:
+                    $businessId = $request->attributes->get('jwt')->businessId;
+                    $allowed = true;
+                    break;
+                case 7:
+                    $subaccount = CompaniesUsers::where('UserId', $request->attributes->get('jwt')->id)
+                        ->pluck('CompanyId')
+                        ->toArray();
+                    $cardCloudSubaccounts = Subaccount::whereIn('ExternalId', $subaccount)
+                        ->pluck('Id')
+                        ->toArray();
+                    if ($request->sourceType === 'card') {
+                        $card = Card::whereIn('SubAccountId', $cardCloudSubaccounts)
+                            ->where('UUID', $request->source)
+                            ->first();
+                        if ($card) {
+                            $allowed = true;
+                            $businessId = $request->attributes->get('jwt')->businessId;
+                        } else {
+                            $allowed = false;
+                        }
+                    } else {
+                        $cardCloudSubaccounts = Subaccount::whereIn('ExternalId', $subaccount)
+                            ->pluck('UUID')
+                            ->toArray();
+                        if (in_array($request->source, $cardCloudSubaccounts)) {
+                            $allowed = true;
+                            $businessId = $request->attributes->get('jwt')->businessId;
+                        } else {
+                            $allowed = false;
+                        }
+                    }
+                    break;
+                case 8:
+                    if ($request->sourceType === 'card') {
+                        $cardAssigned = CardAssigned::where('CardCloudId', $request->source)
+                            ->where('UserId', $request->attributes->get('jwt')->id)
+                            ->first();
+                        $allowed = $cardAssigned ? true : false;
+                        $businessId = $cardAssigned ? $cardAssigned->BusinessId : null;
+                    } else {
+                        $allowed = false;
+                    }
+                    break;
+                default:
+                    $allowed = false;
+            }
+
+            if(!$allowed) {
+                return response("No está permitido realizar esta acción con la tarjeta o cuenta especificada", 400);
+            }
+
             $client = new Client();
             $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/transfer', [
                 'headers' => [
                     'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                    'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id, $businessId),
                     'App-Location-Latitude' => $request->header('app-location-latitude'),
                     'App-Location-Longitude' => $request->header('app-location-longitude')
                 ],
