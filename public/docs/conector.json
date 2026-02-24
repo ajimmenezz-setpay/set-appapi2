@@ -9457,6 +9457,183 @@
                 ]
             }
         },
+        "/api/admin/v1/config": {
+            "get": {
+                "tags": [
+                    "ADMIN Global Configurations"
+                ],
+                "summary": "Get all global configuration settings",
+                "operationId": "getAllGlobalConfigurations",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "key": {
+                                                "type": "string"
+                                            },
+                                            "value": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/config/{key}": {
+            "get": {
+                "tags": [
+                    "ADMIN Global Configurations"
+                ],
+                "summary": "Get a specific global configuration setting by key",
+                "operationId": "getGlobalConfigurationByKey",
+                "parameters": [
+                    {
+                        "name": "key",
+                        "in": "path",
+                        "description": "The key of the configuration setting",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "key": {
+                                            "type": "string"
+                                        },
+                                        "value": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Config setting not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "ADMIN Global Configurations"
+                ],
+                "summary": "Update a specific global configuration setting by key",
+                "operationId": "updateGlobalConfigurationByKey",
+                "parameters": [
+                    {
+                        "name": "key",
+                        "in": "path",
+                        "description": "The key of the configuration setting to update",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "value": {
+                                        "description": "The new value for the configuration setting",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "404": {
+                        "description": "Config setting not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/config/{key}/history": {
+            "get": {
+                "tags": [
+                    "ADMIN Global Configurations"
+                ],
+                "summary": "Get change history for a specific global configuration setting by key",
+                "operationId": "getGlobalConfigurationHistoryByKey",
+                "parameters": [
+                    {
+                        "name": "key",
+                        "in": "path",
+                        "description": "The key of the configuration setting to retrieve history for",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "404": {
+                        "description": "Config setting not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
         "/api/admin/v1/liquidations": {
             "get": {
                 "tags": [
@@ -22039,6 +22216,10 @@
         {
             "name": "Charge Types",
             "description": "Charge Types"
+        },
+        {
+            "name": "ADMIN Global Configurations",
+            "description": "ADMIN Global Configurations"
         },
         {
             "name": "Credit Liquidations",
