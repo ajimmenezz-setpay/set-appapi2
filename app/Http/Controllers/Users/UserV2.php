@@ -6,6 +6,8 @@ use App\Exceptions\Authentication\InvalidCredentialsException;
 use Illuminate\Validation\ValidationException;
 use App\Http\Controllers\Controller;
 use App\Http\Services\JWTToken;
+use App\Models\Backoffice\Companies\CompanyProjection;
+use App\Models\Backoffice\Users\CompaniesAndUsers;
 use App\Models\User;
 use App\Models\Users\Multiprofile;
 use App\Models\Users\UserEnvironments;
@@ -138,6 +140,24 @@ class UserV2 extends Controller
                         $multiProfiles[] = [
                             'profileName' => $profile->ProfileName,
                             'environmentId' => "$env->EnvironmentId",
+                            'environmentName' => $env->Name,
+                            'token' => JWTToken::generateToken($token)
+                        ];
+                    }
+                    break;
+                case 7:
+                    $companies = CompaniesAndUsers::where('UserId', $user->Id)->groupBy('CompanyId')->pluck('CompanyId')->toArray();
+                    $environments = CompanyProjection::join('t_backoffice_business', 't_backoffice_business.Id', '=', 't_backoffice_companies_projection.BusinessId')
+                        ->whereIn('t_backoffice_companies_projection.Id', $companies)
+                        ->where('t_backoffice_business.Active', true)
+                        ->select('t_backoffice_companies_projection.BusinessId', 't_backoffice_business.Name')
+                        ->groupBy('t_backoffice_companies_projection.BusinessId', 't_backoffice_business.Name')
+                        ->get();
+                    foreach ($environments as $env) {
+                        $token = self::tokenMultiProfile($user, $profile, $env->BusinessId);
+                        $multiProfiles[] = [
+                            'profileName' => $profile->ProfileName,
+                            'environmentId' => "$env->BusinessId",
                             'environmentName' => $env->Name,
                             'token' => JWTToken::generateToken($token)
                         ];
