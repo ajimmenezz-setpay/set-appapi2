@@ -124,14 +124,14 @@ class SpeiTransferController extends Controller
             $out = $this->createSpeiTransfer($origin, $uuid, $destination, $request);
             $this->updateBalance($speiCompanyAccount['id'], $speiCompanyAccount['balance'] - $destination['amount']);
 
-            $this->processStpRequest($origin, $destination, $out, $geolocation);
+            $stpId = $this->processStpRequest($origin, $destination, $out, $geolocation);
 
             DB::commit();
 
             return response()->json([
                 'message' => 'Transferencia realizada exitosamente.',
                 'transaction_id' => $out->Id,
-                'stp_id' => $out->StpId
+                'stp_id' => $stpId
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -255,5 +255,7 @@ class SpeiTransferController extends Controller
         StpTransaction::where('Id', $out->Id)->update([
             'StpId' => $stpId
         ]);
+
+        return $stpId;
     }
 }
