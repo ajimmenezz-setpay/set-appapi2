@@ -235,8 +235,8 @@ class SpeiTransferController extends Controller
                 $geolocation['longitude']
             );
 
-            if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
-                $stpId = $response->respuesta->id;
+            if (isset($response->resultado->id) && count($response->resultado->id) > 3) {
+                $stpId = $response->resultado->id;
             } else if (isset($response->resultado->descripcionError)) {
                 throw new \Exception("No hemos podido procesar la transferencia: " . $response->resultado->descripcionError);
             } else {
@@ -246,7 +246,7 @@ class SpeiTransferController extends Controller
                     'transaction_id' => $out->Id,
                     'response' => $response
                 ]);
-                throw new \Exception("No hemos podido procesar la transferencia:" . ErrorRegisterOrder::error($response->respuesta->id));
+                throw new \Exception("No hemos podido procesar la transferencia:" . ErrorRegisterOrder::error($response->resultado->id));
             }
         } else {
             $stpId = rand(100000, 200000);
