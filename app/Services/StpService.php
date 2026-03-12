@@ -13,7 +13,7 @@ class StpService
     {
         $this->client = new Client([
             'base_uri' => $url,
-            'timeout' => 2.0,
+            'timeout' => 10.0,
         ]);
     }
 
