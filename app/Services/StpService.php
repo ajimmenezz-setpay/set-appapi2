@@ -97,7 +97,7 @@ class StpService
         ]);
 
         $finalResponse = json_decode($response->getBody()->getContents());
-        $finalResponse->request_body = $body;
+        $finalResponse->request_body = json_decode($body);
 
         return $finalResponse;
     }
