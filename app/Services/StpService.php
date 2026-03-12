@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use GuzzleHttp\Client;
-use Laravel\Reverb\Loggers\Log;
+
 
 class StpService
 {
@@ -96,9 +96,6 @@ class StpService
             'body' => $body
         ]);
 
-        $finalResponse = json_decode($response->getBody()->getContents());
-        $finalResponse->request_body = json_decode($body);
-
-        return $finalResponse;
+        return json_decode($response->getBody()->getContents());
     }
 }
