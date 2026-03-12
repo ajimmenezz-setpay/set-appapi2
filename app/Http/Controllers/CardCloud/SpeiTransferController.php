@@ -65,6 +65,15 @@ class SpeiTransferController extends Controller
 
             $this->validateBalance($speiCompanyAccount['balance'], $request->amount);
 
+            if (!$request->hasHeader('app-location-latitude') || !$request->hasHeader('app-location-longitude')) {
+                throw new \Exception('La geolocalización es requerida para realizar esta transferencia.', 400);
+            }
+
+            $geolocation = [
+                'latitude' => $request->header('app-location-latitude'),
+                'longitude' => $request->header('app-location-longitude')
+            ];
+
             /**
              * AQUI TRANSACCIONAMOS A CARD CLOUD
              */
@@ -90,7 +99,9 @@ class SpeiTransferController extends Controller
             $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/authorizations/spei', [
                 'headers' => [
                     'Content-Type' => 'application/json',
-                    'uuid' => $uuid
+                    'uuid' => $uuid,
+                    'App-Location-Latitude' => $request->header('app-location-latitude'),
+                    'App-Location-Longitude' => $request->header('app-location-longitude')
                 ],
                 'json' => [
                     'source_card_id' => $cardId,
@@ -113,7 +124,7 @@ class SpeiTransferController extends Controller
             $out = $this->createSpeiTransfer($origin, $uuid, $destination, $request);
             $this->updateBalance($speiCompanyAccount['id'], $speiCompanyAccount['balance'] - $destination['amount']);
 
-            $this->processStpRequest($origin, $destination, $out);
+            $this->processStpRequest($origin, $destination, $out, $geolocation);
 
             DB::commit();
 
@@ -199,7 +210,7 @@ class SpeiTransferController extends Controller
         ]);
     }
 
-    private function processStpRequest($origin, $destination, $out)
+    private function processStpRequest($origin, $destination, $out, $geolocation)
     {
         if (env('APP_ENV') == 'production') {
             $response = StpService::speiOut(
@@ -219,7 +230,9 @@ class SpeiTransferController extends Controller
                 "",
                 40,
                 (string)$destination['institution'],
-                40
+                40,
+                $geolocation['latitude'],
+                $geolocation['longitude']
             );
 
             if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {

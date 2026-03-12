@@ -67,7 +67,7 @@ class StpService
         return json_decode($response->getBody()->getContents());
     }
 
-    public static function speiOut($url, $key, $company, $amount, $traceKey, $concept, $originAccount, $originName, $originRfc, $beneficiaryAccount, $beneficiaryName, $reference, $institution, $beneficiaryRfc, $originAccountType, $beneficiaryInstitution, $beneficiaryAccountType)
+    public static function speiOut($url, $key, $company, $amount, $traceKey, $concept, $originAccount, $originName, $originRfc, $beneficiaryAccount, $beneficiaryName, $reference, $institution, $beneficiaryRfc, $originAccountType, $beneficiaryInstitution, $beneficiaryAccountType, $latitude = null, $longitude = null)
     {
 
         $service = new StpService($url);
@@ -89,7 +89,9 @@ class StpService
             "RfcCurpBeneficiario" => $beneficiaryRfc,
             "TipoCuentaOrdenante" => $originAccountType,
             "InstitucionContraparte" => $beneficiaryInstitution,
-            "TipoCuentaBeneficiario" => $beneficiaryAccountType
+            "TipoCuentaBeneficiario" => $beneficiaryAccountType,
+            "latitud" => $latitude,
+            "longitud" => $longitude
         ]);
 
         $response = $service->client->request('POST', '', [
