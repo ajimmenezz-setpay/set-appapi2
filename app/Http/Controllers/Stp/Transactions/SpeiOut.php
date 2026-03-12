@@ -188,7 +188,6 @@ class SpeiOut extends Controller
                     $stpId = $response->respuesta->id;
                 } else {
                     DB::rollBack();
-                    Log::error("Error al realizar la transferencia a través de STP. Respuesta: " . json_encode($response));
                     throw new \Exception("Error:" . ErrorRegisterOrder::error($response->respuesta->id));
                 }
             } else {
