@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use GuzzleHttp\Client;
-
+use Laravel\Reverb\Loggers\Log;
 
 class StpService
 {
@@ -91,6 +91,8 @@ class StpService
             "InstitucionContraparte" => $beneficiaryInstitution,
             "TipoCuentaBeneficiario" => $beneficiaryAccountType
         ]);
+
+        Log::info("Enviando solicitud de transferencia a STP", json_encode($body));
 
         $response = $service->client->request('POST', '', [
             'body' => $body
