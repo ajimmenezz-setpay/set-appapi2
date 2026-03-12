@@ -214,7 +214,7 @@ class SpeiTransferController extends Controller
                 "",
                 $destination['account'],
                 $destination['name'],
-                "",
+                random_int(1000000, 9999999),
                 "90646",
                 "",
                 40,
