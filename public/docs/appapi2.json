@@ -7773,6 +7773,68 @@
                 ]
             }
         },
+        "/api/speiCloud/institutions": {
+            "get": {
+                "tags": [
+                    "SpeiCloud Lists"
+                ],
+                "summary": "List of institutions",
+                "description": "List of institutions",
+                "operationId": "getSTPInstitutions",
+                "responses": {
+                    "200": {
+                        "description": "List of institutions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "code": {
+                                                "type": "string",
+                                                "example": "002"
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "BANAMEX"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al obtener las instituciones",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error al obtener las instituciones"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/commission/pay": {
             "post": {
                 "tags": [
@@ -9767,6 +9829,10 @@
         {
             "name": "SpeiCloud Authorization Authorizer Users",
             "description": "SpeiCloud Authorization Authorizer Users"
+        },
+        {
+            "name": "SpeiCloud Lists",
+            "description": "SpeiCloud Lists"
         },
         {
             "name": "Commissions",
