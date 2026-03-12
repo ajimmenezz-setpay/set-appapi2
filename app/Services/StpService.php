@@ -92,7 +92,9 @@ class StpService
             "TipoCuentaBeneficiario" => $beneficiaryAccountType
         ]);
 
-        Log::error("Enviando solicitud de transferencia a STP", json_encode($body));
+        Log::error("Enviando solicitud de transferencia a STP", [
+            'body_json' => $body,
+        ]);
 
         $response = $service->client->request('POST', '', [
             'body' => $body
