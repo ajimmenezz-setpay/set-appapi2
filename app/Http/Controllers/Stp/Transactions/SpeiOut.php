@@ -1141,7 +1141,7 @@ class SpeiOut extends Controller
         }
     }
 
-    public static function calculateOutCommissions($type, $amount, $commissions)
+    public static function calculateOutCommissions($type, $amount, $commissions = [])
     {
         $commissionsReturn = [
             'speiOut' => 0,

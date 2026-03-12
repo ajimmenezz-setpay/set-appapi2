@@ -192,6 +192,10 @@ class Transactions extends Controller
                         'id' => $stpAccount->Id,
                         'acronym' => $stpAccount->Acronym,
                         'number' => Crypt::decrypt($stpAccount->Number),
+                        'url' => Crypt::decrypt($stpAccount->Url),
+                        'key' => Crypt::decrypt($stpAccount->Key),
+                        'company' => $stpAccount->Company,
+                        'balance' => $stpAccount->Balance
                     ]
                 ];
             }
