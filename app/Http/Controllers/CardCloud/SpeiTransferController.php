@@ -228,7 +228,8 @@ class SpeiTransferController extends Controller
                 Log::error("Error al realizar la transferencia a través de STP. Respuesta: " . json_encode($response), [
                     'origin' => $origin,
                     'destination' => $destination,
-                    'transaction_id' => $out->Id
+                    'transaction_id' => $out->Id,
+                    'response' => $response
                 ]);
                 throw new \Exception("No hemos podido procesar la transferencia:" . ErrorRegisterOrder::error($response->respuesta->id));
             }
