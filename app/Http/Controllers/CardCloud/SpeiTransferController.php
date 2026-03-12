@@ -202,14 +202,14 @@ class SpeiTransferController extends Controller
     {
         if (env('APP_ENV') == 'production') {
             $response = StpService::speiOut(
-                $origin['stpAccount']['url'],
-                $origin['stpAccount']['key'],
-                $origin['stpAccount']['company'],
+                $origin['stpAccount']['stpAccount']['url'],
+                $origin['stpAccount']['stpAccount']['key'],
+                $origin['stpAccount']['stpAccount']['company'],
                 $destination['amount'],
                 $out->TrackingKey,
                 substr(preg_replace('/[^a-zA-Z0-9\s]/', '', $destination['description']), 0, 38),
-                $origin['stpAccount']['number'],
-                $origin['name'],
+                $origin['stpAccount']['stpAccount']['number'],
+                $origin['stpAccount']['name'],
                 "",
                 $destination['account'],
                 $destination['name'],
