@@ -206,7 +206,7 @@ class SpeiTransferController extends Controller
                 $origin['stpAccount']['stpAccount']['url'],
                 $origin['stpAccount']['stpAccount']['key'],
                 $origin['stpAccount']['stpAccount']['company'],
-                $destination['amount'],
+                number_format($destination['amount'], 2, '.', ''),
                 $out->TrackingKey,
                 substr(preg_replace('/[^a-zA-Z0-9\s]/', '', $destination['description']), 0, 38),
                 $origin['stpAccount']['stpAccount']['number'],
@@ -214,11 +214,11 @@ class SpeiTransferController extends Controller
                 "",
                 $destination['account'],
                 $destination['name'],
-                $out->Reference,
-                90646,
+                "",
+                "90646",
                 "",
                 40,
-                $destination['institution'],
+                (string)$destination['institution'],
                 40
             );
 

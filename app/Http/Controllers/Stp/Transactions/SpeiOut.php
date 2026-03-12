@@ -168,7 +168,7 @@ class SpeiOut extends Controller
                     $origin['stpAccount']['url'],
                     $origin['stpAccount']['key'],
                     $origin['stpAccount']['company'],
-                    $amount,
+                    number_format($amount, 2, '.', ''),
                     $out->TrackingKey,
                     substr(preg_replace('/[^a-zA-Z0-9\s]/', '', $concept), 0, 38),
                     $origin['stpAccount']['number'],
