@@ -225,7 +225,11 @@ class SpeiTransferController extends Controller
             if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
                 $stpId = $response->respuesta->id;
             } else {
-                Log::error("Error al realizar la transferencia a través de STP. Respuesta: " . json_encode($response));
+                Log::error("Error al realizar la transferencia a través de STP. Respuesta: " . json_encode($response), [
+                    'origin' => $origin,
+                    'destination' => $destination,
+                    'transaction_id' => $out->Id
+                ]);
                 throw new \Exception("No hemos podido procesar la transferencia:" . ErrorRegisterOrder::error($response->respuesta->id));
             }
         } else {
