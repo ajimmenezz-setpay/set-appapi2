@@ -184,7 +184,7 @@ class SpeiOut extends Controller
                     40
                 );
 
-                if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
+                if (isset($response->resultado->id) && strlen((string)abs($response->resultado->id)) > 3) {
                     $stpId = $response->respuesta->id;
                 } else {
                     DB::rollBack();

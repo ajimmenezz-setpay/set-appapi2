@@ -235,7 +235,7 @@ class SpeiTransferController extends Controller
                 $geolocation['longitude']
             );
 
-            if (isset($response->resultado->id) && count($response->resultado->id) > 3) {
+            if (isset($response->resultado->id) && strlen((string)abs($response->resultado->id)) > 3) {
                 $stpId = $response->resultado->id;
             } else if (isset($response->resultado->descripcionError)) {
                 throw new \Exception("No hemos podido procesar la transferencia: " . $response->resultado->descripcionError);
