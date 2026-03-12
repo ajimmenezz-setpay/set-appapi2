@@ -72,6 +72,8 @@ Route::middleware([VerifyJwt::class, ApiLogger::class])->group(function () {
 
             Route::post('/{cardId}/block', [App\Http\Controllers\CardCloud\CardManagementController::class, 'blockCard']);
             Route::post('/{cardId}/unblock', [App\Http\Controllers\CardCloud\CardManagementController::class, 'unblockCard']);
+
+            Route::post('/{cardId}/spei-transfer', [App\Http\Controllers\CardCloud\SpeiTransferController::class, 'transfer']);
         });
 
         Route::group(['prefix' => 'detailed-movements'], function () {
@@ -120,6 +122,10 @@ Route::middleware([VerifyJwt::class, ApiLogger::class])->group(function () {
     });
 
     Route::group(['prefix' => 'speiCloud'], function () {
+        Route::group(['prefix' => 'institutions'], function () {
+            Route::get('/', [App\Http\Controllers\SpeiCloud\Lists\Institutions::class, 'index']);
+        });
+
         Route::group(['prefix' => 'transaction'], function () {
             Route::post('/process-payments', [App\Http\Controllers\Stp\Transactions\SpeiOut::class, 'processPayments']);
         });
