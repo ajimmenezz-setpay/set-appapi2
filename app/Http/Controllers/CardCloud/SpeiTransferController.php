@@ -21,6 +21,64 @@ use Illuminate\Support\Facades\Log;
 
 class SpeiTransferController extends Controller
 {
+    /**
+     * @OA\Post(
+     *      path="/api/cardCloud/{cardId}/spei-transfer",
+     *      tags={"Card Cloud V2"},
+     *      summary="Realizar transferencia SPEI desde tarjeta card cloud",
+     *      description="Realizar transferencia SPEI desde tarjeta card cloud",
+     *      operationId="cardCloudSpeiTransfer",
+     *      security={{"bearerAuth":{}}},
+     *
+     *      @OA\Parameter(
+     *          name="cardId",
+     *          in="path",
+     *          description="ID de la tarjeta desde la que se realizará la transferencia",
+     *          required=true,
+     *          @OA\Schema(type="string")
+     *      ),
+     *
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"amount", "destination_account", "destination_name", "destination_bank"},
+     *              @OA\Property(property="amount", type="number", format="float", example=150.75, description="Monto a transferir"),
+     *              @OA\Property(property="destination_account", type="string", example="123456789012345678", description="Número de cuenta destino (18 dígitos)"),
+     *              @OA\Property(property="destination_name", type="string", example="Juan Pérez", description="Nombre del destinatario"),
+     *              @OA\Property(property="destination_bank", type="string", example="002", description="Código del banco destino (código STP)"),
+     *              @OA\Property(property="description", type="string", example="Pago de servicios", description="Descripción de la transferencia (opcional)"),
+     *              @OA\Property(property="auth_code", type="string", example="123456", description="Código de autenticación de 6 dígitos")
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Transferencia realizada exitosamente",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Transferencia realizada exitosamente."),
+     *              @OA\Property(property="transaction_id", type="string", example="c56a4180-65aa-42ec-a945-5fd21dec0538")
+     *        )
+     *     ),
+     *
+     *      @OA\Response(
+     *          response=400,
+     *          description="Error al realizar la transferencia",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="Error al realizar la transferencia"))
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="No tienes permiso para realizar esta transferencia."))
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="Unauthorized"))
+     *      )
+     * )
+     */
     public function transfer(Request $request, $cardId)
     {
         try {
@@ -74,9 +132,6 @@ class SpeiTransferController extends Controller
                 'longitude' => $request->header('app-location-longitude')
             ];
 
-            /**
-             * AQUI TRANSACCIONAMOS A CARD CLOUD
-             */
             $uuid = Uuid::uuid7()->toString();
             $description = 'CardCloud SPEI ' . $cardId . ' a ' . $request->destination_account;
             $origin = [
@@ -130,8 +185,7 @@ class SpeiTransferController extends Controller
 
             return response()->json([
                 'message' => 'Transferencia realizada exitosamente.',
-                'transaction_id' => $out->Id,
-                'stp_id' => $stpId
+                'transaction_id' => $out->Id
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
