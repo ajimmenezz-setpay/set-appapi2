@@ -68,9 +68,9 @@ class Transactions extends Controller
                     unset($companies[$company->Id]['movements']);
                 }
 
-                if ($company->Id == 'd6f8c44d-f2d7-4483-977f-12bc9e1fb8e3') {
-                    $balance = $balance - 300000;
-                }
+                // if ($company->Id == 'd6f8c44d-f2d7-4483-977f-12bc9e1fb8e3') {
+                //     $balance = $balance - 300000;
+                // }
 
                 CompanyProjection::where('Id', $company->Id)
                     ->update([
