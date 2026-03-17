@@ -57,6 +57,10 @@ class UserCardsController extends Controller
                 $decodedJson['subAccountId'] = $decodedJson['subaccount_id'] ?? null;
                 $decodedJson['companyId'] = $decodedJson['subaccount_id'] ?? null;
 
+                if ($decodedJson['status'] == 'CANCELED') {
+                    continue;
+                }
+
 
                 array_push($cardList, $decodedJson);
             }
