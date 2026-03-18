@@ -23,7 +23,7 @@ class Institutions extends Controller
      *          @OA\JsonContent(
      *              type="array",
      *              @OA\Items(
-     *                  @OA\Property(property="code", type="string", example="002"),
+     *                  @OA\Property(property="code", type="integer", example=2),
      *                  @OA\Property(property="name", type="string", example="BANAMEX")
      *              )
      *          )

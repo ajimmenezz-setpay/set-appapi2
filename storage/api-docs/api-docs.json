@@ -7791,8 +7791,8 @@
                                     "items": {
                                         "properties": {
                                             "code": {
-                                                "type": "string",
-                                                "example": "002"
+                                                "type": "integer",
+                                                "example": 2
                                             },
                                             "name": {
                                                 "type": "string",
