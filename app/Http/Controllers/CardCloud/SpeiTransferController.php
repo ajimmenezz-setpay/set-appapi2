@@ -45,7 +45,7 @@ class SpeiTransferController extends Controller
      *              @OA\Property(property="amount", type="number", format="float", example=150.75, description="Monto a transferir"),
      *              @OA\Property(property="destination_account", type="string", example="123456789012345678", description="Número de cuenta destino (18 dígitos)"),
      *              @OA\Property(property="destination_name", type="string", example="Juan Pérez", description="Nombre del destinatario"),
-     *              @OA\Property(property="destination_bank", type="string", example="002", description="Código del banco destino (código STP)"),
+     *              @OA\Property(property="destination_bank", type="integer", example=2, description="ID del banco destino"),
      *              @OA\Property(property="description", type="string", example="Pago de servicios", description="Descripción de la transferencia (opcional)"),
      *              @OA\Property(property="auth_code", type="string", example="123456", description="Código de autenticación de 6 dígitos")
      *          )
@@ -86,7 +86,7 @@ class SpeiTransferController extends Controller
                 'amount' => 'required|numeric|min:1',
                 'destination_account' => 'required|numeric|digits:18',
                 'destination_name' => 'required|string|max:100',
-                'destination_bank' => 'required|string',
+                'destination_bank' => 'required|numeric',
                 'description' => 'nullable|string|max:100'
             ], [
                 'amount.required' => 'El monto es requerido.',
@@ -99,7 +99,7 @@ class SpeiTransferController extends Controller
                 'destination_name.string' => 'El nombre del destinatario debe ser una cadena de texto.',
                 'destination_name.max' => 'El nombre del destinatario no puede exceder los 100 caracteres.',
                 'destination_bank.required' => 'El banco de destino es requerido.',
-                'destination_bank.string' => 'El banco de destino debe ser una cadena de texto.',
+                'destination_bank.numeric' => 'El banco de destino debe ser un id válido.',
                 'description.string' => 'La descripción debe ser una cadena de texto.',
                 'description.max' => 'La descripción no puede exceder los 100 caracteres.'
             ]);
@@ -116,7 +116,7 @@ class SpeiTransferController extends Controller
                 GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->auth_code);
             }
 
-            $this->validateInstitution($request->destination_bank);
+            $bankCode = $this->validateInstitution($request->destination_bank);
             $this->validateCardOwnership($cardId, $request->attributes->get('jwt')->id);
 
             $speiCompanyAccount = Transactions::searchByCompanyAccount(env('CARD_CLOUD_MAIN_STP_ACCOUNT'));
@@ -145,7 +145,7 @@ class SpeiTransferController extends Controller
             $destination = [
                 'account' => $request->destination_account,
                 'name' => $request->destination_name,
-                'institution' => $request->destination_bank,
+                'institution' => $bankCode,
                 'description' => $description,
                 'amount' => $request->amount
             ];
@@ -195,10 +195,11 @@ class SpeiTransferController extends Controller
 
     private function validateInstitution($bankCode)
     {
-        $institution = \App\Models\Speicloud\StpInstitutions::where('Code', $bankCode)->where('Active', 1)->first();
+        $institution = \App\Models\Speicloud\StpInstitutions::where('Id', $bankCode)->where('Active', 1)->first();
         if (!$institution) {
             throw new \Exception('Banco de destino no válido.', 400);
         }
+        return $institution->Code;
     }
 
     private function validateCardOwnership($cardId, $userId)
