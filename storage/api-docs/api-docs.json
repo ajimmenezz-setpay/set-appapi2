@@ -4560,9 +4560,9 @@
                                         "example": "Juan Pérez"
                                     },
                                     "destination_bank": {
-                                        "description": "Código del banco destino (código STP)",
-                                        "type": "string",
-                                        "example": "002"
+                                        "description": "ID del banco destino",
+                                        "type": "integer",
+                                        "example": 2
                                     },
                                     "description": {
                                         "description": "Descripción de la transferencia (opcional)",
