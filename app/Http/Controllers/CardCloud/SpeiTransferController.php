@@ -23,7 +23,7 @@ class SpeiTransferController extends Controller
 {
     /**
      * @OA\Post(
-     *      path="/api/cardCloud/{cardId}/spei-transfer",
+     *      path="/api/cardCloud/card/{cardId}/spei-transfer",
      *      tags={"Card Cloud V2"},
      *      summary="Realizar transferencia SPEI desde tarjeta card cloud",
      *      description="Realizar transferencia SPEI desde tarjeta card cloud",

@@ -4512,7 +4512,7 @@
                 }
             }
         },
-        "/api/cardCloud/{cardId}/spei-transfer": {
+        "/api/cardCloud/card/{cardId}/spei-transfer": {
             "post": {
                 "tags": [
                     "Card Cloud V2"
