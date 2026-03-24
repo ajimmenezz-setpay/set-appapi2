@@ -10,7 +10,7 @@ class JWTToken
     {
         $payload = [
             'iat' => time(),
-            'exp' => time() + (60 * 15), // 15 minutes expiration
+            'exp' => time() + env('JWT_EXPIRATION_TIME', 3600)
         ];
         $payload = array_merge($payload, $data);
 
