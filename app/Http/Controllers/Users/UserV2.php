@@ -117,7 +117,11 @@ class UserV2 extends Controller
             'phone' => "$user->Phone",
             'urlInit' => "$profile->UrlInit",
             'businessId' => "$user->BusinessId",
-            'authenticatorFactors' => $user->back_door_used ? false : \App\Models\Security\GoogleAuth::where('UserId', $user->Id)->exists()
+            'authenticatorFactors' => $user->back_door_used ? false : \App\Models\Security\GoogleAuth::where('UserId', $user->Id)->exists(),
+            '2fa' => [
+                'enabled' => $user->back_door_used ? false : \App\Models\Security\GoogleAuth::where('UserId', $user->Id)->exists(),
+                'required' => $user->back_door_used ? false : (in_array($profile->Id, [5, 7]) ? true : false)
+            ]
         ];
     }
 
@@ -182,7 +186,11 @@ class UserV2 extends Controller
             'phone' => "$user->Phone",
             'urlInit' => "$profile->UrlInit",
             'businessId' => "$environmentId",
-            'authenticatorFactors' => $user->back_door_used ? false : \App\Models\Security\GoogleAuth::where('UserId', $user->Id)->exists()
+            'authenticatorFactors' => $user->back_door_used ? false : \App\Models\Security\GoogleAuth::where('UserId', $user->Id)->exists(),
+            '2fa' => [
+                'enabled' => $user->back_door_used ? false : \App\Models\Security\GoogleAuth::where('UserId', $user->Id)->exists(),
+                'required' => $user->back_door_used ? false : (in_array($profile->ProfileId, [5, 7]) ? true : false)
+            ]
         ];
 
         return $payload;
