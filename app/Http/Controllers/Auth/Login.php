@@ -106,7 +106,11 @@ class Login extends Controller
                 'phone' => "$user->Phone",
                 'urlInit' => "$profile->UrlInit",
                 'businessId' => "$user->BusinessId",
-                'authenticatorFactors' => $this->has2FA($user->Id)
+                'authenticatorFactors' => $this->has2FA($user->Id),
+                '2fa' => [
+                    'enabled' => $this->has2FA($user->Id),
+                    'required' => in_array($profile->Id, [5, 7]) ? true : false
+                ]
             ];
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), $e->getCode() ?: 403);
