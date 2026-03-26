@@ -12397,6 +12397,477 @@
                 }
             }
         },
+        "/api/admin/v1/inventory/employees": {
+            "get": {
+                "tags": [
+                    "Employee Management"
+                ],
+                "summary": "List employees or bosses (Polymorphic)",
+                "description": "Get a list of employees or bosses based on query parameters. If 'searching_boss' is true, it returns bosses for the specified department. Otherwise, it returns all employees with their details.",
+                "operationId": "listEmployeesOrBosses",
+                "parameters": [
+                    {
+                        "name": "searching_boss",
+                        "in": "query",
+                        "description": "True to get bosses list",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "department_id",
+                        "in": "query",
+                        "description": "Required if searching_boss is true",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "oneOf": [
+                                            {
+                                                "$ref": "#/components/schemas/Employee"
+                                            },
+                                            {
+                                                "$ref": "#/components/schemas/Boss"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Employee Management"
+                ],
+                "summary": "Create a new employee",
+                "description": "Create a new employee with the provided details. The request body must include all required fields. The response will return the created employee's details.",
+                "operationId": "createEmployee",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "number",
+                                    "first_name",
+                                    "last_name",
+                                    "email",
+                                    "department_id",
+                                    "job_title"
+                                ],
+                                "properties": {
+                                    "number": {
+                                        "type": "string",
+                                        "example": "EMP-001"
+                                    },
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "John"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "john.doe@example.com"
+                                    },
+                                    "department_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "job_title": {
+                                        "type": "string",
+                                        "example": "Software Engineer"
+                                    },
+                                    "boss_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Employee created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Employee"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/inventory/employees/{id}": {
+            "get": {
+                "tags": [
+                    "Employee Management"
+                ],
+                "summary": "Get employee details",
+                "description": "Retrieve detailed information about a specific employee by their ID. The response includes all employee attributes along with department and boss details.",
+                "operationId": "getEmployeeDetails",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Employee"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Employee Management"
+                ],
+                "summary": "Update an employee",
+                "description": "Update the details of an existing employee. The request body must include all required fields. The response will return the updated employee's details.",
+                "operationId": "updateEmployee",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "number",
+                                    "first_name",
+                                    "last_name",
+                                    "email",
+                                    "department_id",
+                                    "job_title"
+                                ],
+                                "properties": {
+                                    "number": {
+                                        "type": "string",
+                                        "example": "EMP-001"
+                                    },
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "John"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "john.doe@example.com"
+                                    },
+                                    "department_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "job_title": {
+                                        "type": "string",
+                                        "example": "Software Engineer"
+                                    },
+                                    "boss_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Employee"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/inventory/employees/{id}/enable": {
+            "post": {
+                "tags": [
+                    "Employee Management"
+                ],
+                "summary": "Enable employee status",
+                "operationId": "9616e8d14eb244089f80cf6e6cd4f908",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Enabled successfully"
+                    }
+                }
+            }
+        },
+        "/api/admin/v1/inventory/employees/{id}/disable": {
+            "post": {
+                "tags": [
+                    "Employee Management"
+                ],
+                "summary": "Disable employee status",
+                "operationId": "bf40c19de2bc93158f5190fc00ba5439",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Disabled successfully"
+                    }
+                }
+            }
+        },
+        "/api/admin/v1/inventory/lists/departments": {
+            "get": {
+                "tags": [
+                    "ADM Staff Departments"
+                ],
+                "summary": "Get list of staff departments",
+                "operationId": "getDepartments",
+                "parameters": [
+                    {
+                        "name": "active",
+                        "in": "query",
+                        "description": "Filter by active status (true or false)",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Department"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "ADM Staff Departments"
+                ],
+                "summary": "Create a new staff department",
+                "operationId": "createDepartment",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Human Resources"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Department"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    }
+                }
+            }
+        },
+        "/api/admin/v1/inventory/lists/departments/{id}": {
+            "put": {
+                "tags": [
+                    "ADM Staff Departments"
+                ],
+                "summary": "Update an existing staff department",
+                "operationId": "updateDepartment",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "New Name"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Department"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/admin/v1/inventory/lists/departments/{id}/status": {
+            "post": {
+                "tags": [
+                    "ADM Staff Departments"
+                ],
+                "summary": "Change department status",
+                "operationId": "changeDepartmentStatus",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Status updated"
+                    }
+                }
+            }
+        },
         "/api/admin/v1/pld/customer_data/{id}/address": {
             "get": {
                 "tags": [
@@ -21138,6 +21609,99 @@
     },
     "components": {
         "schemas": {
+            "Employee": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "number": {
+                        "type": "string",
+                        "example": "EMP-001"
+                    },
+                    "first_name": {
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "john.doe@company.com"
+                    },
+                    "department_id": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "department_name": {
+                        "type": "string",
+                        "example": "Engineering"
+                    },
+                    "job_title": {
+                        "type": "string",
+                        "example": "Senior Developer"
+                    },
+                    "boss_id": {
+                        "type": "integer",
+                        "example": 5,
+                        "nullable": true
+                    },
+                    "boss_name": {
+                        "type": "string",
+                        "example": "Jane Smith",
+                        "nullable": true
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
+            "Boss": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "job_title": {
+                        "type": "string",
+                        "example": "Tech Lead"
+                    },
+                    "first_name": {
+                        "type": "string",
+                        "example": "Jane"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "example": "Smith"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
+            "Department": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Human Resources"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
             "CustomerNoAddressResponse": {
                 "properties": {
                     "id": {
@@ -22236,6 +22800,14 @@
         {
             "name": "Dashboard",
             "description": "Dashboard"
+        },
+        {
+            "name": "Employee Management",
+            "description": "Employee Management"
+        },
+        {
+            "name": "ADM Staff Departments",
+            "description": "ADM Staff Departments"
         },
         {
             "name": "PLD Customer Address Data",

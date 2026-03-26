@@ -4512,6 +4512,136 @@
                 }
             }
         },
+        "/api/cardCloud/card/{cardId}/spei-transfer": {
+            "post": {
+                "tags": [
+                    "Card Cloud V2"
+                ],
+                "summary": "Realizar transferencia SPEI desde tarjeta card cloud",
+                "description": "Realizar transferencia SPEI desde tarjeta card cloud",
+                "operationId": "cardCloudSpeiTransfer",
+                "parameters": [
+                    {
+                        "name": "cardId",
+                        "in": "path",
+                        "description": "ID de la tarjeta desde la que se realizará la transferencia",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "amount",
+                                    "destination_account",
+                                    "destination_name",
+                                    "destination_bank"
+                                ],
+                                "properties": {
+                                    "amount": {
+                                        "description": "Monto a transferir",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 150.75
+                                    },
+                                    "destination_account": {
+                                        "description": "Número de cuenta destino (18 dígitos)",
+                                        "type": "string",
+                                        "example": "123456789012345678"
+                                    },
+                                    "destination_name": {
+                                        "description": "Nombre del destinatario",
+                                        "type": "string",
+                                        "example": "Juan Pérez"
+                                    },
+                                    "destination_bank": {
+                                        "description": "ID del banco destino",
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "description": {
+                                        "description": "Descripción de la transferencia (opcional)",
+                                        "type": "string",
+                                        "example": "Pago de servicios"
+                                    },
+                                    "auth_code": {
+                                        "description": "Código de autenticación de 6 dígitos",
+                                        "type": "string",
+                                        "example": "123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Transferencia realizada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Transferencia realizada exitosamente."
+                                        },
+                                        "transaction_id": {
+                                            "type": "string",
+                                            "example": "c56a4180-65aa-42ec-a945-5fd21dec0538"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al realizar la transferencia",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error al realizar la transferencia"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "No tienes permiso para realizar esta transferencia."
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/cardCloud/card/transfer": {
             "post": {
                 "tags": [
@@ -7643,6 +7773,68 @@
                 ]
             }
         },
+        "/api/speiCloud/institutions": {
+            "get": {
+                "tags": [
+                    "SpeiCloud Lists"
+                ],
+                "summary": "List of institutions",
+                "description": "List of institutions",
+                "operationId": "getSTPInstitutions",
+                "responses": {
+                    "200": {
+                        "description": "List of institutions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "code": {
+                                                "type": "integer",
+                                                "example": 2
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "BANAMEX"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al obtener las instituciones",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Error al obtener las instituciones"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Unauthorized"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/commission/pay": {
             "post": {
                 "tags": [
@@ -9637,6 +9829,10 @@
         {
             "name": "SpeiCloud Authorization Authorizer Users",
             "description": "SpeiCloud Authorization Authorizer Users"
+        },
+        {
+            "name": "SpeiCloud Lists",
+            "description": "SpeiCloud Lists"
         },
         {
             "name": "Commissions",

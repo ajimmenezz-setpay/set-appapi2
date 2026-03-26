@@ -135,7 +135,7 @@ class ContactController extends Controller
                 $exist = Contact::where('UserId', $request->attributes->get('jwt')->id)->where('ClientId', $request->input('client_id'))->first();
                 if ($exist) throw new Exception('Ya existe un contacto con el mismo ClientId');
             } else {
-                $institution = StpInstitutions::where('Code', $request->input('institution'))->first();
+                $institution = StpInstitutions::where('Id', $request->input('institution'))->first();
                 if (!$institution) throw new Exception('La institución no existe');
 
                 if (strlen($request->input('account')) < 18) throw new Exception('La cuenta CLABE debe tener 18 dígitos');
@@ -356,7 +356,7 @@ class ContactController extends Controller
                 $exist = Contact::where('UserId', $request->attributes->get('jwt')->id)->where('ClientId', $request->input('client_id'))->where('UUID', '!=', $uuid)->first();
                 if ($exist) throw new Exception('Ya existe un contacto con el mismo ClientId');
             } else {
-                $institution = StpInstitutions::where('Code', $request->input('institution'))->first();
+                $institution = StpInstitutions::where('Id', $request->input('institution'))->first();
                 if (!$institution) throw new Exception('La institución no existe');
 
                 if (strlen($request->input('account')) < 18) throw new Exception('La cuenta CLABE debe tener 18 dígitos');
@@ -382,7 +382,7 @@ class ContactController extends Controller
 
     public static function contactObject($contact)
     {
-        $institution = $contact->Institution == 0 ? 'Card Cloud' : StpInstitutions::where('Code', $contact->Institution)->first()->ShortName;
+        $institution = $contact->Institution == 0 ? 'Card Cloud' : StpInstitutions::where('Id', $contact->Institution)->first()->ShortName;
 
         return [
             'contact_id' => $contact->UUID,

@@ -21,6 +21,64 @@ use Illuminate\Support\Facades\Log;
 
 class SpeiTransferController extends Controller
 {
+    /**
+     * @OA\Post(
+     *      path="/api/cardCloud/card/{cardId}/spei-transfer",
+     *      tags={"Card Cloud V2"},
+     *      summary="Realizar transferencia SPEI desde tarjeta card cloud",
+     *      description="Realizar transferencia SPEI desde tarjeta card cloud",
+     *      operationId="cardCloudSpeiTransfer",
+     *      security={{"bearerAuth":{}}},
+     *
+     *      @OA\Parameter(
+     *          name="cardId",
+     *          in="path",
+     *          description="ID de la tarjeta desde la que se realizará la transferencia",
+     *          required=true,
+     *          @OA\Schema(type="string")
+     *      ),
+     *
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"amount", "destination_account", "destination_name", "destination_bank"},
+     *              @OA\Property(property="amount", type="number", format="float", example=150.75, description="Monto a transferir"),
+     *              @OA\Property(property="destination_account", type="string", example="123456789012345678", description="Número de cuenta destino (18 dígitos)"),
+     *              @OA\Property(property="destination_name", type="string", example="Juan Pérez", description="Nombre del destinatario"),
+     *              @OA\Property(property="destination_bank", type="integer", example=2, description="ID del banco destino"),
+     *              @OA\Property(property="description", type="string", example="Pago de servicios", description="Descripción de la transferencia (opcional)"),
+     *              @OA\Property(property="auth_code", type="string", example="123456", description="Código de autenticación de 6 dígitos")
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Transferencia realizada exitosamente",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Transferencia realizada exitosamente."),
+     *              @OA\Property(property="transaction_id", type="string", example="c56a4180-65aa-42ec-a945-5fd21dec0538")
+     *        )
+     *     ),
+     *
+     *      @OA\Response(
+     *          response=400,
+     *          description="Error al realizar la transferencia",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="Error al realizar la transferencia"))
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="No tienes permiso para realizar esta transferencia."))
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized",
+     *          @OA\MediaType(mediaType="text/plain", @OA\Schema(type="string", example="Unauthorized"))
+     *      )
+     * )
+     */
     public function transfer(Request $request, $cardId)
     {
         try {
@@ -28,7 +86,7 @@ class SpeiTransferController extends Controller
                 'amount' => 'required|numeric|min:1',
                 'destination_account' => 'required|numeric|digits:18',
                 'destination_name' => 'required|string|max:100',
-                'destination_bank' => 'required|string',
+                'destination_bank' => 'required|numeric',
                 'description' => 'nullable|string|max:100'
             ], [
                 'amount.required' => 'El monto es requerido.',
@@ -41,7 +99,7 @@ class SpeiTransferController extends Controller
                 'destination_name.string' => 'El nombre del destinatario debe ser una cadena de texto.',
                 'destination_name.max' => 'El nombre del destinatario no puede exceder los 100 caracteres.',
                 'destination_bank.required' => 'El banco de destino es requerido.',
-                'destination_bank.string' => 'El banco de destino debe ser una cadena de texto.',
+                'destination_bank.numeric' => 'El banco de destino debe ser un id válido.',
                 'description.string' => 'La descripción debe ser una cadena de texto.',
                 'description.max' => 'La descripción no puede exceder los 100 caracteres.'
             ]);
@@ -58,7 +116,7 @@ class SpeiTransferController extends Controller
                 GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->auth_code);
             }
 
-            $this->validateInstitution($request->destination_bank);
+            $bankCode = $this->validateInstitution($request->destination_bank);
             $this->validateCardOwnership($cardId, $request->attributes->get('jwt')->id);
 
             $speiCompanyAccount = Transactions::searchByCompanyAccount(env('CARD_CLOUD_MAIN_STP_ACCOUNT'));
@@ -74,9 +132,6 @@ class SpeiTransferController extends Controller
                 'longitude' => $request->header('app-location-longitude')
             ];
 
-            /**
-             * AQUI TRANSACCIONAMOS A CARD CLOUD
-             */
             $uuid = Uuid::uuid7()->toString();
             $description = 'CardCloud SPEI ' . $cardId . ' a ' . $request->destination_account;
             $origin = [
@@ -90,7 +145,7 @@ class SpeiTransferController extends Controller
             $destination = [
                 'account' => $request->destination_account,
                 'name' => $request->destination_name,
-                'institution' => $request->destination_bank,
+                'institution' => $bankCode,
                 'description' => $description,
                 'amount' => $request->amount
             ];
@@ -130,8 +185,7 @@ class SpeiTransferController extends Controller
 
             return response()->json([
                 'message' => 'Transferencia realizada exitosamente.',
-                'transaction_id' => $out->Id,
-                'stp_id' => $stpId
+                'transaction_id' => $out->Id
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -141,10 +195,11 @@ class SpeiTransferController extends Controller
 
     private function validateInstitution($bankCode)
     {
-        $institution = \App\Models\Speicloud\StpInstitutions::where('Code', $bankCode)->where('Active', 1)->first();
+        $institution = \App\Models\Speicloud\StpInstitutions::where('Id', $bankCode)->where('Active', 1)->first();
         if (!$institution) {
             throw new \Exception('Banco de destino no válido.', 400);
         }
+        return $institution->Code;
     }
 
     private function validateCardOwnership($cardId, $userId)
