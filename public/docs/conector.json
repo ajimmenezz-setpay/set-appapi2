@@ -12397,6 +12397,454 @@
                 }
             }
         },
+        "/api/admin/v1/inventory/assets": {
+            "get": {
+                "tags": [
+                    "ADM Inventory Assets"
+                ],
+                "summary": "Get list of inventory assets",
+                "operationId": "getAssets",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/InventoryAsset"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "ADM Inventory Assets"
+                ],
+                "summary": "Create a new inventory asset",
+                "operationId": "createAsset",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InventoryAssetRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Asset created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InventoryAsset"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/inventory/assets/{id}": {
+            "get": {
+                "tags": [
+                    "ADM Inventory Assets"
+                ],
+                "summary": "Get inventory asset by ID",
+                "operationId": "getAssetById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InventoryAsset"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Asset not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "ADM Inventory Assets"
+                ],
+                "summary": "Update an existing inventory asset",
+                "operationId": "updateAsset",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InventoryAssetRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Asset updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InventoryAsset"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    },
+                    "404": {
+                        "description": "Asset not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/inventory/asset-relations/{assetId}": {
+            "get": {
+                "tags": [
+                    "Inventory Asset Relations"
+                ],
+                "summary": "Get relations for an asset",
+                "operationId": "getAssetRelations",
+                "parameters": [
+                    {
+                        "name": "assetId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "deleted",
+                        "in": "query",
+                        "description": "Include deleted relations (true or false)",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "as_parent": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/AssetRelation"
+                                            }
+                                        },
+                                        "as_child": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/AssetRelation"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Asset not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/inventory/asset-relations/{id}": {
+            "get": {
+                "tags": [
+                    "Inventory Asset Relations"
+                ],
+                "summary": "Get relation by ID",
+                "operationId": "getRelationById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AssetRelation"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Relation not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Inventory Asset Relations"
+                ],
+                "summary": "Update an existing asset relation",
+                "operationId": "updateAssetRelation",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "parent_id",
+                                    "child_id",
+                                    "relation_type_id"
+                                ],
+                                "properties": {
+                                    "parent_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "child_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "relation_type_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "example": "This asset is related to the other because..."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Relation updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AssetRelation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Relation not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Inventory Asset Relations"
+                ],
+                "summary": "Delete an asset relation",
+                "operationId": "deleteAssetRelation",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Relation deleted successfully"
+                    },
+                    "404": {
+                        "description": "Relation not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/v1/inventory/asset-relations": {
+            "post": {
+                "tags": [
+                    "Inventory Asset Relations"
+                ],
+                "summary": "Create a new asset relation",
+                "operationId": "createAssetRelation",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "parent_id",
+                                    "child_id",
+                                    "relation_type_id"
+                                ],
+                                "properties": {
+                                    "parent_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "child_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "relation_type_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "example": "This asset is related to the other because..."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Relation created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AssetRelation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/admin/v1/inventory/employees": {
             "get": {
                 "tags": [
@@ -22395,6 +22843,155 @@
     },
     "components": {
         "schemas": {
+            "InventoryAsset": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "code": {
+                        "type": "string",
+                        "example": "ASSET-001"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Laptop Dell XPS 13"
+                    },
+                    "category": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 2
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Laptops"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "status": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Operational"
+                            },
+                            "hex_color": {
+                                "type": "string",
+                                "example": "#00FF00"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "responsible": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 3
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "John Doe"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "is_pci_in_scope": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "notes": {
+                        "type": "string",
+                        "example": "This asset is used for PCI compliance testing."
+                    }
+                },
+                "type": "object"
+            },
+            "InventoryAssetRequest": {
+                "required": [
+                    "code",
+                    "name",
+                    "category_id",
+                    "status_id",
+                    "responsible_id",
+                    "is_pci_in_scope"
+                ],
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "example": "ASSET-001"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Laptop Dell XPS 13"
+                    },
+                    "category_id": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "status_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "responsible_id": {
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "is_pci_in_scope": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "notes": {
+                        "type": "string",
+                        "example": "This asset is used for PCI compliance testing."
+                    }
+                },
+                "type": "object"
+            },
+            "AssetRelation": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "parent": {
+                        "$ref": "#/components/schemas/InventoryAsset"
+                    },
+                    "child": {
+                        "$ref": "#/components/schemas/InventoryAsset"
+                    },
+                    "relation_type": {
+                        "$ref": "#/components/schemas/InventoryRelationTypeShort"
+                    },
+                    "notes": {
+                        "type": "string",
+                        "example": "This asset is related to the other because..."
+                    },
+                    "last_updated": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-01T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "InventoryRelationTypeShort": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Related to"
+                    }
+                },
+                "type": "object"
+            },
             "Employee": {
                 "properties": {
                     "id": {
@@ -23649,6 +24246,14 @@
         {
             "name": "Dashboard",
             "description": "Dashboard"
+        },
+        {
+            "name": "ADM Inventory Assets",
+            "description": "ADM Inventory Assets"
+        },
+        {
+            "name": "Inventory Asset Relations",
+            "description": "Inventory Asset Relations"
         },
         {
             "name": "Employee Management",
