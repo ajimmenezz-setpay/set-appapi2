@@ -12697,7 +12697,7 @@
                 ]
             }
         },
-        "/api/admin/v1/inventory/asset-relations/{id}": {
+        "/api/admin/v1/inventory/asset-relations/{assetId}/relation/{id}": {
             "get": {
                 "tags": [
                     "Inventory Asset Relations"
@@ -12705,6 +12705,14 @@
                 "summary": "Get relation by ID",
                 "operationId": "getRelationById",
                 "parameters": [
+                    {
+                        "name": "assetId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
                     {
                         "name": "id",
                         "in": "path",
@@ -12737,9 +12745,7 @@
                         "bearerAuth": []
                     }
                 ]
-            }
-        },
-        "/api/admin/v1/inventory/asset-relations/{assetId}/relation/{id}": {
+            },
             "put": {
                 "tags": [
                     "Inventory Asset Relations"
