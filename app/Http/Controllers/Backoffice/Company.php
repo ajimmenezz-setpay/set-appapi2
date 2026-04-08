@@ -751,15 +751,16 @@ class Company extends Controller
                             DB::table('t_backoffice_bank_accounts')
                                 ->where('Id', $availableAccount->Id)
                                 ->update(['Available' => 0]);
-
-                            $service['stpAccountId'] = "$serviceSpei->StpAccountId";
-                            $service['bankAccountId'] = "$serviceSpei->BankAccountId";
-                            $service['bankAccountNumber'] = "$serviceSpei->BankAccountNumber";
                         }
+
+                        $service['stpAccountId'] = "$serviceSpei->StpAccountId";
+                        $service['bankAccountId'] = "$serviceSpei->BankAccountId";
+                        $service['bankAccountNumber'] = "$serviceSpei->BankAccountNumber";
                     } else {
 
                         CompaniesServices::where('Id', $mainService->Id)
                             ->update(['Active' => 0, 'UpdateByUser' => $request->attributes->get('jwt')->id, 'UpdateDate' => now()]);
+
                         $service = [];
                     }
                     break;
