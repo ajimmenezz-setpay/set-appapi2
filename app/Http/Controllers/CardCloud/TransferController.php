@@ -14,6 +14,7 @@ use App\Models\Backoffice\Users\CompaniesAndUsers;
 use App\Models\Backoffice\Companies\CompaniesUsers;
 use App\Models\CardCloud\Card;
 use Exception;
+use Laravel\Reverb\Loggers\Log;
 
 class TransferController extends Controller
 {
@@ -616,7 +617,7 @@ class TransferController extends Controller
                 $client = new Client();
                 $response = $client->request('POST', env('CARD_CLOUD_BASE_URL') . '/api/v1/subaccounts/' . $request->subAccount . '/fund_layout', [
                     'headers' => [
-                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id),
+                        'Authorization' => 'Bearer ' . CardCloudApi::getToken($request->attributes->get('jwt')->id, $request->attributes->get('jwt')->businessId),
                         'App-Location-Latitude' => $request->header('app-location-latitude'),
                         'App-Location-Longitude' => $request->header('app-location-longitude')
                     ],
@@ -652,11 +653,27 @@ class TransferController extends Controller
                     $message .= " " . $decodedJson['message'];
                 }
 
+                Log::error('Error al procesar el archivo de transferencias masivas', [
+                    'user_id' => $request->attributes->get('jwt')->id,
+                    'error_message' => $message,
+                    'stack_trace' => $e->getTraceAsString()
+                ]);
+
                 return response($message, $statusCode);
             } else {
+                Log::error('Error al procesar el archivo de transferencias masivas', [
+                    'message' => $e->getMessage(),
+                    'error_message' => 'Error al procesar el archivo.',
+                    'stack_trace' => $e->getTraceAsString()
+                ]);
                 return response("Error al procesar el archivo.", 400);
             }
         } catch (\Exception $e) {
+            Log::error('Error al procesar el archivo de transferencias masivas', [
+                'user_id' => $request->attributes->get('jwt')->id,
+                'error_message' => $e->getMessage(),
+                'stack_trace' => $e->getTraceAsString()
+            ]);
             return self::basicError($e->getMessage());
         }
     }
