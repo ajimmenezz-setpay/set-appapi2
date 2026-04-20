@@ -1190,7 +1190,7 @@ class SpeiOut extends Controller
                     $destination['account'],
                     $destination['name'],
                     $out->Reference,
-                    90646,
+                    $destination['institution'] ?? 90646,
                     "",
                     40,
                     90646,
