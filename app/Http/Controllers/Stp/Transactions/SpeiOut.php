@@ -68,7 +68,7 @@ class SpeiOut extends Controller
 
             $file = $request->file('file');
 
-            GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->input('googleAuthenticatorCode'));
+            // GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->input('googleAuthenticatorCode'));
 
             $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getPathname());
             $sheet = $spreadsheet->getSheet(0);
@@ -131,17 +131,19 @@ class SpeiOut extends Controller
                 $commissionsType = $destination['type'] == 'external-account' ? 'external' : 'internal';
                 $commissions = self::calculateOutCommissions($commissionsType, $data[2], $origin['commissions']);
 
+                $totalAmount += $data[2];
+                $totalCommissions += $commissions['total'] - $data[2];
+
                 $actions[] = [
                     'destination' => $destination,
-                    'commissions' => $commissions,
+                    'comission' => $commissions['total'],
                     'beneficiary' => $data[0],
                     'clabe' => $data[1],
                     'amount' => $data[2],
                     'concept' => $data[3],
                     'bank' => $bank,
                 ];
-                $totalAmount += $data[2];
-                $totalCommissions += $commissions['total'] - $data[2];
+
                 $row++;
             }
 
@@ -180,6 +182,7 @@ class SpeiOut extends Controller
                         'destinationsAccount' => $handler['destinationsAccount'],
                         'url'  => $handler['url']
                     ];
+                    $origin['balance'] -= $action['amount'] + ($action['comission'] - $action['amount']);
                 }
             } catch (\Exception $e) {
                 $errors[] = $e->getMessage();
@@ -204,7 +207,7 @@ class SpeiOut extends Controller
         $calculatedCheckDigit = (10 - ($sum % 10)) % 10;
         $checkDigit = intval($clabe[17]);
         if ($calculatedCheckDigit !== $checkDigit) {
-            throw new \Exception('La CLABE no es válida. El dígito verificador es incorrecto.');
+            throw new \Exception('La CLABE ' . $clabe . ' no es válida. El dígito verificador es incorrecto.');
         }
         return $bank;
     }
