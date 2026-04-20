@@ -47,6 +47,46 @@ class SpeiOut extends Controller
         ],
     ];
 
+    /**
+     * @OA\Post(
+     *      path="/api/speiCloud/transaction/processPaymentsFile",
+     *      summary="Procesar pagos desde un archivo",
+     *      description="Este endpoint permite procesar múltiples pagos desde un archivo Excel",
+     *      tags={"SPEI Cloud"},
+     *      operationId="processPaymentsFile",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\RequestBody(
+     *          @OA\MediaType(
+     *              mediaType="multipart/form-data",
+     *              @OA\Schema(
+     *                  @OA\Property(
+     *                      property="origin_account",
+     *                      type="string",
+     *                      description="Cuenta de origen"
+     *                  ),
+     *                  @OA\Property(
+     *                      property="file",
+     *                      type="file",
+     *                      description="Archivo Excel con los datos de los pagos"
+     *                  ),
+     *                  @OA\Property(
+     *                      property="googleAuthenticatorCode",
+     *                      type="string",
+     *                      description="Código de Google Authenticator"
+     *                  )
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Operación exitosa"
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Solicitud inválida"
+     *      )
+     * )
+     */
     public function processPaymentsFile(Request $request)
     {
         try {

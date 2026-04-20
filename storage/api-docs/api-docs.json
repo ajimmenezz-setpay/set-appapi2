@@ -7900,6 +7900,52 @@
                 ]
             }
         },
+        "/api/speiCloud/transaction/processPaymentsFile": {
+            "post": {
+                "tags": [
+                    "SPEI Cloud"
+                ],
+                "summary": "Procesar pagos desde un archivo",
+                "description": "Este endpoint permite procesar múltiples pagos desde un archivo Excel",
+                "operationId": "processPaymentsFile",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "origin_account": {
+                                        "description": "Cuenta de origen",
+                                        "type": "string"
+                                    },
+                                    "file": {
+                                        "description": "Archivo Excel con los datos de los pagos",
+                                        "type": "file"
+                                    },
+                                    "googleAuthenticatorCode": {
+                                        "description": "Código de Google Authenticator",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "400": {
+                        "description": "Solicitud inválida"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/ticket": {
             "get": {
                 "tags": [
@@ -9837,6 +9883,10 @@
         {
             "name": "Commissions",
             "description": "Commissions"
+        },
+        {
+            "name": "SPEI Cloud",
+            "description": "SPEI Cloud"
         },
         {
             "name": "Ticket",
