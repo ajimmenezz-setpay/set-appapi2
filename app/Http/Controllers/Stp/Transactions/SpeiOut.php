@@ -1190,10 +1190,10 @@ class SpeiOut extends Controller
                     $destination['account'],
                     $destination['name'],
                     $out->Reference,
-                    $destination['institution'] ?? 90646,
+                    90646,
                     "",
                     40,
-                    90646,
+                    $destination['institution'] ?? 90646,
                     40,
                     $request->hasHeader('app-location-latitude') ? $request->header('app-location-latitude') : null,
                     $request->hasHeader('app-location-longitude') ? $request->header('app-location-longitude') : null
