@@ -148,7 +148,7 @@ class SpeiOut extends Controller
             }
 
             if ($origin['balance'] < ($totalAmount + $totalCommissions)) {
-                throw new \Exception('No hay suficiente saldo en la cuenta de origen para realizar las transferencias. Saldo disponible: ' . $origin['balance'] . ', monto total a transferir (incluyendo comisiones): ' . ($totalAmount + $totalCommissions));
+                throw new \Exception('No hay suficiente saldo en la cuenta de origen para realizar las transferencias. Saldo disponible: $' . number_format($origin['balance'], 2, '.', ',') . ', monto total a transferir (incluyendo comisiones): $' . number_format($totalAmount + $totalCommissions, 2, '.', ','));
             }
 
             $processResults = $this->processPaymentsFileActions($origin, $actions, $request);
@@ -180,7 +180,10 @@ class SpeiOut extends Controller
                 } else {
                     $destinos[] = [
                         'destinationsAccount' => $handler['destinationsAccount'],
-                        'url'  => $handler['url']
+                        'url'  => $handler['url'],
+                        'balance' => $origin['balance'],
+                        'amount' => $action['amount'],
+                        'comission' => $action['comission'] - $action['amount']
                     ];
                     $origin['balance'] -= $action['amount'] + ($action['comission'] - $action['amount']);
                 }
@@ -369,6 +372,7 @@ class SpeiOut extends Controller
                 }
             } else {
                 $stpId = "1111111111";
+                sleep(1);
             }
 
             StpTransaction::where('Id', $out->Id)->update([
@@ -448,6 +452,7 @@ class SpeiOut extends Controller
                     }
                 } else {
                     $stpId = "1111111111";
+                    sleep(1);
                 }
 
                 StpTransaction::where('Id', $out->Id)->update([
@@ -544,6 +549,7 @@ class SpeiOut extends Controller
                     }
                 } else {
                     $stpId = "1111111111";
+                    sleep(1);
                 }
 
                 StpTransaction::where('Id', $out->Id)->update([
@@ -640,6 +646,7 @@ class SpeiOut extends Controller
                     }
                 } else {
                     $stpId = "1111111111";
+                    sleep(1);
                 }
 
                 StpTransaction::where('Id', $out->Id)->update([
@@ -707,6 +714,7 @@ class SpeiOut extends Controller
                 }
             } else {
                 $stpId = "1111111111";
+                sleep(1);
             }
 
             StpTransaction::where('Id', $out->Id)->update([
@@ -787,6 +795,7 @@ class SpeiOut extends Controller
                     }
                 } else {
                     $stpId = "1111111111";
+                    sleep(1);
                 }
 
                 StpTransaction::where('Id', $out->Id)->update([
@@ -869,6 +878,7 @@ class SpeiOut extends Controller
                     }
                 } else {
                     $stpId = "1111111111";
+                    sleep(1);
                 }
 
                 StpTransaction::where('Id', $out->Id)->update([
@@ -965,6 +975,7 @@ class SpeiOut extends Controller
                     }
                 } else {
                     $stpId = "1111111111";
+                    sleep(1);
                 }
 
                 StpTransaction::where('Id', $out->Id)->update([
@@ -1061,6 +1072,7 @@ class SpeiOut extends Controller
                     }
                 } else {
                     $stpId = "1111111111";
+                    sleep(1);
                 }
 
                 StpTransaction::where('Id', $out->Id)->update([
@@ -1129,6 +1141,7 @@ class SpeiOut extends Controller
                 }
             } else {
                 $stpId = "1111111111";
+                sleep(1);
             }
 
             StpTransaction::where('Id', $out->Id)->update([
