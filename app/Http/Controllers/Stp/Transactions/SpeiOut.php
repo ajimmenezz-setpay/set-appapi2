@@ -201,11 +201,11 @@ class SpeiOut extends Controller
             $processResults = $this->processPaymentsFileActions($origin, $actions, $request);
 
             BackofficeCompany::where('Id', $origin['id'])->update([
-                'Balance' => $origin['balance'] - ($totalAmount + $totalCommissions)
+                'Balance' => $processResults['balance']
             ]);
 
             CompanyProjection::where('Id', $origin['id'])->update([
-                'Balance' => $origin['balance'] - ($totalAmount + $totalCommissions)
+                'Balance' => $processResults['balance']
             ]);
 
 
@@ -247,7 +247,7 @@ class SpeiOut extends Controller
                 $errors[] = $e->getMessage();
             }
         }
-        return ['destinos' => $destinos, 'errors' => $errors];
+        return ['destinos' => $destinos, 'errors' => $errors, 'balance' => $origin['balance']];
     }
 
     public function validateClabe($clabe)
