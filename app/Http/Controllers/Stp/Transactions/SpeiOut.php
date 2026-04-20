@@ -10,6 +10,7 @@ use App\Http\Controllers\Stp\ErrorRegisterOrder;
 use App\Http\Controllers\Stp\Transactions\Transactions;
 use App\Models\Backoffice\Companies\Company;
 use App\Models\Backoffice\Companies\CompanyProjection;
+use App\Models\Backoffice\Company as BackofficeCompany;
 use App\Models\Speicloud\StpAccounts;
 use App\Models\Speicloud\StpTransaction;
 use App\Services\StpService;
@@ -198,6 +199,15 @@ class SpeiOut extends Controller
             }
 
             $processResults = $this->processPaymentsFileActions($origin, $actions, $request);
+
+            BackofficeCompany::where('Id', $origin['id'])->update([
+                'Balance' => $origin['balance'] - ($totalAmount + $totalCommissions)
+            ]);
+
+            CompanyProjection::where('Id', $origin['id'])->update([
+                'Balance' => $origin['balance'] - ($totalAmount + $totalCommissions)
+            ]);
+
 
             if (count($processResults['errors']) > 0) {
                 return response()->json([
@@ -412,11 +422,28 @@ class SpeiOut extends Controller
                     $request->hasHeader('app-location-longitude') ? $request->header('app-location-longitude') : null
                 );
 
-                if (isset($response->resultado->id) && strlen((string)abs($response->resultado->id)) > 3) {
+                $stpId = null;
+
+                if (isset($response->respuesta->id)) {
                     $stpId = $response->respuesta->id;
+                } else if (isset($response->resultado->id)) {
+                    $stpId = $response->resultado->id;
+                }
+
+                
+                if ($stpId && strlen((string)$stpId) > 3) {
+
+                    // ¡ÉXITO! Aquí va el código que guarda en DB y confirma la transferencia
+                    // No lances excepción aquí.
+
                 } else {
+                    // ¡ERROR! Solo entramos aquí si NO hay un ID válido
                     DB::rollBack();
-                    throw new \Exception("Error:" . ErrorRegisterOrder::error($response->respuesta->id));
+                    Log::channel('spei_out')->error("Error STP API", ['response' => $response]);
+
+                    // Intentamos obtener un código de error si existe, si no, mandamos el objeto completo
+                    $errorCode = $response->respuesta->descripcion ?? 'Error desconocido';
+                    throw new \Exception("Error STP: " . $errorCode);
                 }
             } else {
                 $stpId = "1111111111";
@@ -494,11 +521,28 @@ class SpeiOut extends Controller
                         $request->hasHeader('app-location-longitude') ? $request->header('app-location-longitude') : null
                     );
 
-                    if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
+                    $stpId = null;
+
+                    if (isset($response->respuesta->id)) {
                         $stpId = $response->respuesta->id;
+                    } else if (isset($response->resultado->id)) {
+                        $stpId = $response->resultado->id;
+                    }
+
+                    
+                    if ($stpId && strlen((string)$stpId) > 3) {
+
+                        // ¡ÉXITO! Aquí va el código que guarda en DB y confirma la transferencia
+                        // No lances excepción aquí.
+
                     } else {
+                        // ¡ERROR! Solo entramos aquí si NO hay un ID válido
                         DB::rollBack();
-                        throw new \Exception("Error:" . ErrorRegisterOrder::error($response->respuesta->id));
+                        Log::channel('spei_out')->error("Error STP API", ['response' => $response]);
+
+                        // Intentamos obtener un código de error si existe, si no, mandamos el objeto completo
+                        $errorCode = $response->respuesta->descripcion ?? 'Error desconocido';
+                        throw new \Exception("Error STP: " . $errorCode);
                     }
                 } else {
                     $stpId = "1111111111";
@@ -593,11 +637,28 @@ class SpeiOut extends Controller
                         $request->hasHeader('app-location-longitude') ? $request->header('app-location-longitude') : null
                     );
 
-                    if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
+                    $stpId = null;
+
+                    if (isset($response->respuesta->id)) {
                         $stpId = $response->respuesta->id;
+                    } else if (isset($response->resultado->id)) {
+                        $stpId = $response->resultado->id;
+                    }
+
+                    
+                    if ($stpId && strlen((string)$stpId) > 3) {
+
+                        // ¡ÉXITO! Aquí va el código que guarda en DB y confirma la transferencia
+                        // No lances excepción aquí.
+
                     } else {
+                        // ¡ERROR! Solo entramos aquí si NO hay un ID válido
                         DB::rollBack();
-                        throw new \Exception("Error:" . ErrorRegisterOrder::error($response->respuesta->id));
+                        Log::channel('spei_out')->error("Error STP API", ['response' => $response]);
+
+                        // Intentamos obtener un código de error si existe, si no, mandamos el objeto completo
+                        $errorCode = $response->respuesta->descripcion ?? 'Error desconocido';
+                        throw new \Exception("Error STP: " . $errorCode);
                     }
                 } else {
                     $stpId = "1111111111";
@@ -692,11 +753,28 @@ class SpeiOut extends Controller
                         $request->hasHeader('app-location-longitude') ? $request->header('app-location-longitude') : null
                     );
 
-                    if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
+                    $stpId = null;
+
+                    if (isset($response->respuesta->id)) {
                         $stpId = $response->respuesta->id;
+                    } else if (isset($response->resultado->id)) {
+                        $stpId = $response->resultado->id;
+                    }
+
+                    
+                    if ($stpId && strlen((string)$stpId) > 3) {
+
+                        // ¡ÉXITO! Aquí va el código que guarda en DB y confirma la transferencia
+                        // No lances excepción aquí.
+
                     } else {
+                        // ¡ERROR! Solo entramos aquí si NO hay un ID válido
                         DB::rollBack();
-                        throw new \Exception("Error:" . ErrorRegisterOrder::error($response->respuesta->id));
+                        Log::channel('spei_out')->error("Error STP API", ['response' => $response]);
+
+                        // Intentamos obtener un código de error si existe, si no, mandamos el objeto completo
+                        $errorCode = $response->respuesta->descripcion ?? 'Error desconocido';
+                        throw new \Exception("Error STP: " . $errorCode);
                     }
                 } else {
                     $stpId = "1111111111";
@@ -845,11 +923,28 @@ class SpeiOut extends Controller
                         $request->hasHeader('app-location-longitude') ? $request->header('app-location-longitude') : null
                     );
 
-                    if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
+                    $stpId = null;
+
+                    if (isset($response->respuesta->id)) {
                         $stpId = $response->respuesta->id;
+                    } else if (isset($response->resultado->id)) {
+                        $stpId = $response->resultado->id;
+                    }
+
+                    
+                    if ($stpId && strlen((string)$stpId) > 3) {
+
+                        // ¡ÉXITO! Aquí va el código que guarda en DB y confirma la transferencia
+                        // No lances excepción aquí.
+
                     } else {
+                        // ¡ERROR! Solo entramos aquí si NO hay un ID válido
                         DB::rollBack();
-                        throw new \Exception("Error:" . ErrorRegisterOrder::error($response->respuesta->id));
+                        Log::channel('spei_out')->error("Error STP API", ['response' => $response]);
+
+                        // Intentamos obtener un código de error si existe, si no, mandamos el objeto completo
+                        $errorCode = $response->respuesta->descripcion ?? 'Error desconocido';
+                        throw new \Exception("Error STP: " . $errorCode);
                     }
                 } else {
                     $stpId = "1111111111";
@@ -930,11 +1025,28 @@ class SpeiOut extends Controller
                         $request->hasHeader('app-location-longitude') ? $request->header('app-location-longitude') : null
                     );
 
-                    if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
+                    $stpId = null;
+
+                    if (isset($response->respuesta->id)) {
                         $stpId = $response->respuesta->id;
+                    } else if (isset($response->resultado->id)) {
+                        $stpId = $response->resultado->id;
+                    }
+
+                    
+                    if ($stpId && strlen((string)$stpId) > 3) {
+
+                        // ¡ÉXITO! Aquí va el código que guarda en DB y confirma la transferencia
+                        // No lances excepción aquí.
+
                     } else {
+                        // ¡ERROR! Solo entramos aquí si NO hay un ID válido
                         DB::rollBack();
-                        throw new \Exception("Error:" . ErrorRegisterOrder::error($response->respuesta->id));
+                        Log::channel('spei_out')->error("Error STP API", ['response' => $response]);
+
+                        // Intentamos obtener un código de error si existe, si no, mandamos el objeto completo
+                        $errorCode = $response->respuesta->descripcion ?? 'Error desconocido';
+                        throw new \Exception("Error STP: " . $errorCode);
                     }
                 } else {
                     $stpId = "1111111111";
@@ -1030,10 +1142,28 @@ class SpeiOut extends Controller
                         $request->hasHeader('app-location-longitude') ? $request->header('app-location-longitude') : null
                     );
 
-                    if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
+                    $stpId = null;
+
+                    if (isset($response->respuesta->id)) {
                         $stpId = $response->respuesta->id;
+                    } else if (isset($response->resultado->id)) {
+                        $stpId = $response->resultado->id;
+                    }
+
+                    
+                    if ($stpId && strlen((string)$stpId) > 3) {
+
+                        // ¡ÉXITO! Aquí va el código que guarda en DB y confirma la transferencia
+                        // No lances excepción aquí.
+
                     } else {
-                        throw new \Exception("Error:" . ErrorRegisterOrder::error($response->respuesta->id));
+                        // ¡ERROR! Solo entramos aquí si NO hay un ID válido
+                        DB::rollBack();
+                        Log::channel('spei_out')->error("Error STP API", ['response' => $response]);
+
+                        // Intentamos obtener un código de error si existe, si no, mandamos el objeto completo
+                        $errorCode = $response->respuesta->descripcion ?? 'Error desconocido';
+                        throw new \Exception("Error STP: " . $errorCode);
                     }
                 } else {
                     $stpId = "1111111111";
@@ -1129,10 +1259,28 @@ class SpeiOut extends Controller
                         $request->hasHeader('app-location-longitude') ? $request->header('app-location-longitude') : null
                     );
 
-                    if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
+                    $stpId = null;
+
+                    if (isset($response->respuesta->id)) {
                         $stpId = $response->respuesta->id;
+                    } else if (isset($response->resultado->id)) {
+                        $stpId = $response->resultado->id;
+                    }
+
+                    
+                    if ($stpId && strlen((string)$stpId) > 3) {
+
+                        // ¡ÉXITO! Aquí va el código que guarda en DB y confirma la transferencia
+                        // No lances excepción aquí.
+
                     } else {
-                        throw new \Exception("Error:" . ErrorRegisterOrder::error($response->respuesta->id));
+                        // ¡ERROR! Solo entramos aquí si NO hay un ID válido
+                        DB::rollBack();
+                        Log::channel('spei_out')->error("Error STP API", ['response' => $response]);
+
+                        // Intentamos obtener un código de error si existe, si no, mandamos el objeto completo
+                        $errorCode = $response->respuesta->descripcion ?? 'Error desconocido';
+                        throw new \Exception("Error STP: " . $errorCode);
                     }
                 } else {
                     $stpId = "1111111111";
@@ -1199,7 +1347,6 @@ class SpeiOut extends Controller
                     $request->hasHeader('app-location-longitude') ? $request->header('app-location-longitude') : null
                 );
 
-                // 1. Extraemos el ID buscando en ambas estructuras posibles
                 $stpId = null;
 
                 if (isset($response->respuesta->id)) {
@@ -1208,7 +1355,7 @@ class SpeiOut extends Controller
                     $stpId = $response->resultado->id;
                 }
 
-                // 2. Validamos si obtuvimos un ID válido (mayor a 3 caracteres por seguridad)
+                
                 if ($stpId && strlen((string)$stpId) > 3) {
 
                     // ¡ÉXITO! Aquí va el código que guarda en DB y confirma la transferencia
