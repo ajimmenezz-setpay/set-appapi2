@@ -1201,6 +1201,8 @@ class SpeiOut extends Controller
 
                 if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
                     $stpId = $response->respuesta->id;
+                } else if(isset($response->stdClass->resultado->id) && count($response->stdClass->respuesta->id) > 3){
+                    $stpId = $response->stdClass->respuesta->id;
                 } else {
                     DB::rollBack();
                     Log::channel('spei_out')->error(
