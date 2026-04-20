@@ -89,6 +89,8 @@ class SpeiOut extends Controller
      */
     public function processPaymentsFile(Request $request)
     {
+        ini_set('max_execution_time', 14400);
+        set_time_limit(14400);
         try {
             $request->validate([
                 'origin_account' => 'required|string|min:18|max:18',
