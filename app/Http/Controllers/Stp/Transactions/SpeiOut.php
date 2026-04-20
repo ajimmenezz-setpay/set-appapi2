@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Exception\RequestException;
+use App\Models\Speicloud\StpInstitutions;
 
 class SpeiOut extends Controller
 {
@@ -46,12 +47,185 @@ class SpeiOut extends Controller
         ],
     ];
 
+    public function processPaymentsFile(Request $request)
+    {
+        try {
+            $request->validate([
+                'origin_account' => 'required|string|min:18|max:18',
+                'file' => 'required|file|mimes:xlsx',
+                'googleAuthenticatorCode' => 'required|string'
+            ], [
+                'origin_account.required' => 'La cuenta de origen es requerida',
+                'origin_account.string' => 'La cuenta de origen debe ser una cadena de texto',
+                'origin_account.min' => 'La cuenta de origen debe tener 18 caracteres',
+                'origin_account.max' => 'La cuenta de origen debe tener 18 caracteres',
+                'file.required' => 'El archivo es requerido',
+                'file.file' => 'El archivo debe ser un archivo válido',
+                'file.mimes' => 'El archivo debe ser un archivo de Excel (.xlsx)',
+                'googleAuthenticatorCode.required' => 'El código de Google Authenticator es requerido',
+                'googleAuthenticatorCode.string' => 'El código de Google Authenticator debe ser una cadena de texto'
+            ]);
+
+            $file = $request->file('file');
+
+            GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->input('googleAuthenticatorCode'));
+
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getPathname());
+            $sheet = $spreadsheet->getSheet(0);
+            $header = $sheet->rangeToArray('A1:D1')[0];
+            $expectedHeader = ['Beneficiario', 'CLABE', 'Monto', 'Concepto'];
+            if ($header !== $expectedHeader) {
+                throw new \Exception('El archivo no tiene la estructura correcta, las columnas deben ser: Beneficiario, CLABE, Monto, Concepto');
+            }
+
+            $actions = [];
+            $row = 2;
+            $origin = Transactions::searchByCompanyAccount($request->input('origin_account'));
+            $totalAmount = 0;
+            $totalCommissions = 0;
+
+            while (true) {
+                $data = $sheet->rangeToArray('A' . $row . ':D' . $row)[0];
+                if (empty(array_filter($data))) {
+                    break;
+                }
+
+                if (strlen($data[0]) > 100) {
+                    throw new \Exception('El beneficiario en la fila ' . $row . ' no es válido. La longitud máxima permitida es de 100 caracteres.');
+                }
+
+                if (!preg_match('/^\d{18}$/', $data[1])) {
+                    throw new \Exception('La CLABE en la fila ' . $row . ' no es válida. Asegúrate de que tenga 18 dígitos y solo contenga números.');
+                }
+
+                if (!is_numeric($data[2]) || $data[2] <= 0 || !preg_match('/^\d+(\.\d{1,2})?$/', $data[2])) {
+                    throw new \Exception('El monto en la fila ' . $row . ' no es válido. Asegúrate de que sea un número mayor a 0 y con máximo dos decimales.');
+                }
+
+                if (empty(trim($data[3]))) {
+                    $data[3] = "Transferencia";
+                } else {
+                    if (strlen($data[3]) > 38) {
+                        throw new \Exception('El concepto en la fila ' . $row . ' no es válido. La longitud máxima permitida es de 38 caracteres.');
+                    }
+
+                    if (preg_match('/[^a-zA-Z0-9\s]/', $data[3])) {
+                        throw new \Exception('El concepto en la fila ' . $row . ' no es válido. No se permiten caracteres especiales.');
+                    }
+                }
+
+                $bank = $this->validateClabe($data[1]);
+
+                $destination = $this->getDestination($data[1]);
+                if (is_null($destination)) {
+                    $destination = [
+                        'type' => 'external-account',
+                        'business' => 0,
+                        'balance' => 0,
+                        'account' => $data[1],
+                        'name' => $data[0],
+                        'institution' => $bank->Code
+                    ];
+                }
+
+                $commissionsType = $destination['type'] == 'external-account' ? 'external' : 'internal';
+                $commissions = self::calculateOutCommissions($commissionsType, $data[2], $origin['commissions']);
+
+                $actions[] = [
+                    'destination' => $destination,
+                    'commissions' => $commissions,
+                    'beneficiary' => $data[0],
+                    'clabe' => $data[1],
+                    'amount' => $data[2],
+                    'concept' => $data[3],
+                    'bank' => $bank,
+                ];
+                $totalAmount += $data[2];
+                $totalCommissions += $commissions['total'] - $data[2];
+                $row++;
+            }
+
+            if ($origin['balance'] < ($totalAmount + $totalCommissions)) {
+                throw new \Exception('No hay suficiente saldo en la cuenta de origen para realizar las transferencias. Saldo disponible: ' . $origin['balance'] . ', monto total a transferir (incluyendo comisiones): ' . ($totalAmount + $totalCommissions));
+            }
+
+            $processResults = $this->processPaymentsFileActions($origin, $actions, $request);
+
+            if (count($processResults['errors']) > 0) {
+                return response()->json([
+                    'error' => $processResults['errors'],
+                    'destinos' => $processResults['destinos']
+                ]);
+            }
+
+            return response()->json($processResults['destinos']);
+        } catch (\Exception $e) {
+            return self::basicError($e->getMessage());
+        }
+    }
+
+    public function processPaymentsFileActions($origin, $actions, $paymentRequest = null)
+    {
+        $destinos = [];
+        $errors = [];
+
+        foreach ($actions as $action) {
+            try {
+                $method = self::$handlers[$origin['type']][$action['destination']['type']];
+                $handler = self::$method($origin, $action['destination'], $action['amount'], $action['concept'], $paymentRequest);
+                if (isset($handler['error'])) {
+                    $errors[] = $handler['error'];
+                } else {
+                    $destinos[] = [
+                        'destinationsAccount' => $handler['destinationsAccount'],
+                        'url'  => $handler['url']
+                    ];
+                }
+            } catch (\Exception $e) {
+                $errors[] = $e->getMessage();
+            }
+        }
+        return ['destinos' => $destinos, 'errors' => $errors];
+    }
+
+    public function validateClabe($clabe)
+    {
+        if (!preg_match('/^\d{18}$/', $clabe)) {
+            throw new \Exception('La CLABE no es válida. Asegúrate de que tenga 18 dígitos y solo contenga números.');
+        }
+
+        $bank = $this->getInstitutionCodeByClabe($clabe);
+
+        $weights = [3, 7, 1];
+        $sum = 0;
+        for ($i = 0; $i < 17; $i++) {
+            $sum += intval($clabe[$i]) * $weights[$i % 3];
+        }
+        $calculatedCheckDigit = (10 - ($sum % 10)) % 10;
+        $checkDigit = intval($clabe[17]);
+        if ($calculatedCheckDigit !== $checkDigit) {
+            throw new \Exception('La CLABE no es válida. El dígito verificador es incorrecto.');
+        }
+        return $bank;
+    }
+
+    public static function getInstitutionCodeByClabe($clabe)
+    {
+        $bankCode = substr($clabe, 0, 3);
+        $bank = StpInstitutions::where('Code', 'like', '%' . $bankCode)->first();
+        if (isset($bank->Id)) {
+            return $bank;
+        } else {
+            throw new \Exception('No se encontró el banco para la CLABE proporcionada');
+        }
+    }
+
     public function processPayments(Request $request)
     {
         try {
             $actions = Crypt::opensslDecrypt($request->all());
             $actions = json_decode($actions);
-            // GoogleAuth::authorized($request->attributes->get('jwt')->id, $actions->googleAuthenticatorCode);
+            GoogleAuth::authorized($request->attributes->get('jwt')->id, $actions->googleAuthenticatorCode);
 
             $origin = $this->getOrigin($actions->originBankAccount);
 

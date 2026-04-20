@@ -128,6 +128,7 @@ Route::middleware([VerifyJwt::class, ApiLogger::class])->group(function () {
 
         Route::group(['prefix' => 'transaction'], function () {
             Route::post('/process-payments', [App\Http\Controllers\Stp\Transactions\SpeiOut::class, 'processPayments']);
+            Route::post('/process-payments-from-file', [App\Http\Controllers\Stp\Transactions\SpeiOut::class, 'processPaymentsFile']);
         });
 
         Route::group(['prefix' => 'authorization'], function () {
