@@ -1199,20 +1199,29 @@ class SpeiOut extends Controller
                     $request->hasHeader('app-location-longitude') ? $request->header('app-location-longitude') : null
                 );
 
-                if (isset($response->respuesta->id) && strlen((string)$response->respuesta->id) > 3) {
+                // 1. Extraemos el ID buscando en ambas estructuras posibles
+                $stpId = null;
+
+                if (isset($response->respuesta->id)) {
                     $stpId = $response->respuesta->id;
-
-                } else if (isset($response->stdClass->resultado->id) && strlen((string)$response->stdClass->resultado->id) > 3) {
+                } else if (isset($response->stdClass->resultado->id)) {
                     $stpId = $response->stdClass->resultado->id;
-                } else {
-                    DB::rollBack();
-                    Log::channel('spei_out')->error(
-                        "Error STP API",
-                        ['response' => $response]
-                    );
+                }
 
-                    $errorId = $response->respuesta->id ?? ($response->stdClass->resultado->id ?? 'N/A');
-                    throw new \Exception("Error:" . ErrorRegisterOrder::error($errorId));
+                // 2. Validamos si obtuvimos un ID válido (mayor a 3 caracteres por seguridad)
+                if ($stpId && strlen((string)$stpId) > 3) {
+
+                    // ¡ÉXITO! Aquí va el código que guarda en DB y confirma la transferencia
+                    // No lances excepción aquí.
+
+                } else {
+                    // ¡ERROR! Solo entramos aquí si NO hay un ID válido
+                    DB::rollBack();
+                    Log::channel('spei_out')->error("Error STP API", ['response' => $response]);
+
+                    // Intentamos obtener un código de error si existe, si no, mandamos el objeto completo
+                    $errorCode = $response->respuesta->descripcion ?? 'Error desconocido';
+                    throw new \Exception("Error STP: " . $errorCode);
                 }
             } else {
                 $stpId = "1111111111";
