@@ -211,14 +211,15 @@ class SpeiOut extends Controller
 
             if (count($processResults['errors']) > 0) {
                 return response()->json([
-                    'error' => $processResults['errors'],
                     'destinos' => $processResults['destinos'],
+                    'error' => $processResults['errors'],
                     'balance' => $processResults['balance']
                 ]);
             }
 
             return response()->json([
                 'destinos' => $processResults['destinos'],
+                'error' => [],
                 'balance' => $processResults['balance']
             ]);
         } catch (\Exception $e) {
