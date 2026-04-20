@@ -1203,6 +1203,12 @@ class SpeiOut extends Controller
                     $stpId = $response->respuesta->id;
                 } else {
                     DB::rollBack();
+                    Log::channel('spei_out')->error(
+                        "Error STP API",
+                        [
+                            'response' => $response
+                        ]
+                    );
                     throw new \Exception("Error:" . ErrorRegisterOrder::error($response->respuesta->id));
                 }
             } else {
