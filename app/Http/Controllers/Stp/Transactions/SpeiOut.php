@@ -1199,19 +1199,20 @@ class SpeiOut extends Controller
                     $request->hasHeader('app-location-longitude') ? $request->header('app-location-longitude') : null
                 );
 
-                if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
+                if (isset($response->respuesta->id) && strlen((string)$response->respuesta->id) > 3) {
                     $stpId = $response->respuesta->id;
-                } else if(isset($response->stdClass->resultado->id) && count($response->stdClass->respuesta->id) > 3){
-                    $stpId = $response->stdClass->respuesta->id;
+
+                } else if (isset($response->stdClass->resultado->id) && strlen((string)$response->stdClass->resultado->id) > 3) {
+                    $stpId = $response->stdClass->resultado->id;
                 } else {
                     DB::rollBack();
                     Log::channel('spei_out')->error(
                         "Error STP API",
-                        [
-                            'response' => $response
-                        ]
+                        ['response' => $response]
                     );
-                    throw new \Exception("Error:" . ErrorRegisterOrder::error($response->respuesta->id));
+
+                    $errorId = $response->respuesta->id ?? ($response->stdClass->resultado->id ?? 'N/A');
+                    throw new \Exception("Error:" . ErrorRegisterOrder::error($errorId));
                 }
             } else {
                 $stpId = "1111111111";
