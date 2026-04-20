@@ -1204,8 +1204,8 @@ class SpeiOut extends Controller
 
                 if (isset($response->respuesta->id)) {
                     $stpId = $response->respuesta->id;
-                } else if (isset($response->stdClass->resultado->id)) {
-                    $stpId = $response->stdClass->resultado->id;
+                } else if (isset($response->resultado->id)) {
+                    $stpId = $response->resultado->id;
                 }
 
                 // 2. Validamos si obtuvimos un ID válido (mayor a 3 caracteres por seguridad)
