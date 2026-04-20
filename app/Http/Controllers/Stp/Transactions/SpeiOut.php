@@ -106,9 +106,13 @@ class SpeiOut extends Controller
                 'googleAuthenticatorCode.string' => 'El código de Google Authenticator debe ser una cadena de texto'
             ]);
 
+            if (!$request->hasHeader('app-location-latitude') || !$request->hasHeader('app-location-longitude')) {
+                throw new \Exception('La geolocalización es requerida para realizar las transferencias.', 400);
+            }
+
             $file = $request->file('file');
 
-            // GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->input('googleAuthenticatorCode'));
+            GoogleAuth::authorized($request->attributes->get('jwt')->id, $request->input('googleAuthenticatorCode'));
 
             $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getPathname());
             $sheet = $spreadsheet->getSheet(0);
@@ -401,7 +405,9 @@ class SpeiOut extends Controller
                     "",
                     40,
                     $destination['institution'],
-                    40
+                    40,
+                    $request->hasHeader('app-location-latitude') ? $request->header('app-location-latitude') : null,
+                    $request->hasHeader('app-location-longitude') ? $request->header('app-location-longitude') : null
                 );
 
                 if (isset($response->resultado->id) && strlen((string)abs($response->resultado->id)) > 3) {
@@ -481,7 +487,9 @@ class SpeiOut extends Controller
                         "",
                         40,
                         90646,
-                        40
+                        40,
+                        $request->hasHeader('app-location-latitude') ? $request->header('app-location-latitude') : null,
+                        $request->hasHeader('app-location-longitude') ? $request->header('app-location-longitude') : null
                     );
 
                     if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
@@ -578,7 +586,9 @@ class SpeiOut extends Controller
                         "",
                         40,
                         90646,
-                        40
+                        40,
+                        $request->hasHeader('app-location-latitude') ? $request->header('app-location-latitude') : null,
+                        $request->hasHeader('app-location-longitude') ? $request->header('app-location-longitude') : null
                     );
 
                     if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
@@ -675,7 +685,9 @@ class SpeiOut extends Controller
                         "",
                         40,
                         90646,
-                        40
+                        40,
+                        $request->hasHeader('app-location-latitude') ? $request->header('app-location-latitude') : null,
+                        $request->hasHeader('app-location-longitude') ? $request->header('app-location-longitude') : null
                     );
 
                     if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
@@ -743,7 +755,9 @@ class SpeiOut extends Controller
                     "",
                     40,
                     90646,
-                    40
+                    40,
+                    $request->hasHeader('app-location-latitude') ? $request->header('app-location-latitude') : null,
+                    $request->hasHeader('app-location-longitude') ? $request->header('app-location-longitude') : null
                 );
 
                 if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
@@ -824,7 +838,9 @@ class SpeiOut extends Controller
                         "",
                         40,
                         $destination['institution'],
-                        40
+                        40,
+                        $request->hasHeader('app-location-latitude') ? $request->header('app-location-latitude') : null,
+                        $request->hasHeader('app-location-longitude') ? $request->header('app-location-longitude') : null
                     );
 
                     if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
@@ -907,7 +923,9 @@ class SpeiOut extends Controller
                         "",
                         40,
                         90646,
-                        40
+                        40,
+                        $request->hasHeader('app-location-latitude') ? $request->header('app-location-latitude') : null,
+                        $request->hasHeader('app-location-longitude') ? $request->header('app-location-longitude') : null
                     );
 
                     if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
@@ -1005,7 +1023,9 @@ class SpeiOut extends Controller
                         "",
                         40,
                         90646,
-                        40
+                        40,
+                        $request->hasHeader('app-location-latitude') ? $request->header('app-location-latitude') : null,
+                        $request->hasHeader('app-location-longitude') ? $request->header('app-location-longitude') : null
                     );
 
                     if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
@@ -1102,7 +1122,9 @@ class SpeiOut extends Controller
                         "",
                         40,
                         90646,
-                        40
+                        40,
+                        $request->hasHeader('app-location-latitude') ? $request->header('app-location-latitude') : null,
+                        $request->hasHeader('app-location-longitude') ? $request->header('app-location-longitude') : null
                     );
 
                     if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
@@ -1170,7 +1192,9 @@ class SpeiOut extends Controller
                     "",
                     40,
                     90646,
-                    40
+                    40,
+                    $request->hasHeader('app-location-latitude') ? $request->header('app-location-latitude') : null,
+                    $request->hasHeader('app-location-longitude') ? $request->header('app-location-longitude') : null
                 );
 
                 if (isset($response->respuesta->id) && count($response->respuesta->id) > 3) {
