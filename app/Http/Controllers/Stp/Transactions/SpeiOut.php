@@ -21,6 +21,7 @@ use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Exception\RequestException;
 use App\Models\Speicloud\StpInstitutions;
+use Illuminate\Support\Facades\Http;
 
 class SpeiOut extends Controller
 {
@@ -209,21 +210,69 @@ class SpeiOut extends Controller
             ]);
 
 
+            try {
+                $zipFile = $this->generateZipTransactions($processResults['destinos']);
+            } catch (\Exception $e) {
+                Log::error('Error al generar el archivo ZIP de transacciones: ' . $e->getMessage(), [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]);
+            }
+
             if (count($processResults['errors']) > 0) {
                 return response()->json([
                     'destinos' => $processResults['destinos'],
                     'error' => $processResults['errors'],
-                    'balance' => $processResults['balance']
+                    'balance' => $processResults['balance'],
+                    'zipFile' => isset($zipFile) ? $zipFile : null
                 ]);
             }
 
             return response()->json([
                 'destinos' => $processResults['destinos'],
                 'error' => [],
-                'balance' => $processResults['balance']
+                'balance' => $processResults['balance'],
+                'zipFile' => isset($zipFile) ? $zipFile : null
             ]);
+
         } catch (\Exception $e) {
             return self::basicError($e->getMessage());
+        }
+    }
+
+    private function generateZipTransactions($destinations)
+    {
+        try {
+            $zipFiles = glob(storage_path('app/public/*.zip'));
+            foreach ($zipFiles as $file) {
+                if (is_file($file)) {
+                    unlink($file);
+                }
+            }
+
+            $zip = new \ZipArchive();
+            $fileName = 'transacciones_' . time() . '.zip';
+            $zipPath = storage_path('app/public/' . $fileName);
+
+            if ($zip->open($zipPath, \ZipArchive::CREATE) === TRUE) {
+                foreach ($destinations as $index => $destination) {
+                    $response = Http::get($destination['url']);
+                    if ($response->successful()) {
+                        $uuid = str_replace(env('APP_API_URL') . "/spei/transaccion/", '', $destination['url']);
+                        $zip->addFromString("transaccion_{$uuid}.pdf", $response->body());
+                    }
+                }
+                $zip->close();
+
+                return env('APP_URL') . "/storage/" . $fileName;
+            } else {
+                throw new \Exception('No se pudo crear el archivo ZIP');
+            }
+        } catch (\Exception $e) {
+            Log::error('Error al generar el archivo ZIP de transacciones: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
         }
     }
 
@@ -435,7 +484,7 @@ class SpeiOut extends Controller
                     $stpId = $response->resultado->id;
                 }
 
-                
+
                 if ($stpId && strlen((string)$stpId) > 3) {
 
                     // ¡ÉXITO! Aquí va el código que guarda en DB y confirma la transferencia
@@ -534,7 +583,7 @@ class SpeiOut extends Controller
                         $stpId = $response->resultado->id;
                     }
 
-                    
+
                     if ($stpId && strlen((string)$stpId) > 3) {
 
                         // ¡ÉXITO! Aquí va el código que guarda en DB y confirma la transferencia
@@ -650,7 +699,7 @@ class SpeiOut extends Controller
                         $stpId = $response->resultado->id;
                     }
 
-                    
+
                     if ($stpId && strlen((string)$stpId) > 3) {
 
                         // ¡ÉXITO! Aquí va el código que guarda en DB y confirma la transferencia
@@ -766,7 +815,7 @@ class SpeiOut extends Controller
                         $stpId = $response->resultado->id;
                     }
 
-                    
+
                     if ($stpId && strlen((string)$stpId) > 3) {
 
                         // ¡ÉXITO! Aquí va el código que guarda en DB y confirma la transferencia
@@ -936,7 +985,7 @@ class SpeiOut extends Controller
                         $stpId = $response->resultado->id;
                     }
 
-                    
+
                     if ($stpId && strlen((string)$stpId) > 3) {
 
                         // ¡ÉXITO! Aquí va el código que guarda en DB y confirma la transferencia
@@ -1038,7 +1087,7 @@ class SpeiOut extends Controller
                         $stpId = $response->resultado->id;
                     }
 
-                    
+
                     if ($stpId && strlen((string)$stpId) > 3) {
 
                         // ¡ÉXITO! Aquí va el código que guarda en DB y confirma la transferencia
@@ -1155,7 +1204,7 @@ class SpeiOut extends Controller
                         $stpId = $response->resultado->id;
                     }
 
-                    
+
                     if ($stpId && strlen((string)$stpId) > 3) {
 
                         // ¡ÉXITO! Aquí va el código que guarda en DB y confirma la transferencia
@@ -1272,7 +1321,7 @@ class SpeiOut extends Controller
                         $stpId = $response->resultado->id;
                     }
 
-                    
+
                     if ($stpId && strlen((string)$stpId) > 3) {
 
                         // ¡ÉXITO! Aquí va el código que guarda en DB y confirma la transferencia
@@ -1360,7 +1409,7 @@ class SpeiOut extends Controller
                     $stpId = $response->resultado->id;
                 }
 
-                
+
                 if ($stpId && strlen((string)$stpId) > 3) {
 
                     // ¡ÉXITO! Aquí va el código que guarda en DB y confirma la transferencia
